@@ -1,20 +1,16 @@
 import ImagePreview from "./ImagePreview";
 
 interface ImagePreviewListProps {
-    images: string[];
-    currentPage: number;
-    imagesPerPage: number;
+    images: any[];
+    currentImage: number;
+    onImageSelected: (imageNumber: number) => void;
 }
 
-const ImagePreviewList: React.FC<ImagePreviewListProps> = ({ images, currentPage, imagesPerPage }) => {
-    const startIndex = (currentPage - 1) * imagesPerPage;
-    const endIndex = startIndex + imagesPerPage;
-    const displayedImages = images.slice(startIndex, endIndex);
-
+const ImagePreviewList: React.FC<ImagePreviewListProps> = ({ images, onImageSelected }) => {
     return (
-        <div className="flex flex-col gap-2">
-            {displayedImages.map((image, index) => (
-                <ImagePreview key={index} image={image} index={index} startIndex={startIndex} />
+        <div className="flex flex-col gap-2 overflow-y-auto">
+            {images.map((image, index) => (
+                <ImagePreview key={index} image={image} index={index} onImageSelected={onImageSelected} />
             ))}
         </div>
     );

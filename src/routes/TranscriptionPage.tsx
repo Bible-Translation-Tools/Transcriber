@@ -2,27 +2,44 @@ import { useState } from 'react'
 import ImagePreviewList from '../components/ImagePreviewList';
 import Pagination from '../components/Pagination';
 import TextEditor from '../components/TextEditor';
+import { useImageContext } from '../context/useImageContext'; // Import the hook
 
 function TranscriptionPage() {
-    const [images, setImages] = useState<string[]>([]);
+
+    const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
+
+    //const [images, setImages] = useState<string[]>([]);
     const [text, setText] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
-    const imagesPerPage = 3;
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
-            const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
-            setImages([...images, ...newImages]);
+            for (const file of files) {
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    const base64String = reader.result;
+                    const url = URL.createObjectURL(file);
+                    const image = { url, data: base64String };
+
+                    addImage(image); // Add image via context function
+                };
+
+                reader.readAsDataURL(file);
+            }
         }
-    }
+    };
 
     const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setText(event.target.value);
     };
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        if (currentPage != images.length && page >= 0) {
+            setCurrentPage(page);
+            setSelectedImage(images[page])
+        }
     };
 
     return (
@@ -45,12 +62,12 @@ function TranscriptionPage() {
                         onChange={handleImageUpload}
                     />
                 </label>
-                <ImagePreviewList images={images} currentPage={currentPage} imagesPerPage={imagesPerPage} />
+                <ImagePreviewList images={images} currentImage={currentPage} onImageSelected={handlePageChange}/>
             </div>
             <Pagination
+                image={selectedImage}
                 currentPage={currentPage}
                 totalImages={images.length}
-                imagesPerPage={imagesPerPage}
                 onPageChange={handlePageChange}
             />
             <div className="flex-1 p-4 overflow-y-auto">
