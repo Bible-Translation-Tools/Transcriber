@@ -8,7 +8,7 @@ interface Image {
 }
 
 function UploadImages() {
-    const { addImage } = useImageContext(); // Destructure only addImage
+    const { addImage } = useImageContext();
     const [errorMessage, setErrorMessage] = useState('');
 
     const onDrop = useCallback((acceptedFiles: File[]) => {

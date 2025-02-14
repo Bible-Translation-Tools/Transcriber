@@ -1,6 +1,6 @@
 function TranscriptionTips() {
     return (
-        <div style={{ width: '492px', height: '835px', padding: '40px', background: '#F2F2F2', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '40px' }}>
+        <div style={{ width: '492px', height: '100vh', padding: '40px', background: '#F2F2F2', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: '40px' }}>
             <div style={{ color: '#0F2F4C', fontSize: '33.82px', fontFamily: 'Noto Sans', fontWeight: '500', lineHeight: '38.89px' }}>
                 Tips
             </div>

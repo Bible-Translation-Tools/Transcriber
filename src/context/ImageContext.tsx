@@ -48,6 +48,9 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             request.onsuccess = (event) => {
                 const storedImages = (event.target as IDBRequest).result;
                 setImages(storedImages || []);
+                if (storedImages && selectedImage == null) {
+                    setSelectedImage(storedImages[0]);
+                }
             };
 
             request.onerror = (event) => {
@@ -69,6 +72,9 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
             request.onsuccess = () => {
                 setImages((prevImages) => [...prevImages, image]); // Update state after successful save
+                if (selectedImage == null) {
+                    setSelectedImage(images[0])
+                }
             };
         }
     };
