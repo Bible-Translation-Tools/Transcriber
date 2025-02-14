@@ -21,8 +21,6 @@ function TranscriptionPage() {
         }
       }, [images, apiKey, navigate]);
 
-
-    //const [images, setImages] = useState<string[]>([]);
     const [text, setText] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(0);
 

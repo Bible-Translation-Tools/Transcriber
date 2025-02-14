@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useApiKey } from '../hooks/useApiKey';
 import APIKeyInput from "../components/APIKeyInput";
 import Introduction from "../components/Introduction";
+import PhotoUploadMobile from "../components/PhotoUploadMobile";
 import TranscriptionTips from "../components/TranscriptionTips";
 import UploadImages from "../components/UploadImages";
+import { useMediaQuery } from "react-responsive";
 import { useImageContext } from '../context/useImageContext';
 import { useEffect } from 'react';
 
@@ -26,8 +28,12 @@ function Home() {
 
     console.log("Api key is " + apiKey);
 
-    return (
-        <div className="flex justify-center items-center gap-10 h-screen"> {/* Added height for vertical centering */}
+    const isMobile = useMediaQuery({ maxWidth: 768 });
+    return isMobile ? <PhotoUploadMobile /> : <PhotoUploadDesktop />;
+}
+
+const PhotoUploadDesktop = () =>
+    <div className="flex justify-center items-center gap-10 h-screen"> {/* Added height for vertical centering */}
             <div className="w-[948px] h-screen p-10 bg-white flex flex-col items-center gap-10">
                 <Introduction />
                 {apiKey ? ( // Conditionally render based on apiKey
@@ -38,7 +44,5 @@ function Home() {
             </div>
             <TranscriptionTips />
         </div>
-    );
-}
 
 export default Home;
