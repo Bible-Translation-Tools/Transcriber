@@ -16,7 +16,7 @@ function TranscriptionPage() {
 
     useEffect(() => {
         if (images.length === 0 || apiKey == null) {
-            console.log("Images exist, navigating to Transcriber");
+            console.log("Images exist, navigating to Home");
           navigate('/');
         }
       }, [images, apiKey, navigate]);
