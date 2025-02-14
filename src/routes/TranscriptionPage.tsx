@@ -9,7 +9,7 @@ function TranscriptionPage() {
     const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
 
     //const [images, setImages] = useState<string[]>([]);
-    const [text, setText] = useState<string>('');
+    const [text, setText] = useState<string>('dummy');
     const [currentPage, setCurrentPage] = useState(1);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
