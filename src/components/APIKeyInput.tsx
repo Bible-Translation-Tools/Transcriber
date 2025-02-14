@@ -7,6 +7,7 @@ interface APIKeyInputProps {
 const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
   const [apiKey, setApiKey] = useState('');
   const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [maskedApiKey, setMaskedApiKey] = useState(''); // Store the masked version
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault(); // Prevent default paste behavior
@@ -19,10 +20,20 @@ const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const enteredKey = event.target.value;
-    const trimmedKey = enteredKey.trim();
-    setApiKey(trimmedKey);
-    setShowPlaceholder(trimmedKey === "");
+    const enteredValue = event.target.value; // Value with asterisks
+    const diff = enteredValue.length - apiKey.length; // Calculate the change
+
+    if (diff > 0) { // Characters were added
+      const pos = event.target.selectionStart; // Get cursor position
+      const newApiKey = apiKey.slice(0, pos - diff) + enteredValue.slice(pos - diff) + apiKey.slice(pos);
+      setApiKey(newApiKey);
+      setMaskedApiKey("*".repeat(newApiKey.length));
+    } else if (diff < 0) { // Characters were deleted
+      const pos = event.target.selectionStart;
+      const newApiKey = apiKey.slice(0, pos);
+      setApiKey(newApiKey);
+      setMaskedApiKey("*".repeat(newApiKey.length));
+    }
   }
 
   const handleGetStarted = () => {
@@ -31,7 +42,7 @@ const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
     }
   };
 
-  const maskedApiKey = showPlaceholder ? "" : "*".repeat(apiKey.length);
+  //const maskedApiKey = showPlaceholder ? "" : "*".repeat(apiKey.length);
 
   return (
     <div className="bg-white p-5 rounded-lg shadow-sm w-[800px]">
