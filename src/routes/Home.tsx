@@ -26,23 +26,24 @@ function Home() {
         }
     }, [images, apiKey, navigate]); // Add navigate to dependency array
 
-    console.log("Api key is " + apiKey);
-
-    const isMobile = useMediaQuery({ maxWidth: 768 });
-    return isMobile ? <PhotoUploadMobile /> : <PhotoUploadDesktop />;
-}
-
-const PhotoUploadDesktop = () =>
-    <div className="flex justify-center items-center gap-10 h-screen"> {/* Added height for vertical centering */}
+    const PhotoUploadDesktop = () => (
+        <div className="flex justify-center items-center gap-10 h-screen"> {/* Added height for vertical centering */}
             <div className="w-[948px] h-screen p-10 bg-white flex flex-col items-center gap-10">
                 <Introduction />
                 {apiKey ? ( // Conditionally render based on apiKey
                     <UploadImages />
                 ) : (
-                    <APIKeyInput apiKey={apiKey} onApiKeyStored={storeApiKey} /> // Use storeApiKey from the hook
+                    <APIKeyInput onApiKeyStored={storeApiKey} /> // Use storeApiKey from the hook
                 )}
             </div>
             <TranscriptionTips />
         </div>
+    )
+
+    const isMobile = useMediaQuery({ maxWidth: 768 });
+    return isMobile ? <PhotoUploadMobile /> : <PhotoUploadDesktop />;
+}
+
+
 
 export default Home;
