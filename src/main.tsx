@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './index.css'
 import App from './App.tsx'
 import Home from './routes/Home'
+import { ImageProvider } from './context/ImageContext';
 
 
 const Main = () => {
@@ -11,7 +12,7 @@ const Main = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/transcriber" element={<App/>} />
+        <Route path="/transcriber" element={<App />} />
       </Routes>
     </Router>
   );
@@ -19,6 +20,8 @@ const Main = () => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Main />
+    <ImageProvider>
+      <Main />
+    </ImageProvider>
   </StrictMode>,
 );
