@@ -1,16 +1,28 @@
-import { useState } from 'react'
+import '../App.css'
+import { useEffect, useState } from 'react'
 import ImagePreviewList from '../components/ImagePreviewList';
 import Pagination from '../components/Pagination';
 import TextEditor from '../components/TextEditor';
 import { useImageContext } from '../context/useImageContext'; // Import the hook
+import { useApiKey } from '../hooks/useApiKey';
+import { useNavigate } from 'react-router-dom';
 
 function TranscriptionPage() {
 
     const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
 
-    //const [images, setImages] = useState<string[]>([]);
-    const [text, setText] = useState<string>('dummy');
-    const [currentPage, setCurrentPage] = useState(1);
+    const { apiKey } = useApiKey();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (images.length === 0 || apiKey == null) {
+            console.log("Images exist, navigating to Home");
+          navigate('/');
+        }
+      }, [images, apiKey, navigate]);
+
+    const [text, setText] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState(0);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -39,6 +51,8 @@ function TranscriptionPage() {
         if (currentPage != images.length && page >= 0) {
             setCurrentPage(page);
             setSelectedImage(images[page])
+        } else {
+            setCurrentPage(0);
         }
     };
 

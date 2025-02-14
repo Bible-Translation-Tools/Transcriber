@@ -68,7 +68,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }
 
             request.onsuccess = () => {
-                setImages((prevImages) => [...prevImages, image]); // Update state after successful save
+                setImages((prevImages) => [...prevImages, image]);
             };
         }
     };
