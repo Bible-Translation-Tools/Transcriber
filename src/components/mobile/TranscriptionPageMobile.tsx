@@ -46,7 +46,7 @@ const TranscriptionPageMobile = () => {
       <div className="w-full h-full rounded-lg overflow-hidden shadow-md mb-4">
         {selectedTab === "images" ? (
           <img
-            src={selectedImage.data}
+            src={selectedImage?.data}
             alt="Selected"
             className="w-full h-full object-cover"
           />
