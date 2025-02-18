@@ -4,11 +4,12 @@ interface ImagePreviewListProps {
     images: any[];
     currentImage: number;
     onImageSelected: (imageNumber: number) => void;
+    isVerticalLayout?: boolean; // New prop to control layout
 }
 
-const ImagePreviewList: React.FC<ImagePreviewListProps> = ({ images, onImageSelected }) => {
+const ImagePreviewList: React.FC<ImagePreviewListProps> = ({ images, onImageSelected, isVerticalLayout = true }) => {
     return (
-        <div className="flex flex-col gap-2 overflow-y-auto">
+        <div className={`flex ${isVerticalLayout ? 'flex-col overflow-y-auto' : 'flex-row overflow-x-auto w-full' } gap-2`}>
             {images.map((image, index) => (
                 <ImagePreview key={index} image={image} index={index} onImageSelected={onImageSelected} />
             ))}

@@ -1,10 +1,10 @@
-//import '../App.css'
+import '../App.css'
 
 import { useNavigate } from 'react-router-dom';
 import { useApiKey } from '../hooks/useApiKey';
 import APIKeyInput from "../components/APIKeyInput";
 import Introduction from "../components/Introduction";
-import PhotoUploadMobile from "../components/PhotoUploadMobile";
+import PhotoUploadMobile from "../components/mobile/PhotoUploadMobile";
 import TranscriptionTips from "../components/TranscriptionTips";
 import UploadImages from "../components/UploadImages";
 import { useMediaQuery } from "react-responsive";
