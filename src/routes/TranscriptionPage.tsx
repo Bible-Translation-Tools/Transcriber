@@ -6,12 +6,15 @@ import TextEditor from '../components/TextEditor';
 import { useImageContext } from '../context/useImageContext'; // Import the hook
 import { useApiKey } from '../hooks/useApiKey';
 import { useNavigate } from 'react-router-dom';
+import { useModel } from '../hooks/useModel';
 
 function TranscriptionPage() {
 
     const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
 
     const { apiKey } = useApiKey();
+    const { model } = useModel();
+    
     const navigate = useNavigate();
 
     useEffect(() => {
