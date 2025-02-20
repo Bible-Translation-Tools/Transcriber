@@ -27,28 +27,16 @@ export default class OpenAIModel implements Model {
             const models = await openai.models.list(); // Check key validity
             console.log(`models are ${models}`)
         } catch (error: any) {
-            if (error.response) { // Check for API errors
-                const status = error.response.status;
-                if (
-                    status === 401
-                    || error.message.includes("Incorrect API key provided")
-                    || error.name === 'OpenAIAuthenticationError'
-                ) {
-                    console.error("OpenAI API Key Invalid:", error.message);
-                    return ApiKeyStatus.Invalid;
-                } else if (status === 429) { // Check for Rate Limiting (status code may vary)
-                    console.error("OpenAI API Key Rate Limited:", error.message);
-                    return ApiKeyStatus.RateLimited;
-                } else {
-                    console.error(`OpenAI API Error (${status}):`, error.message);
-                    return ApiKeyStatus.OtherError;
-                }
-            } else if (error.message.includes("NetworkError")) { // Check for network errors
-                console.error("Network Error checking OpenAI API Key:", error.message);
-                return ApiKeyStatus.NetworkError;
+            if (
+                error.status === 401
+                || error.message.includes("Incorrect API key provided")
+                || error.name === 'OpenAIAuthenticationError'
+            ) {
+                console.error("OpenAI API Key Invalid:", error.message);
+                return ApiKeyStatus.Invalid;
             } else {
                 console.error("Other Error checking OpenAI API Key:", error);
-                return ApiKeyStatus.OtherError;
+                return ApiKeyStatus.Invalid;
             }
         }
         return ApiKeyStatus.Valid;
@@ -85,6 +73,6 @@ export default class OpenAIModel implements Model {
             temperature: 0.0,
             max_tokens: 500
         });
-        return {success: true, transcription: response.choices[0].message?.content ?? ""}
+        return { success: true, transcription: response.choices[0].message?.content ?? "" }
     }
 }
