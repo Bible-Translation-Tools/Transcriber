@@ -24,7 +24,11 @@ function TranscriptionPage() {
         }
       }, [images, apiKey, navigate]);
 
-    const [text, setText] = useState<string>('');
+    useEffect(() => {
+        setText(selectedImage?.transcription ?? '')
+    }, [selectedImage]);
+
+    const [text, setText] = useState<string>(selectedImage?.transcription ?? 'no transcription');
     const [currentPage, setCurrentPage] = useState(0);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +40,7 @@ function TranscriptionPage() {
                 reader.onloadend = () => {
                     const base64String = reader.result;
                     const url = URL.createObjectURL(file);
-                    const image = { url, data: base64String };
+                    const image = { url, data: base64String};
 
                     addImage(image); // Add image via context function
                 };

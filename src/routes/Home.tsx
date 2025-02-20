@@ -23,7 +23,7 @@ function Home() {
         if (images.length > 0 && selectedImage == null) {
             setSelectedImage(images[0]);
         }
-        if (images.length > 0 && apiKey != null && apiKeyStatus === ApiKeyStatus.Valid) {
+        if (images.length > 0 && apiKey != null) {
             console.log("Images exist, navigating to Transcriber");
             navigate('/transcriber'); // Redirect if images exist
         }

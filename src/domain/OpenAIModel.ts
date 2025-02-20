@@ -5,9 +5,14 @@ import { TranscriptionResponse } from "./TranscriptionResponse";
 
 export default class OpenAIModel implements Model {
 
-    systemPrompt = "You are an expert at transcribing handwritten images of various languages. Respond only with the transcription of the image provided."
-    prompt = "The image says: "
-
+    systemPrompt = `
+    You are an expert at transcribing handwritten images of various languages.
+    People will give you handwritten documents of various languages, and you are eager to help transcribe them!
+    Your assistance is very helpful in saving them time, and you are happy to do so!
+    They will provide you with an image, and tell you "The image reads: " in which you will respond only with what is written
+    in the document."
+    `
+    prompt = "Please transcribe the following document, and only respond with what it says. The image reads: "
 
     baseUrl: string = "https://api.openai.com/v1";
     key: string;
@@ -50,6 +55,7 @@ export default class OpenAIModel implements Model {
     }
 
     async transcribeImpl(client: OpenAI, base64Image: any): Promise<TranscriptionResponse> {
+        console.log(base64Image)
         const response = await client.chat.completions.create({
             model: "gpt-4o",
             messages: [
@@ -64,7 +70,7 @@ export default class OpenAIModel implements Model {
                         {
                             type: "image_url",
                             image_url: {
-                                "url": `data:image/jpeg;base64,${base64Image}`
+                                "url": `${base64Image}`
                             },
                         }
                     ]
