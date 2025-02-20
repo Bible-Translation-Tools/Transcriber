@@ -1,4 +1,5 @@
-import '../App.css'
+import '../App.css';
+import '../styles/common.css';
 
 import { useNavigate } from 'react-router-dom';
 import { useApiKey } from '../hooks/useApiKey';

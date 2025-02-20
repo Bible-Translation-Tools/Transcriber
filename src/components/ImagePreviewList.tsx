@@ -9,7 +9,7 @@ interface ImagePreviewListProps {
 
 const ImagePreviewList: React.FC<ImagePreviewListProps> = ({ images, onImageSelected, isVerticalLayout = true }) => {
     return (
-        <div className={`flex ${isVerticalLayout ? 'flex-col overflow-y-auto' : 'flex-row overflow-x-auto w-full' } gap-2`}>
+        <div className={`flex ${isVerticalLayout ? 'flex-col overflow-y-auto' : 'flex-row overflow-x-auto w-full img-thumbnail--horizontal' } gap-2`}>
             {images.map((image, index) => (
                 <ImagePreview key={index} image={image} index={index} onImageSelected={onImageSelected} />
             ))}
