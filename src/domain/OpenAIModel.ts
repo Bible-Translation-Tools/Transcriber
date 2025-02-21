@@ -12,7 +12,7 @@ export default class OpenAIModel implements Model {
     They will provide you with an image, and tell you "The image reads: " in which you will respond only with what is written
     in the document."
     `
-    prompt = "Please transcribe the following document, and only respond with what it says. The image reads: "
+    prompt = "Please transcribe the following document. The image reads: "
 
     baseUrl: string = "https://api.openai.com/v1";
     key: string;
@@ -21,7 +21,7 @@ export default class OpenAIModel implements Model {
         this.key = key;
     }
 
-    async keyIsValid(): Promise<ApiKeyStatus> {
+    async keyStatus(): Promise<ApiKeyStatus> {
         try {
             const openai = new OpenAI({
                 apiKey: this.key,
@@ -30,7 +30,7 @@ export default class OpenAIModel implements Model {
             });
 
             const models = await openai.models.list(); // Check key validity
-            console.log(`models are ${models}`)
+            console.log(`models are ${models.data.map((model)=>model.id)}`);
         } catch (error: any) {
             if (
                 error.status === 401
@@ -55,30 +55,29 @@ export default class OpenAIModel implements Model {
     }
 
     async transcribeImpl(client: OpenAI, base64Image: any): Promise<TranscriptionResponse> {
-        console.log(base64Image)
-        const response = await client.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                { role: "system", content: this.systemPrompt },
-                {
-                    role: "user",
-                    content: [
-                        {
-                            type: "text",
-                            text: this.prompt
-                        },
-                        {
-                            type: "image_url",
-                            image_url: {
-                                "url": `${base64Image}`
-                            },
-                        }
-                    ]
-                }
-            ],
-            temperature: 0.0,
-            max_tokens: 500
-        });
+        // const response = await client.chat.completions.create({
+        //     model: "gpt-4o",
+        //     messages: [
+        //         { role: "system", content: this.systemPrompt },
+        //         {
+        //             role: "user",
+        //             content: [
+        //                 {
+        //                     type: "text",
+        //                     text: this.prompt
+        //                 },
+        //                 {
+        //                     type: "image_url",
+        //                     image_url: {
+        //                         "url": `${base64Image}`
+        //                     },
+        //                 }
+        //             ]
+        //         }
+        //     ],
+        //     temperature: 0.0,
+        //     max_tokens: 500
+        // });
         return { success: true, transcription: response.choices[0].message?.content ?? "" }
     }
 }

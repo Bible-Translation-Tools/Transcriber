@@ -43,7 +43,7 @@ function UploadImages() {
             reader.onloadend = () => {
                 const base64String = reader.result;
                 const url = URL.createObjectURL(file);
-                const image: ImageData = { url, data: base64String }; // Type the image object
+                const image: ImageData = { url, data: base64String, transcription: null }; // Type the image object
 
                 addImage(image);
             };

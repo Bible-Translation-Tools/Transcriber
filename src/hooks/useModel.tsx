@@ -1,27 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useApiKey } from './useApiKey';
 import OpenAIModel from '../domain/OpenAIModel';
-import Model from '../domain/Model';
 import { ApiKeyStatus } from '../domain/ApiKeyStatus';
+import Model from '../domain/Model';
 
 export const useModel = () => {
     const { apiKey } = useApiKey();
+    const [apiKeyStatus, setApiKeyStatus] = useState<ApiKeyStatus>(ApiKeyStatus.Missing);
+    const [checkingStatus, setCheckingStatus] = useState(false);
     const [model, setModel] = useState<Model | null>(null);
 
     useEffect(() => {
-        (async () => {
-            if (apiKey != null) {
-                const model = new OpenAIModel(apiKey)
-                const valid = await model.keyIsValid()
-                if (valid == ApiKeyStatus.Valid) {
-                    setModel(model)
-                    alert("API Key is valid!")
+        const checkApiKey = async () => {
+            if (apiKeyStatus == ApiKeyStatus.Valid && model != null) return;
+            if (checkingStatus == true) return;
+            
+            if (apiKey) {
+                setCheckingStatus(true);
+                console.log("Checking API Key Status");
+                const potentialModel = new OpenAIModel(apiKey);
+                const keyStatus = await potentialModel.keyStatus();
+                setApiKeyStatus(keyStatus);
+                setCheckingStatus(false);
+
+                if (keyStatus === ApiKeyStatus.Valid) {
+                    setModel(potentialModel);
                 } else {
-                    alert("API Key invalid!")
+                  setModel(null); // Important: Reset model if key is invalid
                 }
             }
-        })();
-    }, [apiKey]);
+        };
+        checkApiKey();
+    }, [apiKey, apiKeyStatus, checkingStatus, model]); // Add checkingStatus to the dependency array
 
-    return { model }
-}
+    const memoizedModel = useMemo(() => model, [model]);
+
+    return { model: memoizedModel, apiKeyStatus };
+};

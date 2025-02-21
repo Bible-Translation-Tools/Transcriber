@@ -1,11 +1,11 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
-import OpenAIModel from '../domain/OpenAIModel';
-import { useApiKey } from '../hooks/useApiKey';
+import { useModelContext } from './useModelContext';
 
 export interface ImageData {
     url: string; // Key for IndexedDB
     data: any;
     transcription: string | undefined | null; // Optional transcription
+    loading?: boolean
 }
 
 interface ImageContextType {
@@ -27,7 +27,7 @@ export const ImageContext = createContext<ImageContextType>({
 });
 
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { apiKey } = useApiKey();
+    const { model } = useModelContext();
     const [images, setImages] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
     const dbRef = useRef<IDBDatabase | null>(null);
@@ -60,7 +60,17 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
             request.onsuccess = (event) => {
                 const storedImages = (event.target as IDBRequest).result;
-                setImages(storedImages || []);
+                const kickOffTranscriptions = storedImages.map(
+                    (image: ImageData) => {
+                        if (image.transcription != null) {
+                            image.loading = false;
+                        } else {
+
+                        }
+                        return image
+                    }
+                )
+                setImages(kickOffTranscriptions || []);
             };
 
             request.onerror = (event) => {
@@ -84,8 +94,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setImages((prevImages) => [...prevImages, image]);
 
                 (async () => {
-                    if (apiKey != null) {
-                        const model = new OpenAIModel(apiKey);
+                    if (model != null) {
                         const transcription = await model.transcribe(image.data)
                         if (transcription.success == true) {
                             image.transcription = transcription.transcription
@@ -102,7 +111,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const transaction = dbRef.current.transaction('images', 'readwrite');
             const objectStore = transaction.objectStore('images');
 
-            const request = objectStore.put(updatedImage); // Use put to update
+            const request = objectStore.put(updatedImage);
 
             request.onerror = (event) => {
                 console.error("Error updating image in IndexedDB:", event);

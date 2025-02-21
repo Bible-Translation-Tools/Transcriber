@@ -4,25 +4,22 @@ import ImagePreviewList from '../components/ImagePreviewList';
 import Pagination from '../components/Pagination';
 import TextEditor from '../components/TextEditor';
 import { useImageContext } from '../context/useImageContext'; // Import the hook
-import { useApiKey } from '../hooks/useApiKey';
+import { useModelContext } from '../context/useModelContext';
 import { useNavigate } from 'react-router-dom';
-import { useModel } from '../hooks/useModel';
 
 function TranscriptionPage() {
 
     const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
+    const { model } = useModelContext();
 
-    const { apiKey } = useApiKey();
-    const { model } = useModel();
-    
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (images.length === 0 || apiKey == null) {
+        if (images.length === 0 || model == null) {
             console.log("Images exist, navigating to Home");
-          navigate('/');
+            navigate('/');
         }
-      }, [images, apiKey, navigate]);
+      }, [images, model, navigate]);
 
     useEffect(() => {
         setText(selectedImage?.transcription ?? '')
@@ -40,7 +37,7 @@ function TranscriptionPage() {
                 reader.onloadend = () => {
                     const base64String = reader.result;
                     const url = URL.createObjectURL(file);
-                    const image = { url, data: base64String};
+                    const image = { url, data: base64String, transcription: null};
 
                     addImage(image); // Add image via context function
                 };
@@ -65,7 +62,7 @@ function TranscriptionPage() {
 
     return (
         <div className="flex h-screen">
-            <div className="flex flex-col gap-2 w-24 bg-gray-100 p-4 overflow-y-auto">
+            <div className="flex flex-col gap-2 w-24 p-4 overflow-y-auto">
                 <label htmlFor="imageUpload" className="cursor-pointer relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
                     <div className="relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center"> {/* Outer container */}
                         <div className="">
