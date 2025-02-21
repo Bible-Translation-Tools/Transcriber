@@ -21,13 +21,13 @@ export const useModel = () => {
                 const potentialModel = new OpenAIModel(apiKey);
                 const keyStatus = await potentialModel.keyStatus();
                 setApiKeyStatus(keyStatus);
-                setCheckingStatus(false);
 
                 if (keyStatus === ApiKeyStatus.Valid) {
                     setModel(potentialModel);
                 } else {
                   setModel(null); // Important: Reset model if key is invalid
                 }
+                setCheckingStatus(false);
             }
         };
         checkApiKey();

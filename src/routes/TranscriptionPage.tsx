@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 function TranscriptionPage() {
 
-    const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
+    const { images, selectedImage, setSelectedImage, addImage, updateImage } = useImageContext();
     const { model } = useModelContext();
 
     const navigate = useNavigate();
@@ -23,7 +23,7 @@ function TranscriptionPage() {
 
     useEffect(() => {
         setText(selectedImage?.transcription ?? '')
-    }, [selectedImage]);
+    }, [selectedImage, images]);
 
     const [text, setText] = useState<string>(selectedImage?.transcription ?? 'no transcription');
     const [currentPage, setCurrentPage] = useState(0);
@@ -49,6 +49,10 @@ function TranscriptionPage() {
 
     const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setText(event.target.value);
+        if (selectedImage != null) {
+            selectedImage.transcription = text
+            updateImage(selectedImage);
+        }
     };
 
     const handlePageChange = (page: number) => {

@@ -1,7 +1,6 @@
 //import '../App.css'
 
 import { useNavigate } from 'react-router-dom';
-import { useApiKey } from '../hooks/useApiKey';
 import APIKeyInput from "../components/APIKeyInput";
 import Introduction from "../components/Introduction";
 import PhotoUploadMobile from "../components/PhotoUploadMobile";
@@ -14,8 +13,7 @@ import { ApiKeyStatus } from '../domain/ApiKeyStatus';
 import { useModelContext } from '../context/useModelContext';
 
 function Home() {
-    const { apiKey, storeApiKey } = useApiKey();
-    const { model, apiKeyStatus } = useModelContext();
+    const { model, apiKeyStatus, apiKey, storeApiKey } = useModelContext();
     const { images, selectedImage, setSelectedImage } = useImageContext();
     const navigate = useNavigate();
 

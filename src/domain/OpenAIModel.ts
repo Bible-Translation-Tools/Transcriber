@@ -55,29 +55,29 @@ export default class OpenAIModel implements Model {
     }
 
     async transcribeImpl(client: OpenAI, base64Image: any): Promise<TranscriptionResponse> {
-        // const response = await client.chat.completions.create({
-        //     model: "gpt-4o",
-        //     messages: [
-        //         { role: "system", content: this.systemPrompt },
-        //         {
-        //             role: "user",
-        //             content: [
-        //                 {
-        //                     type: "text",
-        //                     text: this.prompt
-        //                 },
-        //                 {
-        //                     type: "image_url",
-        //                     image_url: {
-        //                         "url": `${base64Image}`
-        //                     },
-        //                 }
-        //             ]
-        //         }
-        //     ],
-        //     temperature: 0.0,
-        //     max_tokens: 500
-        // });
+        const response = await client.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                { role: "system", content: this.systemPrompt },
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "text",
+                            text: this.prompt
+                        },
+                        {
+                            type: "image_url",
+                            image_url: {
+                                "url": `${base64Image}`
+                            },
+                        }
+                    ]
+                }
+            ],
+            temperature: 0.0,
+            max_tokens: 500
+        });
         return { success: true, transcription: response.choices[0].message?.content ?? "" }
     }
 }
