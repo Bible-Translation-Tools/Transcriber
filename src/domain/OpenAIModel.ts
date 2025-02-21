@@ -5,14 +5,8 @@ import { TranscriptionResponse } from "./TranscriptionResponse";
 
 export default class OpenAIModel implements Model {
 
-    systemPrompt = `
-    You are an expert at transcribing handwritten images of various languages.
-    People will give you handwritten documents of various languages, and you are eager to help transcribe them!
-    Your assistance is very helpful in saving them time, and you are happy to do so!
-    They will provide you with an image, and tell you "The image reads: " in which you will respond only with what is written
-    in the document."
-    `
-    prompt = "Please transcribe the following document. The image reads: "
+    systemPrompt = "You are an expert at transcribing handwritten images of various languages. Respond only with the transcription of the image provided, do not output the transcription in quotes, parentheses, brackets or other such symbols"
+    prompt = "The image reads: "
 
     baseUrl: string = "https://api.openai.com/v1";
     key: string;
