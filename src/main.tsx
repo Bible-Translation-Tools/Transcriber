@@ -5,6 +5,7 @@ import './index.css'
 import Home from './routes/Home'
 import { ImageProvider } from './context/ImageContext';
 import TranscriptionPage from './routes/TranscriptionPage.tsx';
+import { ModelProvider } from './context/ModelContext.tsx';
 
 
 const Main = () => {
@@ -20,8 +21,10 @@ const Main = () => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ImageProvider>
-      <Main />
-    </ImageProvider>
+    <ModelProvider>
+      <ImageProvider>
+        <Main />
+      </ImageProvider>
+    </ModelProvider>
   </StrictMode>,
 );

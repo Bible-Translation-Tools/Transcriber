@@ -4,24 +4,28 @@ import ImagePreviewList from '../components/ImagePreviewList';
 import Pagination from '../components/Pagination';
 import TextEditor from '../components/TextEditor';
 import { useImageContext } from '../context/useImageContext'; // Import the hook
-import { useApiKey } from '../hooks/useApiKey';
+import { useModelContext } from '../context/useModelContext';
 import { useNavigate } from 'react-router-dom';
 
 function TranscriptionPage() {
 
-    const { images, selectedImage, setSelectedImage, addImage } = useImageContext();
+    const { images, selectedImage, setSelectedImage, addImage, updateImage } = useImageContext();
+    const { model } = useModelContext();
 
-    const { apiKey } = useApiKey();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (images.length === 0 || apiKey == null) {
+        if (images.length === 0 || model == null) {
             console.log("Images exist, navigating to Home");
-          navigate('/');
+            navigate('/');
         }
-      }, [images, apiKey, navigate]);
+      }, [images, model, navigate]);
 
-    const [text, setText] = useState<string>('');
+    useEffect(() => {
+        setText(selectedImage?.transcription ?? '')
+    }, [selectedImage, images]);
+
+    const [text, setText] = useState<string>(selectedImage?.transcription ?? 'no transcription');
     const [currentPage, setCurrentPage] = useState(0);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +37,7 @@ function TranscriptionPage() {
                 reader.onloadend = () => {
                     const base64String = reader.result;
                     const url = URL.createObjectURL(file);
-                    const image = { url, data: base64String };
+                    const image = { url, data: base64String, transcription: null};
 
                     addImage(image); // Add image via context function
                 };
@@ -45,6 +49,10 @@ function TranscriptionPage() {
 
     const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setText(event.target.value);
+        if (selectedImage != null) {
+            selectedImage.transcription = text
+            updateImage(selectedImage);
+        }
     };
 
     const handlePageChange = (page: number) => {
@@ -58,7 +66,7 @@ function TranscriptionPage() {
 
     return (
         <div className="flex h-screen">
-            <div className="flex flex-col gap-2 w-24 bg-gray-100 p-4 overflow-y-auto">
+            <div className="flex flex-col gap-2 w-24 p-4 overflow-y-auto">
                 <label htmlFor="imageUpload" className="cursor-pointer relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
                     <div className="relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center"> {/* Outer container */}
                         <div className="">
@@ -84,8 +92,15 @@ function TranscriptionPage() {
                 totalImages={images.length}
                 onPageChange={handlePageChange}
             />
-            <div className="flex-1 p-4 overflow-y-auto">
-                <TextEditor text={text} onChange={handleTextChange} />
+            <div className="relative flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
+                <div className="h-full">
+                    <TextEditor text={text} onChange={handleTextChange} />
+                </div>
+                {selectedImage?.transcription == null && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg"> {/* Overlay with rounded corners */}
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+                </div>
+            )}
             </div>
         </div >
     );

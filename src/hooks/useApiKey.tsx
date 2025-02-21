@@ -15,14 +15,14 @@ export const useApiKey = () => {
     };
   }, []);
 
-  const storeApiKey = (newApiKey: string) => {
+  const storeApiKey = async (newApiKey: string) => {
     localStorage.setItem('apiKey', newApiKey);
     setApiKey(newApiKey);
   };
 
   const clearApiKey = () => {
-      localStorage.removeItem('apiKey');
-      setApiKey(null);
+    localStorage.removeItem('apiKey');
+    setApiKey(null);
   }
 
   return { apiKey, storeApiKey, clearApiKey };

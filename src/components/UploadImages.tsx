@@ -1,14 +1,10 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useImageContext } from '../context/useImageContext';
-
-interface Image {
-    url: string;
-    data: string | ArrayBuffer | null;
-}
+import { ImageData } from '../context/ImageContext';
 
 function UploadImages() {
-    const { addImage } = useImageContext();
+    const { addImage } = useImageContext(); // Destructure only addImage
     const [errorMessage, setErrorMessage] = useState('');
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -47,7 +43,7 @@ function UploadImages() {
             reader.onloadend = () => {
                 const base64String = reader.result;
                 const url = URL.createObjectURL(file);
-                const image: Image = { url, data: base64String }; // Type the image object
+                const image: ImageData = { url, data: base64String, transcription: null }; // Type the image object
 
                 addImage(image);
             };

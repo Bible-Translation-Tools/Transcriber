@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
+import { ApiKeyStatus } from '../domain/ApiKeyStatus';
 
 interface APIKeyInputProps {
-  onApiKeyStored: (apiKey: string) => void; // Type the prop
+  onApiKeyStored: (apiKey: string) => void; // Type the prop,
+  apiKeyStatus: ApiKeyStatus
 }
 
-const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
+const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored, apiKeyStatus }) => {
+  
   const [apiKey, setApiKey] = useState('');
   const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [maskedApiKey, setMaskedApiKey] = useState(''); // Store the masked version
+  const isInvalid = apiKeyStatus === ApiKeyStatus.Invalid
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
-    event.preventDefault(); // Prevent default paste behavior
+    //event.preventDefault(); // Prevent default paste behavior
 
     const pastedText = event.clipboardData.getData('text');
     const trimmedKey = pastedText.trim();
 
+    console.log(`pasted text: ${trimmedKey}`)
+
     setApiKey(trimmedKey);
+    setMaskedApiKey("*".repeat(apiKey.length));
     setShowPlaceholder(false);
   };
+
+  console.log("APIKEYINPUT Status" + apiKeyStatus)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue = event.target.value; // Value with asterisks
@@ -38,6 +47,7 @@ const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
 
   const handleGetStarted = () => {
     if (apiKey) {
+      console.log(`Storing api key: ${apiKey}`)
       onApiKeyStored(apiKey)
     }
   };
@@ -57,7 +67,7 @@ const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
           onPaste={handlePaste}
           onChange={handleChange}
           placeholder={showPlaceholder ? "Paste the API key included in your email here." : ""}
-          className="w-full px-2 py-2 border border-gray-300 rounded-md text-base bg-gray-100"
+          className={`w-full px-2 py-2 border rounded-md text-base bg-gray-100 ${isInvalid ? 'border-red-500' : 'border-gray-300'}`}
         />
         {!showPlaceholder &&
           <span
@@ -67,6 +77,7 @@ const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored }) => {
             copy
           </span>}
       </div>
+      {isInvalid && <p className="text-red-500 mt-2">Invalid API Key</p>} {/* Error message */}
       <button
         onClick={handleGetStarted}
         className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 border-none cursor-pointer"
