@@ -15,6 +15,7 @@ interface ImageContextType {
     setSelectedImage: (image: ImageData | null) => void;
     addImage: (image: ImageData) => void;
     updateImage: (updatedImage: ImageData) => void; // For updating transcription
+    updateTranscription: (updatedImage: ImageData) => void; // For updating transcription
 }
 
 export const ImageContext = createContext<ImageContextType>({
@@ -24,6 +25,7 @@ export const ImageContext = createContext<ImageContextType>({
     setSelectedImage: () => { },
     addImage: () => { },
     updateImage: () => { },
+    updateTranscription: () => { },
 });
 
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -130,9 +132,12 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
     };
 
+    const updateTranscription = (imageToUpdate: ImageData) => {
+        updateImage(imageToUpdate);
+    };
 
     return (
-        <ImageContext.Provider value={{ images, selectedImage, setImages, setSelectedImage, addImage, updateImage }}>
+        <ImageContext.Provider value={{ images, selectedImage, setImages, setSelectedImage, addImage, updateImage, updateTranscription }}>
             {children}
         </ImageContext.Provider>
     );
