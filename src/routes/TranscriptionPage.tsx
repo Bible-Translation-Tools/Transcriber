@@ -92,8 +92,15 @@ function TranscriptionPage() {
                 totalImages={images.length}
                 onPageChange={handlePageChange}
             />
-            <div className="flex-1 p-4 overflow-y-auto">
-                <TextEditor text={text} onChange={handleTextChange} />
+            <div className="relative flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
+                <div className="h-full">
+                    <TextEditor text={text} onChange={handleTextChange} />
+                </div>
+                {selectedImage?.transcription == null && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg"> {/* Overlay with rounded corners */}
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+                </div>
+            )}
             </div>
         </div >
     );

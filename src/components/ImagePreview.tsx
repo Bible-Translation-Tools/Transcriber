@@ -13,13 +13,22 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ image, index, onImageSelect
     };
 
     return (
-        <button onClick={handleImageSelected}>
-            <img
-                style={{ width: 64, height: 64, opacity: 0.80, background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.20) 100%)', borderRadius: 8 }}
-                src={image.data}
-                // alt={`Image ${startIndex + index + 1}`}
-            />
-        </button>
+        <div className="relative"> {/* Relative wrapper for positioning */}
+            <button onClick={handleImageSelected} className="relative"> {/* Added relative here too */}
+                <img
+                    className="w-16 h-16 opacity-80 rounded-lg"
+                    style={{ background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.20) 100%)' }}
+                    src={image.data}
+                    alt={`Image ${index + 1}`}
+                />
+            </button>
+             {/* Conditionally render the progress spinner */}
+            {image.transcription == null && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg"> {/* Overlay with rounded corners */}
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+                </div>
+            )}
+        </div>
     );
 };
 
