@@ -7,20 +7,26 @@ interface APIKeyInputProps {
 }
 
 const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored, apiKeyStatus }) => {
+  
   const [apiKey, setApiKey] = useState('');
   const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [maskedApiKey, setMaskedApiKey] = useState(''); // Store the masked version
   const isInvalid = apiKeyStatus === ApiKeyStatus.Invalid
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
-    event.preventDefault(); // Prevent default paste behavior
+    //event.preventDefault(); // Prevent default paste behavior
 
     const pastedText = event.clipboardData.getData('text');
     const trimmedKey = pastedText.trim();
 
+    console.log(`pasted text: ${trimmedKey}`)
+
     setApiKey(trimmedKey);
+    setMaskedApiKey("*".repeat(apiKey.length));
     setShowPlaceholder(false);
   };
+
+  console.log("APIKEYINPUT Status" + apiKeyStatus)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue = event.target.value; // Value with asterisks
@@ -41,6 +47,7 @@ const APIKeyInput: React.FC<APIKeyInputProps> = ({ onApiKeyStored, apiKeyStatus 
 
   const handleGetStarted = () => {
     if (apiKey) {
+      console.log(`Storing api key: ${apiKey}`)
       onApiKeyStored(apiKey)
     }
   };

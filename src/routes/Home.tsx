@@ -31,7 +31,7 @@ function Home() {
         <div className="flex justify-center items-center gap-10 h-screen"> {/* Added height for vertical centering */}
             <div className="w-[948px] h-screen p-10 bg-white flex flex-col items-center gap-10">
                 <Introduction />
-                {apiKey && apiKeyStatus == ApiKeyStatus.Valid? ( // Conditionally render based on apiKey
+                {apiKeyStatus === ApiKeyStatus.Valid? ( // Conditionally render based on apiKey
                     <UploadImages />
                 ) : (
                     <APIKeyInput onApiKeyStored={storeApiKey} apiKeyStatus={apiKeyStatus} /> // Use storeApiKey from the hook

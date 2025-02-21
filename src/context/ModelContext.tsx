@@ -19,8 +19,7 @@ export const ModelContext = createContext<ModelContextType>({
 });
 
 export const ModelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { model, apiKeyStatus } = useModel();
-    const { apiKey, storeApiKey } = useApiKey();
+    const { model, apiKeyStatus, apiKey, storeApiKey } = useModel();
 
     return (
         <ModelContext.Provider value={{ model, apiKeyStatus, apiKey, storeApiKey }}>
