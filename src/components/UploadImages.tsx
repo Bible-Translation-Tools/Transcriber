@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useImageContext } from '../context/useImageContext';
 import { ImageData } from '../context/ImageContext';
+import { pdf2image } from "@pardnchiu/pdf2image";
 
 function UploadImages() {
     const { addImage } = useImageContext(); // Destructure only addImage
@@ -38,17 +39,45 @@ function UploadImages() {
         }
 
         validFiles.forEach(file => {
-            const reader = new FileReader();
+            if (file.type !== 'application/pdf') {
+                const reader = new FileReader();
 
-            reader.onloadend = () => {
-                const base64String = reader.result;
-                const url = URL.createObjectURL(file);
-                const image: ImageData = { url, data: base64String, transcription: null }; // Type the image object
+                reader.onloadend = () => {
+                    const base64String = reader.result;
+                    const url = URL.createObjectURL(file);
+                    const image: ImageData = { url, data: base64String, transcription: null }; // Type the image object
 
-                addImage(image);
-            };
+                    addImage(image);
+                };
 
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            } else {
+                const reader = new FileReader();
+                
+                (async () => {
+                    reader.onload = async e => {
+                        const _this = e.target;
+                        if (_this?.result != null) {
+                            const converter = new pdf2image({
+                                filename: `${file.name} yyyy-MM-DD`,
+                                file: _this.result,
+                                scale: 4,
+                                type: "jpeg"
+                            });
+
+                            await converter.convert();
+
+                            converter.images.forEach((imageData: any) => {
+                                const url = URL.createObjectURL(file);
+                                const image: ImageData = { url, data: imageData, transcription: null }; // Type the image object
+                                addImage(image);
+                            });
+                        }
+                    };
+                })();
+
+                reader.readAsArrayBuffer(file);
+            }
         });
     };
 
