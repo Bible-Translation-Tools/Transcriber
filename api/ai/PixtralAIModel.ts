@@ -1,6 +1,6 @@
 import { MistralClient } from "@mistralai/mistral";
 import { ApiKeyStatus } from "./ApiKeyStatus";
-import Model from "./Model";
+import Model from "../../api/ai/Model";
 
 class PixtralModel implements Model {
     baseUrl: string = "https://api.mistral.ai/v1/models";

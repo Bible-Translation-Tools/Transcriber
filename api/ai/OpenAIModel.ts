@@ -1,6 +1,6 @@
 import { ApiKeyStatus } from "./ApiKeyStatus";
 import OpenAI from 'openai';
-import Model from "./Model";
+import Model from "../../api/ai/Model";
 import { TranscriptionResponse } from "./TranscriptionResponse";
 
 export default class OpenAIModel implements Model {

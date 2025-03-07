@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
-import { useModelContext } from './useModelContext';
+import getTranscription from '../domain/getTranscription';
 
 export interface ImageData {
     url: string; // Key for IndexedDB
@@ -29,7 +29,6 @@ export const ImageContext = createContext<ImageContextType>({
 });
 
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { model } = useModelContext();
     const [images, setImages] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
     const dbRef = useRef<IDBDatabase | null>(null);
@@ -96,13 +95,11 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setImages((prevImages) => [...prevImages, image]);
 
                 (async () => {
-                    if (model != null) {
-                        const transcription = await model.transcribe(image.data)
+                        const transcription = await getTranscription(image.data)
                         if (transcription.success == true) {
                             image.transcription = transcription.transcription
                             updateImage(image)
                         }
-                    }
                 })();
             };
         }
