@@ -4,22 +4,20 @@ import ImagePreviewList from '../components/ImagePreviewList';
 import Pagination from '../components/Pagination';
 import TextEditor from '../components/TextEditor';
 import { useImageContext } from '../context/useImageContext'; // Import the hook
-import { useModelContext } from '../context/useModelContext';
 import { useNavigate } from 'react-router-dom';
 
 function TranscriptionPage() {
 
     const { images, selectedImage, setSelectedImage, addImage, updateTranscription } = useImageContext();
-    const { model } = useModelContext();
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (images.length === 0 || model == null) {
+        if (images.length === 0) {
             console.log("Images exist, navigating to Home");
             navigate('/');
         }
-      }, [images, model, navigate]);
+      }, [images, navigate]);
 
     useEffect(() => {
         setText(selectedImage?.transcription ?? '')

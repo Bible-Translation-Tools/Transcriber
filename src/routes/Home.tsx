@@ -1,7 +1,6 @@
 //import '../App.css'
 
 import { useNavigate } from 'react-router-dom';
-import APIKeyInput from "../components/APIKeyInput";
 import Introduction from "../components/Introduction";
 import PhotoUploadMobile from "../components/PhotoUploadMobile";
 import TranscriptionTips from "../components/TranscriptionTips";
@@ -9,11 +8,8 @@ import UploadImages from "../components/UploadImages";
 import { useMediaQuery } from "react-responsive";
 import { useImageContext } from '../context/useImageContext';
 import { useEffect } from 'react';
-import { ApiKeyStatus } from '../domain/ApiKeyStatus';
-import { useModelContext } from '../context/useModelContext';
 
 function Home() {
-    const { model, apiKeyStatus, apiKey, storeApiKey } = useModelContext();
     const { images, selectedImage, setSelectedImage } = useImageContext();
     const navigate = useNavigate();
 
@@ -21,21 +17,17 @@ function Home() {
         if (images.length > 0 && selectedImage == null) {
             setSelectedImage(images[0]);
         }
-        if (images.length > 0 && model != null) {
+        if (images.length > 0) {
             console.log("Images exist, navigating to Transcriber");
             navigate('/transcriber'); // Redirect if images exist
         }
-    }, [images, model, navigate]); // Add navigate to dependency array
+    }, [images, navigate]);
 
     const PhotoUploadDesktop = () => (
-        <div className="flex justify-center items-center gap-10 h-screen"> {/* Added height for vertical centering */}
+        <div className="flex justify-center items-center gap-10 h-screen">
             <div className="w-[948px] h-screen p-10 bg-white flex flex-col items-center gap-10">
                 <Introduction />
-                {apiKeyStatus === ApiKeyStatus.Valid? ( // Conditionally render based on apiKey
-                    <UploadImages />
-                ) : (
-                    <APIKeyInput onApiKeyStored={storeApiKey} apiKeyStatus={apiKeyStatus} /> // Use storeApiKey from the hook
-                )}
+                <UploadImages />
             </div>
             <TranscriptionTips />
         </div>

@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "api/ai/Model.ts", "api/ai/TranscriptionResponse.ts", "api/ai/ApiKeyStatus.ts"]
 }
