@@ -7,54 +7,25 @@ interface TextEditorProps {
 
 const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
     const [inputValue, setInputValue] = useState(text);
-    const [typing, setTyping] = useState(false);
-    const [doneTyping, setDoneTyping] = useState(false);
-    const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
+    const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
-        let typingTimer: NodeJS.Timeout | null = null;
-        const doneTypingInterval = 500;
-
-        const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement> | Event) => {
-            const newValue = (event as React.ChangeEvent<HTMLTextAreaElement>)?.target?.value;
-
-            if (newValue !== undefined) {
-                setInputValue(newValue);
-                setTyping(true);
-
-                if (typingTimer) {
-                    clearTimeout(typingTimer);
-                }
-
-                typingTimer = setTimeout(() => {
-                    setTyping(false);
-                    setDoneTyping(true);
-
-                    console.log("saving changes...")
-                    onChange(newValue);
-
-                    setDoneTyping(false);
-
-                }, doneTypingInterval);
-            } else {
-                console.error("Event or event.target is undefined:", event);
+    const debounce = (func: (...args: any[]) => void, delay: number) => {
+        let timer: NodeJS.Timeout;
+        return (...args: any[]) => {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
             }
+            timer = setTimeout(() => func(...args), delay);
+            setTypingTimeout(timer);
         };
+    };
+    const debouncedOnChange = debounce(onChange, 500);
 
-        const textArea = textAreaRef.current;
-
-        if (textArea) {
-            textArea.addEventListener('input', handleInputChange);
-
-            return () => {
-                textArea.removeEventListener('input', handleInputChange);
-                if (typingTimer) {
-                    clearTimeout(typingTimer);
-                }
-            };
-        }
-
-    }, []);
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        debouncedOnChange(newValue);
+    };
 
     useEffect(() => {
         setInputValue(text);
@@ -62,12 +33,13 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 
     return (
         <textarea
-            ref={textAreaRef}
             value={inputValue}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInputValue(e.target.value)}
-            className="w-full h-full border border-gray-300 p-2 text-lg resize-none"
+            defaultValue={text}
+            onChange={handleChange}
+            className="w-full flex-grow  grow-1 flex-1 border border-gray-300 p-2 text-lg resize-none"
         />
     );
 };
 
 export default TextEditor;
+

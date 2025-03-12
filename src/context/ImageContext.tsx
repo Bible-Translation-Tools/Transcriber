@@ -16,6 +16,7 @@ interface ImageContextType {
     addImage: (image: ImageData) => void;
     updateImage: (updatedImage: ImageData) => void; // For updating transcription
     updateTranscription: (updatedImage: ImageData) => void; // For updating transcription
+    resubmitImageForTranscription: (imageToUpdate: ImageData) => void;
 }
 
 export const ImageContext = createContext<ImageContextType>({
@@ -26,6 +27,7 @@ export const ImageContext = createContext<ImageContextType>({
     addImage: () => { },
     updateImage: () => { },
     updateTranscription: () => { },
+    resubmitImageForTranscription: () => { },
 });
 
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -95,17 +97,17 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setImages((prevImages) => [...prevImages, image]);
 
                 (async () => {
-                        const transcription = await getTranscription(image.data)
-                        if (transcription.success == true) {
-                            image.transcription = transcription.transcription
-                            updateImage(image)
-                        }
+                    const transcription = await getTranscription(image.data)
+                    if (transcription.success == true) {
+                        image.transcription = transcription.transcription
+                        updateImage(image)
+                    }
                 })();
             };
         }
     };
 
-    const updateImage = (updatedImage: ImageData) => {
+    const updateImage = (updatedImage: ImageData, reloadOnSuccess = true) => {
         if (dbRef.current) {
             const transaction = dbRef.current.transaction('images', 'readwrite');
             const objectStore = transaction.objectStore('images');
@@ -117,24 +119,43 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             };
 
             request.onsuccess = () => {
-                setImages((prevImages) =>
-                    prevImages.map((image) =>
-                        image.url === updatedImage.url ? updatedImage : image
-                    )
-                );
-                if (selectedImage && selectedImage.url === updatedImage.url) {
-                    setSelectedImage(updatedImage);
+                for (var i = 0; i < images.length; i++) {
+                    if (images[i].url === updatedImage.url) {
+                        images[i].transcription = updatedImage.transcription
+                    }
+                }
+
+                if (reloadOnSuccess) {
+                    setImages((prevImages) =>
+                        prevImages.map((image) =>
+                            image.url === updatedImage.url ? updatedImage : image
+                        )
+                    );
+                    if (selectedImage && selectedImage.url === updatedImage.url) {
+                        setSelectedImage(updatedImage);
+                    }
                 }
             };
         }
     };
 
     const updateTranscription = (imageToUpdate: ImageData) => {
-        updateImage(imageToUpdate);
+        updateImage(imageToUpdate, false);
     };
 
+    const resubmitImageForTranscription = (imageToUpdate: ImageData) => {
+        updateImage({url: imageToUpdate.url, data: imageToUpdate.data, transcription: null, loading: true});
+        (async () => {
+            const transcription = await getTranscription(imageToUpdate.data)
+            if (transcription.success == true) {
+                imageToUpdate.transcription = transcription.transcription
+                updateImage(imageToUpdate, true)
+            }
+        })();
+    }
+
     return (
-        <ImageContext.Provider value={{ images, selectedImage, setImages, setSelectedImage, addImage, updateImage, updateTranscription }}>
+        <ImageContext.Provider value={{ images, selectedImage, setImages, setSelectedImage, addImage, updateImage, updateTranscription, resubmitImageForTranscription }}>
             {children}
         </ImageContext.Provider>
     );

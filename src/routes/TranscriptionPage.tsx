@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 
 function TranscriptionPage() {
 
-    const { images, selectedImage, setSelectedImage, addImage, updateTranscription } = useImageContext();
-
+    const { images, selectedImage, setSelectedImage, addImage, updateTranscription, resubmitImageForTranscription } = useImageContext();
+    const [currentPage, setCurrentPage] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,14 +17,12 @@ function TranscriptionPage() {
             console.log("Images exist, navigating to Home");
             navigate('/');
         }
-      }, [images, navigate]);
+    }, [images, navigate]);
 
-    useEffect(() => {
-        setText(selectedImage?.transcription ?? '')
-    }, [selectedImage, images]);
 
-    const [text, setText] = useState<string>(selectedImage?.transcription ?? 'no transcription');
-    const [currentPage, setCurrentPage] = useState(0);
+    for (var i = 0; i < images.length; i++) {
+        console.log(images[i].url)
+    }
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -35,9 +33,9 @@ function TranscriptionPage() {
                 reader.onloadend = () => {
                     const base64String = reader.result;
                     const url = URL.createObjectURL(file);
-                    const image = { url, data: base64String, transcription: null};
+                    const image = { url, data: base64String, transcription: null };
 
-                    addImage(image); // Add image via context function
+                    addImage(image);
                 };
 
                 reader.readAsDataURL(file);
@@ -45,21 +43,29 @@ function TranscriptionPage() {
         }
     };
 
-    const handleTextChange = (newText: string) => {
-        //setText(event.target.value);
-        setText(newText)
+    const handleResubmitImage = () => {
         if (selectedImage != null) {
-            selectedImage.transcription = newText
-            updateTranscription(selectedImage);
+            resubmitImageForTranscription(selectedImage)
+        }
+    }
+
+    // change to explicitly be a useCallback?
+    const handleTextChange = (newText: string) => {
+        if (selectedImage != null) {
+            updateTranscription({
+                ...selectedImage,
+                transcription: newText,
+            });
         }
     };
 
     const handlePageChange = (page: number) => {
-        if (currentPage != images.length && page >= 0) {
-            setCurrentPage(page);
+        if (page < images.length && page >= 0) {
             setSelectedImage(images[page])
+            setCurrentPage(page)
         } else {
-            setCurrentPage(0);
+            setSelectedImage(images[0])
+            setCurrentPage(0)
         }
     };
 
@@ -83,7 +89,7 @@ function TranscriptionPage() {
                         onChange={handleImageUpload}
                     />
                 </label>
-                <ImagePreviewList images={images} currentImage={currentPage} onImageSelected={handlePageChange}/>
+                <ImagePreviewList images={images} currentImage={currentPage} onImageSelected={handlePageChange} />
             </div>
             <Pagination
                 image={selectedImage}
@@ -91,15 +97,20 @@ function TranscriptionPage() {
                 totalImages={images.length}
                 onPageChange={handlePageChange}
             />
-            <div className="relative flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
-                <div className="h-full">
-                    <TextEditor text={text} onChange={handleTextChange} />
+            <div className="relative h-screen flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
+                <div className="h-full flex flex-col">
+                    <button
+                        onClick={handleResubmitImage}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2">
+                        Clear Document and Refresh Transcription
+                    </button>
+                    <TextEditor text={selectedImage?.transcription ?? ""} onChange={(text) => { handleTextChange(text) }} />
                 </div>
                 {selectedImage?.transcription == null && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg"> {/* Overlay with rounded corners */}
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
-                </div>
-            )}
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg"> {/* Overlay with rounded corners */}
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+                    </div>
+                )}
             </div>
         </div >
     );
