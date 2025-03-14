@@ -79,10 +79,10 @@ const Dropdown: React.FC<DropdownProps> = ({
                     {searchable && (
                         <input
                             type="text"
-                            placeholder="Search..."
+                            placeholder="Search “English” or “eng”..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full p-2 border-b focus:outline-none"
+                            className="w-full p-2 border-b focus:outline-none text-color-on-surface-tertiary text-l italic font-[Noto_Sans] leading-10"
                         />
                     )}
                     <div className='max-h-[60vh] overflow-y-scroll'>

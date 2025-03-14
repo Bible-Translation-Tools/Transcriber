@@ -26,7 +26,6 @@ const NavBar: React.FC = () => {
                     selectedBook={selectedBook}
                     selectedChapter={selectedChapter}
                 />
-                {selectedChapter && <span className="ml-2">{selectedChapter}</span>}
             </div>
             <div>
                 <button className="flex items-center text-gray-700 hover:text-gray-900">
