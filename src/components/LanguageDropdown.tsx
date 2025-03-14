@@ -140,8 +140,8 @@ interface LanguageDropdownProps {
 const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedLanguage }) => {
     const languageOptions: Option[] = [
         { label: 'English', value: 'en', code: 'eng' },
-        { label: 'Cebuano', value: 'ceb', code: 'cbo' },
-        { label: 'Umutu', value: 'umu', code: 'uli' },
+        { label: 'Cebuano', value: 'ceb', code: 'ceb' },
+        { label: 'Umutu', value: 'umu', code: 'umu' },
         { label: 'Amharic', value: 'am', code: 'am' },
         { label: 'Arabic', value: 'ar', code: 'ar' },
         { label: 'Arabic - Dominant Culture Variant', value: 'ar-x-dcv', code: 'ar-x-dcv' },
@@ -152,7 +152,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedL
     ];
 
     const recentLanguages: Option[] = [
-        { label: 'English', value: 'en', code: 'eng' },
+        { label: 'English', value: 'en', code: 'en' },
         { label: 'Cebuano', value: 'ceb', code: 'cbo' },
         { label: 'Umutu', value: 'umu', code: 'uli' },
     ];

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import LanguageDropdown from './LanguageDropdown';
 import BookDropdown from './BookDropdown';
+import { useImageContext } from '../context/useImageContext';
 
 const NavBar: React.FC = () => {
-    const [selectedLanguage, setSelectedLanguage] = useState('umu');
-    const [selectedBook, setSelectedBook] = useState('gen');
-    const [selectedChapter, setSelectedChapter] = useState(1);
+
+    const {bookCode, setBookCode, languageCode, setLanguageCode, chapter, setChapter} = useImageContext();
 
     const handleBookChapterSelect = (book: string, chapter: number) => {
-        setSelectedBook(book);
-        setSelectedChapter(chapter);
+        setBookCode(book);
+        setChapter(chapter);
         console.log(`Book: ${book}, Chapter: ${chapter || 'None'}`);
     };
 
@@ -17,14 +17,14 @@ const NavBar: React.FC = () => {
         <div className="flex items-center justify-between p-4 bg-white">
             <div className="flex flex-1 grow items-center">
                 <LanguageDropdown
-                    onSelect={setSelectedLanguage}
-                    selectedLanguage={selectedLanguage}
+                    onSelect={setLanguageCode}
+                    selectedLanguage={languageCode}
                 />
                 <div className="mx-2"></div>
                 <BookDropdown
                     onSelect={handleBookChapterSelect}
-                    selectedBook={selectedBook}
-                    selectedChapter={selectedChapter}
+                    selectedBook={bookCode}
+                    selectedChapter={chapter}
                 />
             </div>
             <div>

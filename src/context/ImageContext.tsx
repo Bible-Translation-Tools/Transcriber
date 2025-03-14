@@ -5,10 +5,19 @@ export interface ImageData {
     url: string; // Key for IndexedDB
     data: any;
     transcription: string | undefined | null; // Optional transcription
+    languageCode: string,
+    bookCode: string,
+    chapter: number,
     loading?: boolean
 }
 
 interface ImageContextType {
+    languageCode: string,
+    setLanguageCode: (code: string) => void,
+    bookCode: string,
+    setBookCode: (code: string) => void,
+    chapter: number,
+    setChapter: (chapter: number) => void,
     images: ImageData[];
     selectedImage: ImageData | null;
     setImages: (images: ImageData[]) => void;
@@ -20,6 +29,12 @@ interface ImageContextType {
 }
 
 export const ImageContext = createContext<ImageContextType>({
+    languageCode: "en",
+    setLanguageCode: () => { },
+    bookCode: "gen",
+    setBookCode: () => { },
+    chapter: 1,
+    setChapter: () => { },
     images: [],
     selectedImage: null,
     setImages: () => { },
@@ -31,6 +46,9 @@ export const ImageContext = createContext<ImageContextType>({
 });
 
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [languageCode, updateLanguageCode] = useState("en")
+    const [bookCode, updateBookCode] = useState("gen")
+    const [chapter, updateChapter] = useState(1)
     const [images, setImages] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
     const dbRef = useRef<IDBDatabase | null>(null);
@@ -55,7 +73,11 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         };
     }, []);
 
-    const loadImagesFromDB = () => {
+    const loadImagesFromDB = (
+        languageToLoad = languageCode,
+        bookToLoad = bookCode,
+        chapterToLoad = chapter
+    ) => {
         if (dbRef.current) {
             const transaction = dbRef.current.transaction('images', 'readonly');
             const objectStore = transaction.objectStore('images');
@@ -63,17 +85,30 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
             request.onsuccess = (event) => {
                 const storedImages = (event.target as IDBRequest).result;
-                const kickOffTranscriptions = storedImages.map(
-                    (image: ImageData) => {
-                        if (image.transcription != null) {
-                            image.loading = false;
-                        } else {
+                const kickOffTranscriptions = storedImages
+                    .filter((image: ImageData) => {
+                        if (image.languageCode !== languageToLoad) return false;
+                        if (image.bookCode !== bookToLoad) return false;
+                        if (image.chapter !== chapterToLoad) return false;
+                        return true;
+                     })
+                    .map(
+                        (image: ImageData) => {
+                            if (image.transcription != null) {
+                                image.loading = false;
+                            } else {
 
+                            }
+                            return image
                         }
-                        return image
-                    }
-                )
+                    )
+
                 setImages(kickOffTranscriptions || []);
+                if (kickOffTranscriptions.length > 0) {
+                    setSelectedImage(kickOffTranscriptions[0])
+                } else {
+                    setSelectedImage(null)
+                }
             };
 
             request.onerror = (event) => {
@@ -87,20 +122,22 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const transaction = dbRef.current.transaction('images', 'readwrite');
             const objectStore = transaction.objectStore('images');
 
-            const request = objectStore.put(image);
+            const imageWithCurrentMetadata = {...image, languageCode: languageCode, bookCode: bookCode, chapter: chapter}
+
+            const request = objectStore.put(imageWithCurrentMetadata);
 
             request.onerror = (event) => {
                 console.error("Error saving image to IndexedDB:", event);
             };
 
             request.onsuccess = () => {
-                setImages((prevImages) => [...prevImages, image]);
+                setImages((prevImages) => [...prevImages, imageWithCurrentMetadata]);
 
                 (async () => {
-                    const transcription = await getTranscription(image.data)
+                    const transcription = await getTranscription(imageWithCurrentMetadata.data)
                     if (transcription.success == true) {
-                        image.transcription = transcription.transcription
-                        updateImage(image)
+                        imageWithCurrentMetadata.transcription = transcription.transcription
+                        updateImage(imageWithCurrentMetadata)
                     }
                 })();
             };
@@ -144,7 +181,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     const resubmitImageForTranscription = (imageToUpdate: ImageData) => {
-        updateImage({url: imageToUpdate.url, data: imageToUpdate.data, transcription: null, loading: true});
+        updateImage({ ...imageToUpdate, transcription: null, loading: true });
         (async () => {
             const transcription = await getTranscription(imageToUpdate.data)
             if (transcription.success == true) {
@@ -154,8 +191,38 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         })();
     }
 
+    const setLanguageCode = (languageCode: string) => {
+        updateLanguageCode(languageCode)
+        loadImagesFromDB(languageCode)
+    }
+
+    const setBookCode = (bookCode: string) => {
+        updateBookCode(bookCode)
+        //loadImagesFromDB(languageCode)
+    }
+
+    const setChapter = (chapter: number) => {
+        updateChapter(chapter)
+        loadImagesFromDB(languageCode, bookCode, chapter)
+    }
+
     return (
-        <ImageContext.Provider value={{ images, selectedImage, setImages, setSelectedImage, addImage, updateImage, updateTranscription, resubmitImageForTranscription }}>
+        <ImageContext.Provider value={{
+            languageCode,
+            setLanguageCode,
+            bookCode,
+            setBookCode,
+            chapter,
+            setChapter,
+            images,
+            selectedImage,
+            setImages,
+            setSelectedImage,
+            addImage,
+            updateImage,
+            updateTranscription,
+            resubmitImageForTranscription
+        }}>
             {children}
         </ImageContext.Provider>
     );

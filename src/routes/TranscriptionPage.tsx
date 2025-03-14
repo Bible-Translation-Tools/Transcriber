@@ -13,12 +13,12 @@ function TranscriptionPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (images.length === 0) {
-            console.log("Images exist, navigating to Home");
-            navigate('/');
-        }
-    }, [images, navigate]);
+    // useEffect(() => {
+    //     if (images.length === 0) {
+    //         console.log("Images exist, navigating to Home");
+    //         navigate('/');
+    //     }
+    // }, [images, navigate]);
 
 
     for (var i = 0; i < images.length; i++) {
