@@ -100,7 +100,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                 className="w-96 max-w-96 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-start items-center"
                 onClick={toggleDropdown}
             >
-                <div class="w-96 max-w-96 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-color-surface-border inline-flex justify-start items-center">
+                <div class="w-96 max-w-96 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
                     <div class="flex-1 p-4 flex justify-start items-center gap-2">
                         <div class="w-6 h-6 relative overflow-hidden">
                             <div class="w-4 h-5 bg-color-on-surface-secondary">
@@ -113,7 +113,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                         </div>
                         <div class="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">{bookOptions.find((b) => b.value === selectedBook)?.label}</div>
                     </div>
-                    <div class="w-20 p-4 max-h-12 border-l border-color-surface-border flex justify-start items-center gap-2">
+                    <div class="w-20 p-4 max-h-12 border-l border-neutral-200 flex justify-start items-center gap-2">
                         <div class="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">{selectedChapter}</div>
                     </div>
                 </div>
