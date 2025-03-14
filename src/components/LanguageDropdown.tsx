@@ -55,7 +55,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
     return (
         <div className="relative min-w-64 max-w-128" ref={dropdownRef}>
-            <div className="min-w-64 max-w-128 max-h-12 p-4 bg-gray-100 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-color-surface-border inline-flex justify-center items-center gap-2"
+            <button className="min-w-64 max-w-128 max-h-12 p-4 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-center items-center gap-2"
                 onClick={toggleDropdown}
             >
                 <div className="w-6 h-6 relative overflow-hidden">
@@ -77,7 +77,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                         </svg>
                     </div>
                 </div>
-            </div>
+            </button>
 
             {isOpen && (
                 <div className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border">
@@ -95,14 +95,14 @@ const Dropdown: React.FC<DropdownProps> = ({
                             <div className="p-2">
                                 <h3 className="text-sm font-semibold mb-1">Recent Languages</h3>
                                 {recentOptions.map((option) => (
-                                    <div
+                                    <button
                                         key={option.value}
-                                        className="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                                        className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between w-full"
                                         onClick={() => handleOptionClick(option.value, option.label)} // Pass label here
                                     >
-                                        <span>{option.label}</span>
-                                        {option.code && <span className="text-gray-500 text-sm">{option.code}</span>}
-                                    </div>
+                                        <span className='items-start'>{option.label}</span>
+                                        {option.code && <span className="text-gray-500 text-sm items-end">{option.code}</span>}
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -110,14 +110,14 @@ const Dropdown: React.FC<DropdownProps> = ({
                         <div className="p-2">
                             <h3 className="text-sm font-semibold mb-1">All Languages</h3>
                             {filteredOptions.map((option) => (
-                                <div
+                                <button
                                     key={option.value}
-                                    className="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                                    className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between w-full"
                                     onClick={() => handleOptionClick(option.value, option.label)} // Pass label here
                                 >
-                                    <span>{option.label}</span>
-                                    {option.code && <span className="text-gray-500 text-sm">{option.code}</span>}
-                                </div>
+                                    <span className='items-start'>{option.label}</span>
+                                    {option.code && <span className="text-gray-500 text-sm items-end">{option.code}</span>}
+                                </button>
                             ))}
                         </div>
                     </div>

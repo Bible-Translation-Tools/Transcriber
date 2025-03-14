@@ -96,8 +96,8 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 
     return (
         <div className="relative w-96" ref={dropdownRef}>
-            <div
-                className="w-96 max-w-96 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-color-surface-border inline-flex justify-start items-center"
+            <button
+                className="w-96 max-w-96 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-start items-center"
                 onClick={toggleDropdown}
             >
                 <div class="w-96 max-w-96 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-color-surface-border inline-flex justify-start items-center">
@@ -130,7 +130,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                         clipRule="evenodd"
                     />
                 </svg> */}
-            </div>
+            </button>
 
             {isOpen && (
                 <div className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border">
@@ -142,15 +142,16 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                         className="w-full p-2 border-b focus:outline-none text-color-on-surface-tertiary text-l italic font-[Noto_Sans] leading-10"
                     />
 
-                    <div className="p-2 max-h-[75vh] overflow-y-scroll">
+                    <div className="flex flex-col items start p-2 max-h-[75vh] overflow-y-scroll">
                         {filteredOptions.map((option) => (
                             <React.Fragment key={option.value}>
-                                <div
-                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                <button
+                                    className="flex-start p-2 hover:bg-gray-100 cursor-pointer text-left"
                                     onClick={() => handleBookClick(option.value)}
+                                    role="button"
                                 >
                                     {option.label}
-                                </div>
+                                </button>
                                 {openBook === option.value && (
                                     <div className="self-stretch inline-flex justify-start items-start gap-0.5 flex-wrap content-start">
                                         {chapters.map((chapter) => (
