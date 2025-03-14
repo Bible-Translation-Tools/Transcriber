@@ -5,7 +5,7 @@ import { useImageContext } from '../context/useImageContext';
 
 const NavBar: React.FC = () => {
 
-    const {bookCode, setBookCode, languageCode, setLanguageCode, chapter, setChapter} = useImageContext();
+    const {languageCode, setLanguageCode, recentLanguages, bookCode, setBookCode, chapter, setChapter} = useImageContext();
 
     const handleBookChapterSelect = (book: string, chapter: number) => {
         setBookCode(book);
@@ -17,6 +17,7 @@ const NavBar: React.FC = () => {
         <div className="flex items-center justify-between p-4 bg-white">
             <div className="flex flex-1 grow items-center">
                 <LanguageDropdown
+                    recentLanguages={recentLanguages}
                     onSelect={setLanguageCode}
                     selectedLanguage={languageCode}
                 />

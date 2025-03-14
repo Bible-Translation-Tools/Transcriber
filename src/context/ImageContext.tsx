@@ -14,6 +14,7 @@ export interface ImageData {
 interface ImageContextType {
     languageCode: string,
     setLanguageCode: (code: string) => void,
+    recentLanguages: string[],
     bookCode: string,
     setBookCode: (code: string) => void,
     chapter: number,
@@ -31,6 +32,7 @@ interface ImageContextType {
 export const ImageContext = createContext<ImageContextType>({
     languageCode: "en",
     setLanguageCode: () => { },
+    recentLanguages: [],
     bookCode: "gen",
     setBookCode: () => { },
     chapter: 1,
@@ -47,6 +49,7 @@ export const ImageContext = createContext<ImageContextType>({
 
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [languageCode, updateLanguageCode] = useState("en")
+    const [recentLanguages, setRecentLanguages] = useState<string[]>([]);
     const [bookCode, updateBookCode] = useState("gen")
     const [chapter, updateChapter] = useState(1)
     const [images, setImages] = useState<ImageData[]>([]);
@@ -85,6 +88,10 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
             request.onsuccess = (event) => {
                 const storedImages = (event.target as IDBRequest).result;
+
+                const recentLangs = [...new Set<string>(storedImages.map((image: ImageData) => image.languageCode))]
+                setRecentLanguages(recentLangs)
+
                 const kickOffTranscriptions = storedImages
                     .filter((image: ImageData) => {
                         if (image.languageCode !== languageToLoad) return false;
@@ -210,6 +217,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         <ImageContext.Provider value={{
             languageCode,
             setLanguageCode,
+            recentLanguages,
             bookCode,
             setBookCode,
             chapter,

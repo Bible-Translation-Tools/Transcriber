@@ -135,11 +135,12 @@ const Dropdown: React.FC<DropdownProps> = ({
 interface LanguageDropdownProps {
     onSelect: (value: string) => void;
     selectedLanguage: string;
+    recentLanguages: string[];
 }
 
-const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedLanguage }) => {
+const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedLanguage, recentLanguages }) => {
     const languageOptions: Option[] = [
-        { label: 'English', value: 'en', code: 'eng' },
+        { label: 'English', value: 'en', code: 'en' },
         { label: 'Cebuano', value: 'ceb', code: 'ceb' },
         { label: 'Umutu', value: 'umu', code: 'umu' },
         { label: 'Amharic', value: 'am', code: 'am' },
@@ -151,11 +152,9 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedL
         // ... more languages
     ];
 
-    const recentLanguages: Option[] = [
-        { label: 'English', value: 'en', code: 'en' },
-        { label: 'Cebuano', value: 'ceb', code: 'cbo' },
-        { label: 'Umutu', value: 'umu', code: 'uli' },
-    ];
+    const recentLangs: Option[] = languageOptions.filter((option) => {
+        if (recentLanguages.includes(option.code ?? "")) return true
+    })
 
     const [selectedLabel, setSelectedLabel] = useState<string>(''); // Add selectedLabel state
 
@@ -172,7 +171,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedL
             options={languageOptions}
             placeholder="Select Language"
             onSelect={handleSelect} // Use handleSelect here
-            recentOptions={recentLanguages}
+            recentOptions={recentLangs}
             selectedLabel={selectedLabel} // Pass selectedLabel
         />
     );
