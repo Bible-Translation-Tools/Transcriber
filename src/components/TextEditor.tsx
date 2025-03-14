@@ -36,7 +36,7 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
             value={inputValue}
             defaultValue={text}
             onChange={handleChange}
-            className="w-full flex-grow  grow-1 flex-1 border border-gray-300 p-2 text-lg resize-none"
+            className="w-full flex-grow  grow-1 flex-1 border border-gray-300 bg-white p-2 text-lg resize-none"
         />
     );
 };

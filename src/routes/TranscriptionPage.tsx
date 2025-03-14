@@ -71,7 +71,7 @@ function TranscriptionPage() {
     };
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen bg-gray-100">
             <NavBar></NavBar>
             <div className='flex'>
                 <div className="flex flex-col gap-2 w-24 p-4 overflow-y-auto">

@@ -4,8 +4,8 @@ import BookDropdown from './BookDropdown';
 
 const NavBar: React.FC = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('umu');
-    const [selectedBook, setSelectedBook] = useState('1jn');
-    const [selectedChapter, setSelectedChapter] = useState(4);
+    const [selectedBook, setSelectedBook] = useState('gen');
+    const [selectedChapter, setSelectedChapter] = useState(1);
 
     const handleBookChapterSelect = (book: string, chapter: number) => {
         setSelectedBook(book);
@@ -14,8 +14,8 @@ const NavBar: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-gray-100">
-            <div className="flex items-center">
+        <div className="flex items-center justify-between p-4 bg-white">
+            <div className="flex flex-1 grow items-center">
                 <LanguageDropdown
                     onSelect={setSelectedLanguage}
                     selectedLanguage={selectedLanguage}
