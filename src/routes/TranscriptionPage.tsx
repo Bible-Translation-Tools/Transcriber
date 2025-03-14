@@ -100,7 +100,7 @@ function TranscriptionPage() {
                     totalImages={images.length}
                     onPageChange={handlePageChange}
                 />
-                <div className="relative h-screen flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
+                <div className="relative flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
                     <div className="h-full flex flex-col">
                         <button
                             onClick={handleResubmitImage}

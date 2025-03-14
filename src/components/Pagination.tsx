@@ -1,3 +1,5 @@
+import ZoomableImage from "./ZoomableImage";
+
 interface PaginationProps {
     image: any,
     currentPage: number;
@@ -9,11 +11,11 @@ interface PaginationProps {
 const Pagination: React.FC<PaginationProps> = ({ image, currentPage, totalImages, onPageChange }) => {
 
     return (
-
-        <div className="w-[451px] h-screen flex flex-col justify-center items-center p-6">
-            <div className="flex-auto">
-                {image != undefined ? <img src={image.data} /> : <div />}
-            </div><div className="flex">
+        <div className="relative w-[451px] flex flex-col justify-content items-center p-6">
+            <div className="relative flex-start">
+                {image != undefined ? <ZoomableImage src={image.data} /> : <div />}
+            </div>
+            <div className="flex-end flex">
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 0}
