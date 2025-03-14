@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import ImagePreviewList from '../components/ImagePreviewList';
 import Pagination from '../components/Pagination';
 import TextEditor from '../components/TextEditor';
-import { useImageContext } from '../context/useImageContext'; // Import the hook
+import { useImageContext } from '../context/useImageContext';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 

@@ -12,6 +12,7 @@ interface DropdownProps {
     onSelect: (value: string) => void;
     recentOptions?: Option[];
     searchable?: boolean;
+    selectedLabel: string; // Add selectedLabel prop
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -20,6 +21,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     onSelect,
     recentOptions,
     searchable = true,
+    selectedLabel, // Receive selectedLabel
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -29,7 +31,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         setIsOpen(!isOpen);
     };
 
-    const handleOptionClick = (value: string) => {
+    const handleOptionClick = (value: string, label: string) => { // Pass label here
         onSelect(value);
         setIsOpen(false);
     };
@@ -57,7 +59,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                 className="flex items-center justify-between p-2 border rounded cursor-pointer"
                 onClick={toggleDropdown}
             >
-                <span>{placeholder}</span>
+                <span>{selectedLabel || placeholder}</span> {/* Use selectedLabel or placeholder */}
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`}
@@ -83,7 +85,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                             className="w-full p-2 border-b focus:outline-none"
                         />
                     )}
-
+                    <div className='max-h-[60vh] overflow-y-scroll'>
                     {recentOptions && recentOptions.length > 0 && (
                         <div className="p-2">
                             <h3 className="text-sm font-semibold mb-1">Recent Languages</h3>
@@ -91,7 +93,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                                 <div
                                     key={option.value}
                                     className="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                                    onClick={() => handleOptionClick(option.value)}
+                                    onClick={() => handleOptionClick(option.value, option.label)} // Pass label here
                                 >
                                     <span>{option.label}</span>
                                     {option.code && <span className="text-gray-500 text-sm">{option.code}</span>}
@@ -106,12 +108,13 @@ const Dropdown: React.FC<DropdownProps> = ({
                             <div
                                 key={option.value}
                                 className="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                                onClick={() => handleOptionClick(option.value)}
+                                onClick={() => handleOptionClick(option.value, option.label)} // Pass label here
                             >
                                 <span>{option.label}</span>
                                 {option.code && <span className="text-gray-500 text-sm">{option.code}</span>}
                             </div>
                         ))}
+                    </div>
                     </div>
                 </div>
             )}
@@ -144,12 +147,23 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedL
         { label: 'Umutu', value: 'umu', code: 'uli' },
     ];
 
+    const [selectedLabel, setSelectedLabel] = useState<string>(''); // Add selectedLabel state
+
+    const handleSelect = (value: string) => {
+        const selectedOption = languageOptions.find((option) => option.value === value);
+        if (selectedOption) {
+            setSelectedLabel(selectedOption.label);
+        }
+        onSelect(value);
+    };
+
     return (
         <Dropdown
             options={languageOptions}
             placeholder="Select Language"
-            onSelect={onSelect}
+            onSelect={handleSelect} // Use handleSelect here
             recentOptions={recentLanguages}
+            selectedLabel={selectedLabel} // Pass selectedLabel
         />
     );
 };

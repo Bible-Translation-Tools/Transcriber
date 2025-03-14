@@ -51,7 +51,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
   const handleChapterClick = (chapter: number) => {
     onSelect(openBook || '', chapter);
     setIsOpen(false);
-    setOpenBook(null); // Close the chapter list after selection
+    setOpenBook(null);
   };
 
   const filteredOptions = bookOptions.filter((option) =>
@@ -125,7 +125,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
             className="w-full p-2 border-b focus:outline-none"
           />
 
-          <div className="p-2">
+          <div className="p-2 max-h-[75vh] overflow-y-scroll">
             {filteredOptions.map((option) => (
               <React.Fragment key={option.value}>
                 <div
@@ -135,7 +135,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                   {option.label}
                 </div>
                 {openBook === option.value && (
-                  <div className="flex flex-wrap pl-4"> {/* Indent chapters */}
+                  <div className="flex flex-wrap pl-4 max-h-[200px] overflow-y-scroll"> {/* Indent chapters */}
                     {chapters.map((chapter) => (
                       <button
                         key={chapter}
