@@ -10,7 +10,7 @@ const Controls = () => {
     const { zoomIn, zoomOut, resetTransform } = useControls();
 
     return (
-        <div className="tools tools absolute top-4 left-4 flex space-x-2 z-10">
+        <div className="tools tools absolute top-4 left-4 flex space-x-2 z-1">
             <button
                 className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
                 onClick={() => zoomIn()}>
