@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "buildNoCheck": "vite build",
     "lint": "eslint .",
@@ -21,6 +21,7 @@
     "@mui/material": "^6.4.4",
     "@pardnchiu/pdf2image": "^1.1.2",
     "@tailwindcss/vite": "^4.0.6",
+    "hono": "^4.7.4",
     "openai": "^4.85.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -28,11 +29,12 @@
     "react-responsive": "^10.0.0",
     "react-router-dom": "^7.1.5",
     "react-zoom-pan-pinch": "^3.7.0",
-    "tailwindcss": "^4.0.6"
+    "tailwindcss": "^4.0.6",
+    "valibot": "^1.0.0-rc.4"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^0.1.9",
-    "@cloudflare/workers-types": "^4.20250303.0",
+    "@cloudflare/workers-types": "^4.20250313.0",
     "@eslint/js": "^9.17.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
@@ -44,6 +46,7 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
+    "vite-tsconfig-paths": "^5.1.4",
     "wrangler": "^3.114.0"
   }
 }
