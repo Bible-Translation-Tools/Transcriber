@@ -58,8 +58,8 @@ const Dropdown: React.FC<DropdownProps> = ({
             <button className="min-w-64 max-w-128 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-center items-center gap-2"
                 onClick={toggleDropdown}
             >
-                <div class="min-w-64 max-w-128 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
-                    <div class="flex-1 p-4 flex justify-start items-center gap-2">
+                <div className="min-w-64 max-w-128 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
+                    <div className="flex-1 p-4 flex justify-start items-center gap-2">
 
                         <div className="w-6 h-6 relative overflow-hidden">
                             <div className="w-5 h-5 bg-color-on-surface-secondary">
@@ -70,9 +70,9 @@ const Dropdown: React.FC<DropdownProps> = ({
                                 </svg>
                             </div>
                         </div>
-                        <div class="flex-1 grow justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">{selectedLabel || placeholder}</div>
-                        <div class="w-6 h-6 relative overflow-hidden">
-                            <div class="w-2 h-1  bg-color-on-surface-secondary">
+                        <div className="flex-1 grow justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">{selectedLabel || placeholder}</div>
+                        <div className="w-6 h-6 relative overflow-hidden">
+                            <div className="w-2 h-1  bg-color-on-surface-secondary">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="material-symbols:arrow-drop-down-rounded">
                                         <path id="Vector" d="M11.4752 14.475L7.8502 10.85C7.8002 10.8 7.76286 10.746 7.7382 10.688C7.71353 10.63 7.70086 10.5673 7.7002 10.5C7.7002 10.3667 7.7462 10.25 7.8382 10.15C7.9302 10.05 8.05086 10 8.2002 10H15.8002C15.9502 10 16.0712 10.05 16.1632 10.15C16.2552 10.25 16.3009 10.3667 16.3002 10.5C16.3002 10.5333 16.2502 10.65 16.1502 10.85L12.5252 14.475C12.4419 14.5583 12.3585 14.6167 12.2752 14.65C12.1919 14.6833 12.1002 14.7 12.0002 14.7C11.9002 14.7 11.8085 14.6833 11.7252 14.65C11.6419 14.6167 11.5585 14.5583 11.4752 14.475Z" fill="#516B86" />
@@ -135,13 +135,14 @@ const Dropdown: React.FC<DropdownProps> = ({
 interface LanguageDropdownProps {
     onSelect: (value: string) => void;
     selectedLanguage: string;
+    recentLanguages: string[];
 }
 
-const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedLanguage }) => {
+const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedLanguage, recentLanguages }) => {
     const languageOptions: Option[] = [
-        { label: 'English', value: 'en', code: 'eng' },
-        { label: 'Cebuano', value: 'ceb', code: 'cbo' },
-        { label: 'Umutu', value: 'umu', code: 'uli' },
+        { label: 'English', value: 'en', code: 'en' },
+        { label: 'Cebuano', value: 'ceb', code: 'ceb' },
+        { label: 'Umutu', value: 'umu', code: 'umu' },
         { label: 'Amharic', value: 'am', code: 'am' },
         { label: 'Arabic', value: 'ar', code: 'ar' },
         { label: 'Arabic - Dominant Culture Variant', value: 'ar-x-dcv', code: 'ar-x-dcv' },
@@ -151,11 +152,9 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedL
         // ... more languages
     ];
 
-    const recentLanguages: Option[] = [
-        { label: 'English', value: 'en', code: 'eng' },
-        { label: 'Cebuano', value: 'ceb', code: 'cbo' },
-        { label: 'Umutu', value: 'umu', code: 'uli' },
-    ];
+    const recentLangs: Option[] = languageOptions.filter((option) => {
+        if (recentLanguages.includes(option.code ?? "")) return true
+    })
 
     const [selectedLabel, setSelectedLabel] = useState<string>(''); // Add selectedLabel state
 
@@ -172,7 +171,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({ onSelect, selectedL
             options={languageOptions}
             placeholder="Select Language"
             onSelect={handleSelect} // Use handleSelect here
-            recentOptions={recentLanguages}
+            recentOptions={recentLangs}
             selectedLabel={selectedLabel} // Pass selectedLabel
         />
     );
