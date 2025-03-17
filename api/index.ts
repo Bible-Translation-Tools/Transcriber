@@ -6,12 +6,6 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
-        if (url.pathname.endsWith("/api/v1/")) {
-            return Response.json({
-                name: env.OPENAI_KEY,
-            });
-        }
-
         if (url.pathname.startsWith("/api/v1/transcribe/")) {
 
             function createApiMap(): Map<TranscriptionModel, string> {
