@@ -73,7 +73,7 @@ function TranscriptionPage() {
     return (
         <div className="flex flex-col h-screen bg-gray-100">
             <NavBar></NavBar>
-            <div className='flex'>
+            <div className='flex grow'>
                 <div className="flex flex-col gap-2 w-24 p-4 overflow-y-auto">
                     <label htmlFor="imageUpload" className="cursor-pointer relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
                         <div className="relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center"> {/* Outer container */}
@@ -100,7 +100,7 @@ function TranscriptionPage() {
                     totalImages={images.length}
                     onPageChange={handlePageChange}
                 />
-                <div className="relative flex-1 p-4 overflow-y-auto"> {/* Relative wrapper for positioning */}
+                <div className="relative flex-1 p-4 grow overflow-y-auto"> {/* Relative wrapper for positioning */}
                     <div className="h-full flex flex-col">
                         <button
                             onClick={handleResubmitImage}
