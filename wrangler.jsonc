@@ -32,10 +32,10 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
 	"vars": {
-    "SSO_BASE_URL": "https://wacs-dev.bibletranslationtools.org",
-    "SSO_CLIENT_ID": "c9812108-0bbb-4917-8e1d-b952598f1c83",
-    "SSO_REDIRECT_PATH": "/Transcriber"
-  }
+		"SSO_BASE_URL": "https://wacs-dev.bibletranslationtools.org",
+		"SSO_CLIENT_ID": "c9812108-0bbb-4917-8e1d-b952598f1c83",
+		"SSO_REDIRECT_PATH": "/Transcriber"
+	}
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
