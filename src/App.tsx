@@ -1,15 +1,15 @@
-import './App.css'
-import TranscriptionPage from './routes/TranscriptionPage'
-import { ImageProvider } from './context/ImageContext'; // Import your context
+import "./App.css";
+import { ImageProvider } from "./context/ImageContext"; // Import your context
+import TranscriptionPage from "./routes/TranscriptionPage";
 
 function App() {
-  return (
-    <>
-      <ImageProvider>
-        <TranscriptionPage />
-      </ImageProvider>
-    </>
-  )
+	return (
+		<>
+			<ImageProvider>
+				<TranscriptionPage />
+			</ImageProvider>
+		</>
+	);
 }
 
-export default App
+export default App;
