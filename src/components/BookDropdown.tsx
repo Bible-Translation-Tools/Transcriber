@@ -126,7 +126,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 								</svg>
 							</div>
 						</div>
-						<div class="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">
+						<div className="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">
 							{
 								bookOptions.find(
 									(b) => b.value === selectedBook,
@@ -134,8 +134,8 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 							}
 						</div>
 					</div>
-					<div class="w-20 p-4 max-h-12 border-l border-neutral-200 flex justify-start items-center gap-2">
-						<div class="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">
+					<div className="w-20 p-4 max-h-12 border-l border-neutral-200 flex justify-start items-center gap-2">
+						<div className="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">
 							{selectedChapter}
 						</div>
 					</div>

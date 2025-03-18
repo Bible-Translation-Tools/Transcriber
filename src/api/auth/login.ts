@@ -94,12 +94,6 @@ export async function setLoginCookies({
 	idToken,
 	refresh,
 }: SetCookieArgs) {
-	// console.log("setting cookies", {
-	//   accessExpires,
-	//   accessToken,
-	//   idToken,
-	//   refresh,
-	// });
 	setCookie(ctx, WACS_API_TOKEN, accessToken, {
 		path: "/",
 		secure: true,
@@ -133,7 +127,6 @@ export async function getOauthTokens({
 	const CLIENT_ID = env.SSO_CLIENT_ID;
 	const CLIENT_SECRET = env.SSO_CLIENT_SECRET;
 	const REFERRER = request.headers.get("Referer") || "";
-	console.log("referrer:", REFERRER);
 	const referrerUrl = new URL(REFERRER);
 	const REDIRECT_PATH = env.SSO_REDIRECT_PATH;
 	const SSO_BASE_URL = env.SSO_BASE_URL;
@@ -163,9 +156,6 @@ export async function getOauthTokens({
 		requestBody.grant_type = grantType;
 		requestBody.refresh_token = refreshToken as string; //validated above
 	}
-
-	console.log("requestBody:", requestBody);
-
 	try {
 		const authUrl = `${SSO_BASE_URL}/login/oauth/access_token`;
 		const response = await fetch(authUrl, {
@@ -175,7 +165,6 @@ export async function getOauthTokens({
 			},
 			body: JSON.stringify(requestBody),
 		});
-		console.log(response);
 		if (!response.ok) {
 			return {
 				type: "error",
@@ -185,7 +174,7 @@ export async function getOauthTokens({
 		}
 		const data = (await response.json()) as TokenResponse;
 		// todo: should validate not assert shape of tokenData
-		console.log(data);
+		// console.log(data);
 		return {
 			type: "ok",
 			accessToken: data.access_token,
