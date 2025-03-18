@@ -1,5 +1,12 @@
+export type TranscriptionUser = {
+    id: number | undefined,
+    user: string
+}
+
 export type TranscriptionImage = {
     id: string,
+    userId: string,
+    path: string,
     data: string,
     language_code: string,
     book_code: string,

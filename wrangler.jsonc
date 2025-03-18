@@ -3,53 +3,63 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "transcriber",
-	"main": "src/entrypoint.ts",
-	"compatibility_date": "2025-03-03",
-	"assets": {
-		"not_found_handling": "single-page-application",
-		"binding": "ASSETS"
-	},
-	"observability": {
-		"enabled": true
-	},
-	/**
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "transcriber",
+    "main": "src/entrypoint.ts",
+    "compatibility_date": "2025-03-03",
+    "assets": {
+        "directory": "./dist",
+        "not_found_handling": "single-page-application",
+        "binding": "ASSETS"
+    },
+    "observability": {
+        "enabled": true
+    },
+    /**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
-	// "placement": { "mode": "smart" },
-
-	/**
+    // "placement": { "mode": "smart" },
+    /**
 	 * Bindings
 	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
 	 * databases, object storage, AI inference, real-time communication and more.
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
-
-	/**
+    "r2_buckets": [
+        {
+            "binding": "HTR_STORAGE",
+            "bucket_name": "htr_storage"
+        }
+    ],
+    "d1_databases": [
+        {
+            "binding": "HTR_DATABASE",
+            "database_name": "htr_database",
+            "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        }
+    ],
+    /**
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
-	"vars": {
-    "SSO_BASE_URL": "https://wacs-dev.bibletranslationtools.org",
-    "SSO_CLIENT_ID": "c9812108-0bbb-4917-8e1d-b952598f1c83",
-    "SSO_REDIRECT_PATH": "/Transcriber"
-  }
-	/**
+    "vars": {
+        "SSO_BASE_URL": "https://wacs-dev.bibletranslationtools.org",
+        "SSO_CLIENT_ID": "c9812108-0bbb-4917-8e1d-b952598f1c83",
+        "SSO_REDIRECT_PATH": "/Transcriber"
+    }
+    /**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-
-	/**
+    /**
 	 * Static Assets
 	 * https://developers.cloudflare.com/workers/static-assets/binding/
 	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
-
-	/**
+    // "assets": { "directory": "./public/", "binding": "ASSETS" },
+    /**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
 	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+    // "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }

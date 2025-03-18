@@ -5,19 +5,19 @@ import {type JwtVariables, decode} from "hono/jwt";
 import {
   HandleTranscriptionRequest,
   transcriptionRequestSchema,
-} from "@api/domain/HandleTranscriptionRequest";
-import {TranscriptionModel} from "@api/domain/TranscriptionRequest";
+} from "../api/domain/HandleTranscriptionRequest";
+import {TranscriptionModel} from "../api/domain/TranscriptionRequest";
 const apiV1Router = new Hono<{
   Bindings: Env;
   Variables: JwtVariables;
 }>();
 import {validator} from "hono/validator";
 import * as v from "valibot";
-import {authRouter} from "@api/auth/router";
+import {authRouter} from "../api/auth/router";
 import {jwk} from "hono/jwk";
-import {checkOrRefresh, getR2Keys} from "@api/auth/utils";
+import {checkOrRefresh, getR2Keys} from "../api/auth/utils";
 import {getCookie} from "hono/cookie";
-import {getOauthTokens, setLoginCookies} from "@api/auth/login";
+import {getOauthTokens, setLoginCookies} from "../api/auth/login";
 import {
   GRANT_CODE_FLOW,
   CSRF_STATE_KEY,
@@ -66,7 +66,48 @@ apiV1Router.post(
     const jwtPayload = c.get("jwtPayload");
     console.log({jwtPayload});
     const body = c.req.valid("json");
+
+    const bucket = c.env.HTR_STORAGE;
+    const repo = new D1TranscriptionRepository(c.env.HTR_DATABASE, new R2ImageRepository(bucket))
+
+    // const jwt = await JSON.parse(jwtPayload);
+    // const user = jwt.sub;
+
+    const imageId = self.crypto.randomUUID();
+
+    const bookCode = "gen";
+    const languageCode = "en"
+    const chapter = 1;
+
     const htrRes = await HandleTranscriptionRequest(createApiMap(c.env), body);
+    const image: TranscriptionImage = {
+        id: imageId,
+        userId: "user",
+        path: `${"images"}/user1/${imageId}`,
+        data: "",
+        book_code: bookCode,
+        language_code: languageCode,
+        chapter: chapter,
+        verse_start: 0,
+        verse_end: 0,
+        transcription: [
+            {
+                human_modified: false,
+                prompt: "",
+                system_prompt: "",
+                date: Date.now(),
+                model: "gpt-4o",
+                text: [
+                    {
+                       start_verse: 0,
+                       end_verse: 0,
+                       text: ""
+                    }
+                ]
+            }
+        ]
+    }
+    await repo.createTranscriptionImage(image)
     return htrRes;
   }
 );
@@ -80,5 +121,59 @@ function createApiMap(env: Env): Map<TranscriptionModel, string> {
   keys.set(TranscriptionModel.OPENAI, env.OPENAI_KEY);
   return keys;
 }
+
+import { drizzle } from 'drizzle-orm/d1';
+import { messages } from "../api/persistence/schema"
+import { sql } from 'drizzle-orm';
+import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
+import { R2ImageRepository } from "./persistence/R2ImageRepository";
+import { TranscriptionImage } from "@src/data/TranscriptionImage";
+
+apiV1Router.get('/initdb', async (c) => {
+  try {
+    const db = drizzle(c.env.HTR_DATABASE);
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT
+      );
+    `);
+    return c.text('Table created');
+  } catch (error) {
+    console.error(error);
+    return c.text(`Error: ${error.message}`, 500);
+  }
+});
+
+apiV1Router.get('/insert', async (c) => {
+  try {
+    const db = drizzle(c.env.HTR_DATABASE);
+    await db.insert(messages).values({ content: 'Hello, World!' });
+    return c.text('Message inserted!');
+  } catch (error) {
+    console.error(error);
+    return c.text(`Error: ${error.message}`, 500);
+  }
+});
+
+apiV1Router.get('/getdb', async (c) => {
+  try {
+    const db = drizzle(c.env.HTR_DATABASE);
+    const result = await db.select().from(messages);
+    if (result.length > 0) {
+      return c.json(result);
+    } else {
+      return c.text('No messages found.');
+    }
+  } catch (error) {
+    console.error(error);
+    return c.text(`Error: ${error.message}`, 500);
+  }
+});
+
+apiV1Router.get('/db', (c) => {
+    return c.text('Please use /init, /insert, or /get');
+});
+
 
 export {apiV1Router};

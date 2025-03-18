@@ -7,4 +7,6 @@ interface Env {
 	OPENAI_KEY: string;
 	SSO_CLIENT_SECRET: string;
 	ASSETS: Fetcher;
+    HTR_STORAGE: R2Bucket;
+    HTR_DATABASE: D1Database;
 }
