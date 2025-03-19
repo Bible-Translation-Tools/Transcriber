@@ -6,10 +6,10 @@ export class R2ImageRepository {
         this.bucket = bucket;
     }
 
-    async storeImage(imageId: string, imageData: ArrayBuffer): Promise<string> {
-        const key = `images/${imageId}`; // Example key structure
-        await this.bucket.put(key, imageData);
-        return key; // Return the R2 key as the file path
+    async storeImage(imagePath: string, imageData: string): Promise<string> {
+        const key = imagePath
+        await this.bucket.put(key, imageData, { httpMetadata: { contentType: 'text/plain' }, });
+        return key;
     }
 
     async retrieveImage(key: string): Promise<ArrayBuffer | null> {

@@ -1,8 +1,10 @@
+import { TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
 import getTranscription from "@src/domain/getTranscription";
 import type React from "react";
 import { createContext, useEffect, useRef, useState } from "react";
 
 export interface ImageData {
+    id: string;
 	url: string; // Key for IndexedDB
 	data: any;
 	transcription: string | undefined | null; // Optional transcription
@@ -139,8 +141,9 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 			);
 			const objectStore = transaction.objectStore("images");
 
-			const imageWithCurrentMetadata = {
+			const imageWithCurrentMetadata: ImageData = {
 				...image,
+                id: self.crypto.randomUUID(),
 				languageCode: languageCode,
 				bookCode: bookCode,
 				chapter: chapter,
@@ -160,7 +163,14 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 
 				(async () => {
 					const transcription = await getTranscription(
-						imageWithCurrentMetadata.data,
+						{
+                            image: imageWithCurrentMetadata.data,
+                            imageId: imageWithCurrentMetadata.id,
+                            bookCode: imageWithCurrentMetadata.bookCode,
+                            languageCode: imageWithCurrentMetadata.languageCode,
+                            chapter: imageWithCurrentMetadata.chapter,
+                            model: TranscriptionModel.OPENAI
+                        },
 					);
 					if (transcription.success) {
 						// imageWithCurrentMetadata.transcription =
@@ -222,7 +232,15 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 	const resubmitImageForTranscription = (imageToUpdate: ImageData) => {
 		updateImage({ ...imageToUpdate, transcription: null, loading: true });
 		(async () => {
-			const transcription = await getTranscription(imageToUpdate.data);
+            const request: TranscriptionRequest = {
+                model: TranscriptionModel.OPENAI,
+                image: imageToUpdate.data,
+                imageId: imageToUpdate.id,
+                languageCode: imageToUpdate.languageCode,
+                bookCode: imageToUpdate.bookCode,
+                chapter: imageToUpdate.chapter
+            }
+			const transcription = await getTranscription(request);
 			if (transcription.success) {
 				imageToUpdate.transcription = transcription.transcription;
 				updateImage(imageToUpdate, true);

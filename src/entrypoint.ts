@@ -6,7 +6,7 @@ import { apiV1Router } from "@api/index";
 
 app.route("/api/v1/", apiV1Router);
 app.get("/api/v1/test", (c) => {
-	return c.text("works");
+    return c.text("works");
 });
 
 // fallback to span handling of anything else

@@ -13,7 +13,7 @@ export class D1TranscriptionRepository {
     }
 
     async createTranscriptionImage(image: TranscriptionImage): Promise<void> {
-        const filePath = await this.imageRepo.storeImage(image.id, this.base64ToArrayBuffer(image.data));
+        const filePath = await this.imageRepo.storeImage(image.path, image.data);
 
         await this.db.insert(schema.transcriptionImages).values({
             id: image.id,
@@ -46,15 +46,5 @@ export class D1TranscriptionRepository {
                 });
             }
         }
-    }
-
-    private base64ToArrayBuffer(base64: string): ArrayBuffer {
-        const binary_string = atob(base64);
-        const len = binary_string.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
-        }
-        return bytes.buffer;
     }
 }
