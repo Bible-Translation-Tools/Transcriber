@@ -1,21 +1,21 @@
 enum TranscriptionErrorCode {
-    InvalidFileFormat = "invalid_file_format",
-    FileSizeExceeded = "file_size_exceeded",
-    AuthenticationError = "authentication_error",
-    RateLimitExceeded = "rate_limit_exceeded",
-    UnexpectedResponse = "unexpected_response",
-    UnknownError = "unknown_error", // A general error for unexpected situations
+	InvalidFileFormat = "invalid_file_format",
+	FileSizeExceeded = "file_size_exceeded",
+	AuthenticationError = "authentication_error",
+	RateLimitExceeded = "rate_limit_exceeded",
+	UnexpectedResponse = "unexpected_response",
+	UnknownError = "unknown_error", // A general error for unexpected situations
 }
 
 interface TranscriptionSuccess {
-    success: true;
-    transcription: string;
+	success: true;
+	transcription: string;
 }
 
 interface TranscriptionError {
-    success: false;
-    error: string;
-    errorCode: TranscriptionErrorCode;
+	success: false;
+	error: string;
+	errorCode: TranscriptionErrorCode;
 }
 
 type TranscriptionResponse = TranscriptionSuccess | TranscriptionError;
