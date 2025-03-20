@@ -1,4 +1,5 @@
 import { DetaultTranscriptionPrompt, TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
+import { LanguageOption } from "@src/components/LanguageDropdown";
 import getTranscription from "@src/domain/getTranscription";
 import type React from "react";
 import { createContext, useEffect, useRef, useState } from "react";
@@ -15,8 +16,8 @@ export interface ImageData {
 }
 
 interface ImageContextType {
-    languageCode: string;
-    setLanguageCode: (code: string) => void;
+    language: LanguageOption | null;
+    setLanguage: (option: LanguageOption) => void;
     recentLanguages: string[];
     bookCode: string;
     setBookCode: (code: string) => void;
@@ -37,8 +38,8 @@ interface ImageContextType {
 }
 
 export const ImageContext = createContext<ImageContextType>({
-    languageCode: "en",
-    setLanguageCode: () => { },
+    language: null,
+    setLanguage: () => { },
     recentLanguages: [],
     bookCode: "gen",
     setBookCode: () => { },
@@ -61,7 +62,16 @@ export const ImageContext = createContext<ImageContextType>({
 export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    const [languageCode, updateLanguageCode] = useState("en");
+
+    const storedSelectedLanguage = localStorage.getItem('selectedLanguage')
+    let restoredLanguage = null
+    if (storedSelectedLanguage != null) {
+        try {
+        restoredLanguage = JSON.parse(storedSelectedLanguage)
+        } catch {}
+    }
+
+    const [language, updateLanguage] = useState<LanguageOption | null>(restoredLanguage);
     const [recentLanguages, setRecentLanguages] = useState<string[]>([]);
     const [bookCode, updateBookCode] = useState("gen");
     const [chapter, updateChapter] = useState(1);
@@ -93,7 +103,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     const loadImagesFromDB = (
-        languageToLoad = languageCode,
+        languageToLoad = language.code,
         bookToLoad = bookCode,
         chapterToLoad = chapter,
     ) => {
@@ -154,7 +164,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
             const imageWithCurrentMetadata: ImageData = {
                 ...image,
                 id: self.crypto.randomUUID(),
-                languageCode: languageCode,
+                languageCode: language.code,
                 bookCode: bookCode,
                 chapter: chapter,
             };
@@ -262,9 +272,10 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
         })();
     };
 
-    const setLanguageCode = (languageCode: string) => {
-        updateLanguageCode(languageCode);
-        loadImagesFromDB(languageCode);
+    const setLanguage = (lang: LanguageOption) => {
+        localStorage.setItem("selectedLanguage", JSON.stringify(lang))
+        updateLanguage(lang);
+        loadImagesFromDB(lang.code);
     };
 
     const setBookCode = (bookCode: string) => {
@@ -274,7 +285,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const setChapter = (chapter: number) => {
         updateChapter(chapter);
-        loadImagesFromDB(languageCode, bookCode, chapter);
+        loadImagesFromDB(language.code, bookCode, chapter);
     };
 
     const setPrompt = (prompt: string) => {
@@ -290,8 +301,8 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
     return (
         <ImageContext.Provider
             value={{
-                languageCode,
-                setLanguageCode,
+                language,
+                setLanguage,
                 recentLanguages,
                 bookCode,
                 setBookCode,

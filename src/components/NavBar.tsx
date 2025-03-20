@@ -7,8 +7,8 @@ import { useLanguageContext } from "@src/context/useLanguageContext";
 
 const NavBar: React.FC = () => {
 	const {
-		languageCode,
-		setLanguageCode,
+		language,
+		setLanguage,
 		recentLanguages,
 		bookCode,
 		setBookCode,
@@ -36,8 +36,8 @@ const NavBar: React.FC = () => {
 				<LanguageDropdown
                     languageOptions={languages}
 					recentLanguages={recentLanguages}
-					onSelect={setLanguageCode}
-					selectedLanguage={languageCode}
+					onSelect={setLanguage}
+					selectedLanguage={language}
 				/>
 				<div className="mx-2" />
 				<BookDropdown

@@ -23,11 +23,11 @@ export async function getLanguagesPublicDataApi() {
         if (res.ok) {
             const data = await res.json();
             const languages = data.data.language;
-            languages.sort((a: Option, b: Option) => {
+            languages.sort((a: LanguageOption, b: LanguageOption) => {
                 return a.anglicized.localeCompare(b.anglicized);
             });
             // set state call here:
-            return languages as Option[];
+            return languages as LanguageOption[];
         }
         throw new Error("Failed to fetch languages");
     } catch (error) {

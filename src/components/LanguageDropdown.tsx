@@ -9,7 +9,7 @@ export interface LanguageOption {
 interface DropdownProps {
     options: LanguageOption[];
     placeholder: string;
-    onSelect: (value: string) => void;
+    onSelect: (value: LanguageOption) => void;
     recentOptions?: LanguageOption[];
     searchable?: boolean;
     selectedLabel: string; // Add selectedLabel prop
@@ -31,7 +31,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         setIsOpen(!isOpen);
     };
 
-    const handleOptionClick = (value: string, anglicized: string) => {
+    const handleOptionClick = (value: LanguageOption) => {
         onSelect(value);
         setIsOpen(false);
     };
@@ -134,8 +134,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                                         className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between w-full"
                                         onClick={() =>
                                             handleOptionClick(
-                                                option.code,
-                                                option.anglicized,
+                                                option
                                             )
                                         } // Pass label here
                                     >
@@ -163,8 +162,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                                     className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between w-full"
                                     onClick={() =>
                                         handleOptionClick(
-                                            option.code,
-                                            option.anglicized,
+                                            option,
                                         )
                                     } // Pass label here
                                 >
@@ -187,8 +185,8 @@ const Dropdown: React.FC<DropdownProps> = ({
 };
 
 interface LanguageDropdownProps {
-    onSelect: (value: string) => void;
-    selectedLanguage: string;
+    onSelect: (value: LanguageOption) => void;
+    selectedLanguage: LanguageOption;
     languageOptions: LanguageOption[];
     recentLanguages: string[];
 }
@@ -199,28 +197,17 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
     languageOptions,
     recentLanguages,
 }) => {
-
-    let selected = languageOptions.find((lang) => selectedLanguage === lang.code);
-    if (!selected && recentLanguages.length > 0) {
-        selected = languageOptions.find((lang) => recentLanguages[0] === lang.code)
-    }
-
-    console.log(selected)
-
     const recentLangs: LanguageOption[] = languageOptions.filter((option) => {
         if (recentLanguages.includes(option.code ?? "")) return true;
     });
 
-    const [selectedLabel, setSelectedLabel] = useState<string>(selectedLanguage);
-
-    const handleSelect = (value: string) => {
+    const handleSelect = (value: LanguageOption) => {
         const selectedOption = languageOptions.find(
-            (option) => option.code === value,
+            (option) => option.code === value.code,
         );
-        if (selectedOption) {
-            setSelectedLabel(selectedOption.anglicized);
+        if (selectedOption != undefined) {
+            onSelect(selectedOption);
         }
-        onSelect(value);
     };
 
     return (
@@ -229,7 +216,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
             placeholder="Select Language"
             onSelect={handleSelect} // Use handleSelect here
             recentOptions={recentLangs}
-            selectedLabel={selectedLabel} // Pass selectedLabel
+            selectedLabel={selectedLanguage?.anglicized ?? ""} // Pass selectedLabel
         />
     );
 };
