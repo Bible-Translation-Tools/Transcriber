@@ -5,6 +5,8 @@ export type TranscriptionRequest = {
     languageCode: string;
     bookCode: string;
     chapter: number;
+    systemPrompt: string;
+    prompt: string;
 };
 
 export enum TranscriptionModel {

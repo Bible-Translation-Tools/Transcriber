@@ -15,8 +15,9 @@ export async function HandleTranscriptionRequest(
     switch (body.model) {
         case TranscriptionModel.OPENAI: {
             const model = new OpenAIModel(
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
                 apiKeys.get(TranscriptionModel.OPENAI)!,
+                body.systemPrompt,
+                body.prompt
             );
             transcriptionResponse = await model.transcribe(body.image);
             break;
@@ -49,8 +50,8 @@ export async function HandleTranscriptionRequest(
             transcription: [
                 {
                     human_modified: false,
-                    prompt: "The image reads: ",
-                    system_prompt: "You are an expert at transcribing handwritten images of various languages. Respond only with the transcription of the image provided, do not output the transcription in quotes, parentheses, brackets or other such symbols",
+                    prompt: body.prompt,
+                    system_prompt: body.systemPrompt,
                     date: Date.now(),
                     model: body.model,
                     text: [
@@ -77,7 +78,9 @@ export const transcriptionRequestSchema = v.object({
     imageId: v.string(),
     languageCode: v.string(),
     bookCode: v.string(),
-    chapter: v.number()
+    chapter: v.number(),
+    systemPrompt: v.string(),
+    prompt: v.string()
 });
 export type TranscriptionRequest = v.InferOutput<
     typeof transcriptionRequestSchema

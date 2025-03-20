@@ -2,17 +2,18 @@ import OpenAI from "openai";
 import { ApiKeyStatus } from "./ApiKeyStatus";
 import type Model from "./Model";
 import type { TranscriptionResponse } from "./TranscriptionResponse";
+import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 
 export default class OpenAIModel implements Model {
-	systemPrompt =
-		"You are an expert at transcribing handwritten images of various languages. Respond only with the transcription of the image provided, do not output the transcription in quotes, parentheses, brackets or other such symbols";
-	prompt = "The image reads: ";
-
+	systemPrompt: string;
+	prompt: string;
 	baseUrl = "https://api.openai.com/v1";
 	key: string;
 
-	constructor(key: string) {
+	constructor(key: string, systemPrompt: string = DetaultTranscriptionPrompt.SYSTEM, prompt: string = DetaultTranscriptionPrompt.PROMPT) {
 		this.key = key;
+        this.systemPrompt = systemPrompt;
+        this.prompt = prompt;
 	}
 
 	async keyStatus(): Promise<ApiKeyStatus> {
