@@ -25,7 +25,7 @@ const apiV1Router = new Hono<{
 }>();
 apiV1Router.basePath(apiV1);
 
-export const transcribeRoute = "/transcribe/";
+export const transcribeRoute = "/transcriber/";
 
 apiV1Router.use("*", logger());
 apiV1Router.use(

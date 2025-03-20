@@ -3,6 +3,7 @@ import { useImageContext } from "../context/useImageContext";
 import BookDropdown from "./BookDropdown";
 import LanguageDropdown from "./LanguageDropdown";
 import { useNavigate } from "react-router-dom";
+import { useLanguageContext } from "@src/context/useLanguageContext";
 
 const NavBar: React.FC = () => {
 	const {
@@ -15,6 +16,7 @@ const NavBar: React.FC = () => {
 		setChapter,
 	} = useImageContext();
 
+    const { languages } = useLanguageContext();
     const navigate = useNavigate();
 
 
@@ -32,6 +34,7 @@ const NavBar: React.FC = () => {
 		<div className="flex items-center justify-between p-4 bg-white">
 			<div className="flex flex-1 grow items-center">
 				<LanguageDropdown
+                    languageOptions={languages}
 					recentLanguages={recentLanguages}
 					onSelect={setLanguageCode}
 					selectedLanguage={languageCode}
