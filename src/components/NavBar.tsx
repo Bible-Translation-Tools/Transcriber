@@ -1,8 +1,8 @@
 import type React from "react";
-import { useState } from "react";
 import { useImageContext } from "../context/useImageContext";
 import BookDropdown from "./BookDropdown";
 import LanguageDropdown from "./LanguageDropdown";
+import { useNavigate } from "react-router-dom";
 
 const NavBar: React.FC = () => {
 	const {
@@ -15,11 +15,18 @@ const NavBar: React.FC = () => {
 		setChapter,
 	} = useImageContext();
 
+    const navigate = useNavigate();
+
+
 	const handleBookChapterSelect = (book: string, chapter: number) => {
 		setBookCode(book);
 		setChapter(chapter);
 		console.log(`Book: ${book}, Chapter: ${chapter || "None"}`);
 	};
+
+    const onSettingsClicked = () => {
+        navigate("/settings");
+    }
 
 	return (
 		<div className="flex items-center justify-between p-4 bg-white">
@@ -39,7 +46,8 @@ const NavBar: React.FC = () => {
 			<div>
 				<button
 					type="button"
-					className="flex items-center text-gray-700 hover:text-gray-900"
+					className="flex flex-row text-xl bg-transparent hover:bg-gray-200 py-2 px-4 rounded items-center justify-items-center gap-2"
+                    onClick={onSettingsClicked}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

@@ -1,4 +1,4 @@
-import { TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
+import { DetaultTranscriptionPrompt, TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
 import getTranscription from "@src/domain/getTranscription";
 import type React from "react";
 import { createContext, useEffect, useRef, useState } from "react";
@@ -24,6 +24,10 @@ interface ImageContextType {
 	setChapter: (chapter: number) => void;
 	images: ImageData[];
 	selectedImage: ImageData | null;
+    systemPrompt: string;
+    setSystemPrompt: (prompt: string) => void;
+    prompt: string;
+    setPrompt: (prompt: string) => void;
 	setImages: (images: ImageData[]) => void;
 	setSelectedImage: (image: ImageData | null) => void;
 	addImage: (image: ImageData) => void;
@@ -42,6 +46,10 @@ export const ImageContext = createContext<ImageContextType>({
 	setChapter: () => {},
 	images: [],
 	selectedImage: null,
+    systemPrompt: localStorage.getItem('systemPrompt') || DetaultTranscriptionPrompt.SYSTEM,
+    setSystemPrompt: () => { },
+    prompt: localStorage.getItem('prompt') || DetaultTranscriptionPrompt.PROMPT,
+    setPrompt: () => { },
 	setImages: () => {},
 	setSelectedImage: () => {},
 	addImage: () => {},
@@ -59,6 +67,8 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [chapter, updateChapter] = useState(1);
 	const [images, setImages] = useState<ImageData[]>([]);
 	const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+    const [systemPrompt, updateSystemPrompt] = useState<string>(localStorage.getItem('systemPrompt') || DetaultTranscriptionPrompt.SYSTEM)
+    const [prompt, updatePrompt] = useState<string>(localStorage.getItem('prompt') || DetaultTranscriptionPrompt.PROMPT)
 	const dbRef = useRef<IDBDatabase | null>(null);
 
 	useEffect(() => {
@@ -263,6 +273,16 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 		loadImagesFromDB(languageCode, bookCode, chapter);
 	};
 
+    const setPrompt = (prompt: string) => {
+        localStorage.setItem('prompt', prompt);
+        updatePrompt(prompt);
+    }
+
+    const setSystemPrompt = (prompt: string) => {
+        localStorage.setItem('systemPrompt', prompt);
+        updateSystemPrompt(prompt);
+    }
+
 	return (
 		<ImageContext.Provider
 			value={{
@@ -275,6 +295,10 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 				setChapter,
 				images,
 				selectedImage,
+                systemPrompt,
+                setSystemPrompt,
+                prompt,
+                setPrompt,
 				setImages,
 				setSelectedImage,
 				addImage,

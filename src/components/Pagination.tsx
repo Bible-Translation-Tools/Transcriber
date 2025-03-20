@@ -15,7 +15,7 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
 	return (
 		<div className="relative w-[451px] flex flex-col justify-content items-center p-6">
-			<div className="grow relative flex-start group">
+			<div className="grow relative flex-start group ">
 				{image ? <ZoomableImage src={image.data} /> : <div />}
 			</div>
 			<div className="flex-end flex">
