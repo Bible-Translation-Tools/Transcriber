@@ -9,6 +9,11 @@ export type TranscriptionRequest = {
     prompt: string;
 };
 
+export type UpdateTranscriptionRequest = {
+    imageId: string,
+    transcription: string
+}
+
 export enum TranscriptionModel {
 	OPENAI = "openai",
 	PIXTRAl = "pixtral",

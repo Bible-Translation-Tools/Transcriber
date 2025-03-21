@@ -7,7 +7,7 @@ export const transcriptionUsers = sqliteTable("TranscriptionUsers", {
 
 export const transcriptionImages = sqliteTable('TranscriptionImages', {
     id: text('id').primaryKey(),
-    userId: text("user_id").references(() => transcriptionUsers.id),
+    userId: integer("user_id").references(() => transcriptionUsers.id),
     userDeleted: integer("user_deleted"),
     filePath: text('file_path'),
     languageCode: text('language_code'),
@@ -25,19 +25,5 @@ export const transcriptions = sqliteTable('Transcriptions', {
     prompt: text('prompt'),
     systemPrompt: text('system_prompt'),
     date: integer('date'),
-});
-
-export const transcriptionTexts = sqliteTable('TranscriptionTexts', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    transcriptionId: integer('transcription_id').references(() => transcriptions.id),
-    startVerse: integer('start_verse'),
-    endVerse: integer('end_verse'),
     text: text('text'),
 });
-
-export const messages = sqliteTable('messages', {
-  id: integer('id').primaryKey(),
-  content: text('content'),
-});
-
-export type Message = typeof messages.$inferSelect;

@@ -5,6 +5,15 @@ import { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepos
 import { TranscriptionImage } from "@src/data/TranscriptionImage";
 import * as v from "valibot";
 
+
+export async function HandleUpdateTranscriptionRequest(
+    body: UpdateTranscriptionRequest,
+    imageRepo: D1TranscriptionRepository
+): Promise<Response> {
+    imageRepo.updateTranscriptionText(body.imageId, body.transcription);
+    return Response.json({});
+}
+
 export async function HandleTranscriptionRequest(
     userId: string,
     apiKeys: Map<TranscriptionModel, string>,
@@ -55,17 +64,11 @@ export async function HandleTranscriptionRequest(
                     system_prompt: body.systemPrompt,
                     date: Date.now(),
                     model: body.model,
-                    text: [
-                        {
-                            start_verse: 0,
-                            end_verse: 0,
-                            text: transcription,
-                        }
-                    ]
+                    text: transcription,
                 }
             ]
         }
-
+        
         await imageRepo.createTranscriptionImage(image)
         return Response.json(transcriptionResponse)
     } else {
@@ -85,4 +88,12 @@ export const transcriptionRequestSchema = v.object({
 });
 export type TranscriptionRequest = v.InferOutput<
     typeof transcriptionRequestSchema
+>;
+
+export const updateTranscriptionRequestSchema = v.object({
+    imageId: v.string(),
+    transcription: v.string()
+});
+export type UpdateTranscriptionRequest = v.InferOutput<
+    typeof updateTranscriptionRequestSchema
 >;

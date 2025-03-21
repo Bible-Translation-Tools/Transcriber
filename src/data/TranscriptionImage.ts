@@ -22,12 +22,6 @@ export type Transcription = {
     model: string;
     prompt: string;
     system_prompt: string;
-    text: TranscriptionText[];
-    date: EpochTimeStamp;
-};
-
-export type TranscriptionText = {
-    start_verse: number;
-    end_verse: number;
     text: string;
+    date: EpochTimeStamp;
 };

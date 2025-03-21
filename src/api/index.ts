@@ -2,19 +2,17 @@ import { authRouter } from "@api/auth/router";
 import { checkOrRefresh, syncR2Keys } from "@api/auth/utils";
 import {
     HandleTranscriptionRequest,
+    HandleUpdateTranscriptionRequest,
     transcriptionRequestSchema,
+    updateTranscriptionRequestSchema,
 } from "@api/domain/HandleTranscriptionRequest";
-import { TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
-import { TranscriptionImage } from "@src/data/TranscriptionImage";
-import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
+import { TranscriptionModel } from "@api/domain/TranscriptionRequest";
 import { Hono } from "hono";
 import { except } from "hono/combine";
 import type { JwtVariables } from "hono/jwt";
 import { logger } from "hono/logger";
 import { validator } from "hono/validator";
 import * as v from "valibot";
-import { messages } from "../api/persistence/schema";
 import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
 import { R2ImageRepository } from "./persistence/R2ImageRepository";
 
@@ -26,6 +24,7 @@ const apiV1Router = new Hono<{
 apiV1Router.basePath(apiV1);
 
 export const transcribeRoute = "/transcriber/";
+export const updateTranscriptionRoute = "/updateTranscription/";
 
 apiV1Router.use("*", logger());
 apiV1Router.use(
@@ -79,6 +78,37 @@ apiV1Router.post(
         );
         return htrRes;
     },
+);
+
+apiV1Router.post(
+    `${updateTranscriptionRoute}`,
+    validator("json", (value) => {
+        // throws if invalid
+        const parsed = v.safeParse(updateTranscriptionRequestSchema, value);
+        if (!parsed.success) {
+            console.error(`invalid transcription update request`);
+            return new Response(
+                JSON.stringify({ error: "Invalid request format" }),
+                {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                },
+            );
+        }
+        return parsed.output;
+    }),
+    async (c) => {
+        const body = c.req.valid("json");
+
+        const bucket = c.env.HTR_STORAGE;
+        const repo = new D1TranscriptionRepository(c.env.HTR_DATABASE, new R2ImageRepository(bucket))
+
+        const htrRes = await HandleUpdateTranscriptionRequest(
+            body,
+            repo
+        );
+        return htrRes;
+    }
 );
 
 apiV1Router.route("/auth", authRouter);

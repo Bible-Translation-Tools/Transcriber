@@ -27,14 +27,6 @@ CREATE TABLE IF NOT EXISTS "Transcriptions" (
     "model" TEXT,
     "prompt" TEXT,
     "system_prompt" TEXT,
-    "date" INTEGER
-);
-
--- Create TranscriptionTexts table if it doesn't exist
-CREATE TABLE IF NOT EXISTS "TranscriptionTexts" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "transcription_id" INTEGER REFERENCES "Transcriptions"("id"),
-    "start_verse" INTEGER,
-    "end_verse" INTEGER,
+    "date" INTEGER,
     "text" TEXT
 );
