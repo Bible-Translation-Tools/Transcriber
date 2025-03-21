@@ -1,10 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
-interface Option {
-	label: string;
-	value: string;
-}
-
 interface BookDropdownProps {
 	onSelect: (book: string, chapter?: number) => void;
 	selectedBook: string;
@@ -114,7 +109,8 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 	};
 
 	const filteredOptions = bookOptions.filter((option) =>
-		option.label.toLowerCase().includes(searchTerm.toLowerCase()),
+		option.label.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
+        option.value.toLowerCase().startsWith(searchTerm.toLowerCase())
 	);
 
 	const handleOutsideClick = useCallback((event: MouseEvent) => {
