@@ -17,6 +17,7 @@ export class D1TranscriptionRepository {
 
         await this.db.insert(schema.transcriptionImages).values({
             id: image.id,
+            userDeleted: image.user_deleted ? 1 : 0,
             filePath,
             languageCode: image.language_code,
             bookCode: image.book_code,

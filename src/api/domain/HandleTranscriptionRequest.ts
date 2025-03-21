@@ -39,6 +39,7 @@ export async function HandleTranscriptionRequest(
 
         const image: TranscriptionImage = {
             id: body.imageId,
+            user_deleted: false,
             userId: userId,
             path: `${userId}/${body.imageId}`,
             data: body.image,

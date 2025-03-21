@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "TranscriptionUsers" (
 -- Create TranscriptionImages table if it doesn't exist
 CREATE TABLE IF NOT EXISTS "TranscriptionImages" (
     "id" TEXT PRIMARY KEY,
+    "user_deleted" INTEGER,
     "user_id" INTEGER REFERENCES "TranscriptionUsers"("id"),
     "file_path" TEXT,
     "language_code" TEXT,

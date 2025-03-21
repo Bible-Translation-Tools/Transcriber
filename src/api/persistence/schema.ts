@@ -8,6 +8,7 @@ export const transcriptionUsers = sqliteTable("TranscriptionUsers", {
 export const transcriptionImages = sqliteTable('TranscriptionImages', {
     id: text('id').primaryKey(),
     userId: text("user_id").references(() => transcriptionUsers.id),
+    userDeleted: integer("user_deleted"),
     filePath: text('file_path'),
     languageCode: text('language_code'),
     bookCode: text('book_code'),
