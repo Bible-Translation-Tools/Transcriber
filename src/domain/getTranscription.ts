@@ -2,7 +2,7 @@ import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
 } from "@api/ai/TranscriptionResponse";
-import { TranscriptionRequest } from "@api/domain/TranscriptionRequest";
+import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest";
 import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@api/index";
 
 export async function getTranscription(
@@ -35,14 +35,17 @@ export async function getTranscription(
 
 export async function sendUpdatedTranscription(
 	imageId: string,
-    transcription: string
+	transcription: string,
 ): Promise<void> {
 	const response = await fetch(`${apiV1}${updateTranscriptionRoute}`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({imageId: imageId, transcription: transcription}),
+		body: JSON.stringify({
+			imageId: imageId,
+			transcription: transcription,
+		}),
 	});
 
 	console.log(response);

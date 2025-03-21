@@ -1,9 +1,9 @@
+import { useLanguageContext } from "@src/context/useLanguageContext";
 import type React from "react";
+import { useNavigate } from "react-router-dom";
 import { useImageContext } from "../context/useImageContext";
 import BookDropdown from "./BookDropdown";
 import LanguageDropdown from "./LanguageDropdown";
-import { useNavigate } from "react-router-dom";
-import { useLanguageContext } from "@src/context/useLanguageContext";
 
 const NavBar: React.FC = () => {
 	const {
@@ -16,9 +16,8 @@ const NavBar: React.FC = () => {
 		setChapter,
 	} = useImageContext();
 
-    const { languages } = useLanguageContext();
-    const navigate = useNavigate();
-
+	const { languages } = useLanguageContext();
+	const navigate = useNavigate();
 
 	const handleBookChapterSelect = (book: string, chapter: number) => {
 		setBookCode(book);
@@ -26,15 +25,15 @@ const NavBar: React.FC = () => {
 		console.log(`Book: ${book}, Chapter: ${chapter || "None"}`);
 	};
 
-    const onSettingsClicked = () => {
-        navigate("/settings");
-    }
+	const onSettingsClicked = () => {
+		navigate("/settings");
+	};
 
 	return (
 		<div className="flex items-center justify-between p-4 bg-white">
 			<div className="flex flex-1 grow items-center">
 				<LanguageDropdown
-                    languageOptions={languages}
+					languageOptions={languages}
 					recentLanguages={recentLanguages}
 					onSelect={setLanguage}
 					selectedLanguage={language}
@@ -50,7 +49,7 @@ const NavBar: React.FC = () => {
 				<button
 					type="button"
 					className="flex flex-row text-xl bg-transparent hover:bg-gray-200 py-2 px-4 rounded items-center justify-items-center gap-2"
-                    onClick={onSettingsClicked}
+					onClick={onSettingsClicked}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

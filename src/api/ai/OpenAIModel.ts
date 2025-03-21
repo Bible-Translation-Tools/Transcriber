@@ -1,8 +1,8 @@
+import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 import OpenAI from "openai";
 import { ApiKeyStatus } from "./ApiKeyStatus";
 import type Model from "./Model";
 import type { TranscriptionResponse } from "./TranscriptionResponse";
-import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 
 export default class OpenAIModel implements Model {
 	systemPrompt: string;
@@ -10,10 +10,14 @@ export default class OpenAIModel implements Model {
 	baseUrl = "https://api.openai.com/v1";
 	key: string;
 
-	constructor(key: string, systemPrompt: string = DetaultTranscriptionPrompt.SYSTEM, prompt: string = DetaultTranscriptionPrompt.PROMPT) {
+	constructor(
+		key: string,
+		systemPrompt: string = DetaultTranscriptionPrompt.SYSTEM,
+		prompt: string = DetaultTranscriptionPrompt.PROMPT,
+	) {
 		this.key = key;
-        this.systemPrompt = systemPrompt;
-        this.prompt = prompt;
+		this.systemPrompt = systemPrompt;
+		this.prompt = prompt;
 	}
 
 	async keyStatus(): Promise<ApiKeyStatus> {

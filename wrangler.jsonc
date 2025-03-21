@@ -29,7 +29,7 @@
 	"r2_buckets": [
 		{
 			"binding": "HTR_STORAGE",
-			"bucket_name": "htr_storage"
+			"bucket_name": "htr-storage" //underscore is not allowed. Already created the other infra with underscores though.
 		}
 	],
 	"d1_databases": [
@@ -42,8 +42,8 @@
 	// todo: maybe just axe this in favor of cf cache.
 	"kv_namespaces": [
 		{
-			"binding": "TRANSCRIBER_KV",
-			"id": "transcriber"
+			"binding": "HTR_KV",
+			"id": "htr_kv"
 		}
 	],
 	/**

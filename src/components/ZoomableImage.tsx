@@ -51,11 +51,11 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({ src }) => {
 			{({ zoomIn, zoomOut, resetTransform, ...rest }) => (
 				<>
 					<Controls />
-                    <div className="cursor-move">
-					<TransformComponent>
-						<img src={src} alt="test" />
-					</TransformComponent>
-                    </div>
+					<div className="cursor-move">
+						<TransformComponent>
+							<img src={src} alt="test" />
+						</TransformComponent>
+					</div>
 				</>
 			)}
 		</TransformWrapper>

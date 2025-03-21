@@ -11,79 +11,79 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 	selectedBook,
 	selectedChapter,
 }) => {
-    interface Option {
-        label: string;
-        value: string;
-    }
-    
-    const bookOptions: Option[] = [
-        { label: "Genesis", value: "gen" },
-        { label: "Exodus", value: "exo" },
-        { label: "Leviticus", value: "lev" },
-        { label: "Numbers", value: "num" },
-        { label: "Deuteronomy", value: "deu" },
-        { label: "Joshua", value: "jos" },
-        { label: "Judges", value: "jdg" },
-        { label: "Ruth", value: "rut" },
-        { label: "1 Samuel", value: "1sa" },
-        { label: "2 Samuel", value: "2sa" },
-        { label: "1 Kings", value: "1ki" },
-        { label: "2 Kings", value: "2ki" },
-        { label: "1 Chronicles", value: "1ch" },
-        { label: "2 Chronicles", value: "2ch" },
-        { label: "Ezra", value: "ezr" },
-        { label: "Nehemiah", value: "neh" },
-        { label: "Esther", value: "est" },
-        { label: "Job", value: "job" },
-        { label: "Psalms", value: "psa" },
-        { label: "Proverbs", value: "pro" },
-        { label: "Ecclesiastes", value: "ecc" },
-        { label: "Song of Solomon", value: "sng" },
-        { label: "Isaiah", value: "isa" },
-        { label: "Jeremiah", value: "jer" },
-        { label: "Lamentations", value: "lam" },
-        { label: "Ezekiel", value: "ezk" },
-        { label: "Daniel", value: "dan" },
-        { label: "Hosea", value: "hos" },
-        { label: "Joel", value: "jol" },
-        { label: "Amos", value: "amo" },
-        { label: "Obadiah", value: "oba" },
-        { label: "Jonah", value: "jon" },
-        { label: "Micah", value: "mic" },
-        { label: "Nahum", value: "nam" },
-        { label: "Habakkuk", value: "hab" },
-        { label: "Zephaniah", value: "zep" },
-        { label: "Haggai", value: "hag" },
-        { label: "Zechariah", value: "zec" },
-        { label: "Malachi", value: "mal" },
-        { label: "Matthew", value: "mat" },
-        { label: "Mark", value: "mrk" },
-        { label: "Luke", value: "luk" },
-        { label: "John", value: "jhn" },
-        { label: "Acts", value: "act" },
-        { label: "Romans", value: "rom" },
-        { label: "1 Corinthians", value: "1co" },
-        { label: "2 Corinthians", value: "2co" },
-        { label: "Galatians", value: "gal" },
-        { label: "Ephesians", value: "eph" },
-        { label: "Philippians", value: "php" },
-        { label: "Colossians", value: "col" },
-        { label: "1 Thessalonians", value: "1th" },
-        { label: "2 Thessalonians", value: "2th" },
-        { label: "1 Timothy", value: "1ti" },
-        { label: "2 Timothy", value: "2ti" },
-        { label: "Titus", value: "tit" },
-        { label: "Philemon", value: "phm" },
-        { label: "Hebrews", value: "heb" },
-        { label: "James", value: "jas" },
-        { label: "1 Peter", value: "1pe" },
-        { label: "2 Peter", value: "2pe" },
-        { label: "1 John", value: "1jn" },
-        { label: "2 John", value: "2jn" },
-        { label: "3 John", value: "3jn" },
-        { label: "Jude", value: "jud" },
-        { label: "Revelation", value: "rev" },
-    ];
+	interface Option {
+		label: string;
+		value: string;
+	}
+
+	const bookOptions: Option[] = [
+		{ label: "Genesis", value: "gen" },
+		{ label: "Exodus", value: "exo" },
+		{ label: "Leviticus", value: "lev" },
+		{ label: "Numbers", value: "num" },
+		{ label: "Deuteronomy", value: "deu" },
+		{ label: "Joshua", value: "jos" },
+		{ label: "Judges", value: "jdg" },
+		{ label: "Ruth", value: "rut" },
+		{ label: "1 Samuel", value: "1sa" },
+		{ label: "2 Samuel", value: "2sa" },
+		{ label: "1 Kings", value: "1ki" },
+		{ label: "2 Kings", value: "2ki" },
+		{ label: "1 Chronicles", value: "1ch" },
+		{ label: "2 Chronicles", value: "2ch" },
+		{ label: "Ezra", value: "ezr" },
+		{ label: "Nehemiah", value: "neh" },
+		{ label: "Esther", value: "est" },
+		{ label: "Job", value: "job" },
+		{ label: "Psalms", value: "psa" },
+		{ label: "Proverbs", value: "pro" },
+		{ label: "Ecclesiastes", value: "ecc" },
+		{ label: "Song of Solomon", value: "sng" },
+		{ label: "Isaiah", value: "isa" },
+		{ label: "Jeremiah", value: "jer" },
+		{ label: "Lamentations", value: "lam" },
+		{ label: "Ezekiel", value: "ezk" },
+		{ label: "Daniel", value: "dan" },
+		{ label: "Hosea", value: "hos" },
+		{ label: "Joel", value: "jol" },
+		{ label: "Amos", value: "amo" },
+		{ label: "Obadiah", value: "oba" },
+		{ label: "Jonah", value: "jon" },
+		{ label: "Micah", value: "mic" },
+		{ label: "Nahum", value: "nam" },
+		{ label: "Habakkuk", value: "hab" },
+		{ label: "Zephaniah", value: "zep" },
+		{ label: "Haggai", value: "hag" },
+		{ label: "Zechariah", value: "zec" },
+		{ label: "Malachi", value: "mal" },
+		{ label: "Matthew", value: "mat" },
+		{ label: "Mark", value: "mrk" },
+		{ label: "Luke", value: "luk" },
+		{ label: "John", value: "jhn" },
+		{ label: "Acts", value: "act" },
+		{ label: "Romans", value: "rom" },
+		{ label: "1 Corinthians", value: "1co" },
+		{ label: "2 Corinthians", value: "2co" },
+		{ label: "Galatians", value: "gal" },
+		{ label: "Ephesians", value: "eph" },
+		{ label: "Philippians", value: "php" },
+		{ label: "Colossians", value: "col" },
+		{ label: "1 Thessalonians", value: "1th" },
+		{ label: "2 Thessalonians", value: "2th" },
+		{ label: "1 Timothy", value: "1ti" },
+		{ label: "2 Timothy", value: "2ti" },
+		{ label: "Titus", value: "tit" },
+		{ label: "Philemon", value: "phm" },
+		{ label: "Hebrews", value: "heb" },
+		{ label: "James", value: "jas" },
+		{ label: "1 Peter", value: "1pe" },
+		{ label: "2 Peter", value: "2pe" },
+		{ label: "1 John", value: "1jn" },
+		{ label: "2 John", value: "2jn" },
+		{ label: "3 John", value: "3jn" },
+		{ label: "Jude", value: "jud" },
+		{ label: "Revelation", value: "rev" },
+	];
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -108,9 +108,10 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 		setOpenBook(null);
 	};
 
-	const filteredOptions = bookOptions.filter((option) =>
-		option.label.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-        option.value.toLowerCase().startsWith(searchTerm.toLowerCase())
+	const filteredOptions = bookOptions.filter(
+		(option) =>
+			option.label.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
+			option.value.toLowerCase().startsWith(searchTerm.toLowerCase()),
 	);
 
 	const handleOutsideClick = useCallback((event: MouseEvent) => {
@@ -132,76 +133,143 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 	}, [handleOutsideClick]);
 
 	const getChapters = (book: string): number[] => {
-        switch (book) {
-            case "gen": return Array.from({ length: 50 }, (_, i) => i + 1);
-            case "exo": return Array.from({ length: 40 }, (_, i) => i + 1);
-            case "lev": return Array.from({ length: 27 }, (_, i) => i + 1);
-            case "num": return Array.from({ length: 36 }, (_, i) => i + 1);
-            case "deu": return Array.from({ length: 34 }, (_, i) => i + 1);
-            case "jos": return Array.from({ length: 24 }, (_, i) => i + 1);
-            case "jdg": return Array.from({ length: 21 }, (_, i) => i + 1);
-            case "rut": return Array.from({ length: 4 }, (_, i) => i + 1);
-            case "1sa": return Array.from({ length: 31 }, (_, i) => i + 1);
-            case "2sa": return Array.from({ length: 24 }, (_, i) => i + 1);
-            case "1ki": return Array.from({ length: 22 }, (_, i) => i + 1);
-            case "2ki": return Array.from({ length: 25 }, (_, i) => i + 1);
-            case "1ch": return Array.from({ length: 29 }, (_, i) => i + 1);
-            case "2ch": return Array.from({ length: 36 }, (_, i) => i + 1);
-            case "ezr": return Array.from({ length: 10 }, (_, i) => i + 1);
-            case "neh": return Array.from({ length: 13 }, (_, i) => i + 1);
-            case "est": return Array.from({ length: 10 }, (_, i) => i + 1);
-            case "job": return Array.from({ length: 42 }, (_, i) => i + 1);
-            case "psa": return Array.from({ length: 150 }, (_, i) => i + 1);
-            case "pro": return Array.from({ length: 31 }, (_, i) => i + 1);
-            case "ecc": return Array.from({ length: 12 }, (_, i) => i + 1);
-            case "sng": return Array.from({ length: 8 }, (_, i) => i + 1);
-            case "isa": return Array.from({ length: 66 }, (_, i) => i + 1);
-            case "jer": return Array.from({ length: 52 }, (_, i) => i + 1);
-            case "lam": return Array.from({ length: 5 }, (_, i) => i + 1);
-            case "ezk": return Array.from({ length: 48 }, (_, i) => i + 1);
-            case "dan": return Array.from({ length: 12 }, (_, i) => i + 1);
-            case "hos": return Array.from({ length: 14 }, (_, i) => i + 1);
-            case "jol": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "amo": return Array.from({ length: 9 }, (_, i) => i + 1);
-            case "oba": return Array.from({ length: 1 }, (_, i) => i + 1);
-            case "jon": return Array.from({ length: 4 }, (_, i) => i + 1);
-            case "mic": return Array.from({ length: 7 }, (_, i) => i + 1);
-            case "nam": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "hab": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "zep": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "hag": return Array.from({ length: 2 }, (_, i) => i + 1);
-            case "zec": return Array.from({ length: 14 }, (_, i) => i + 1);
-            case "mal": return Array.from({ length: 4 }, (_, i) => i + 1);
-            case "mat": return Array.from({ length: 28 }, (_, i) => i + 1);
-            case "mrk": return Array.from({ length: 16 }, (_, i) => i + 1);
-            case "luk": return Array.from({ length: 24 }, (_, i) => i + 1);
-            case "jhn": return Array.from({ length: 21 }, (_, i) => i + 1);
-            case "act": return Array.from({ length: 28 }, (_, i) => i + 1);
-            case "rom": return Array.from({ length: 16 }, (_, i) => i + 1);
-            case "1co": return Array.from({ length: 16 }, (_, i) => i + 1);
-            case "2co": return Array.from({ length: 13 }, (_, i) => i + 1);
-            case "gal": return Array.from({ length: 6 }, (_, i) => i + 1);
-            case "eph": return Array.from({ length: 6 }, (_, i) => i + 1);
-            case "php": return Array.from({ length: 4 }, (_, i) => i + 1);
-            case "col": return Array.from({ length: 4 }, (_, i) => i + 1);
-            case "1th": return Array.from({ length: 5 }, (_, i) => i + 1);
-            case "2th": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "1ti": return Array.from({ length: 6 }, (_, i) => i + 1);
-            case "2ti": return Array.from({ length: 4 }, (_, i) => i + 1);
-            case "tit": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "phm": return Array.from({ length: 1 }, (_, i) => i + 1);
-            case "heb": return Array.from({ length: 13 }, (_, i) => i + 1);
-            case "jas": return Array.from({ length: 5 }, (_, i) => i + 1);
-            case "1pe": return Array.from({ length: 5 }, (_, i) => i + 1);
-            case "2pe": return Array.from({ length: 3 }, (_, i) => i + 1);
-            case "1jn": return Array.from({ length: 5 }, (_, i) => i + 1);
-            case "2jn": return Array.from({ length: 1 }, (_, i) => i + 1);
-            case "3jn": return Array.from({ length: 1 }, (_, i) => i + 1);
-            case "jud": return Array.from({ length: 1 }, (_, i) => i + 1);
-            case "rev": return Array.from({ length: 22 }, (_, i) => i + 1);
-            default: return [];
-        }
-    };
+		switch (book) {
+			case "gen":
+				return Array.from({ length: 50 }, (_, i) => i + 1);
+			case "exo":
+				return Array.from({ length: 40 }, (_, i) => i + 1);
+			case "lev":
+				return Array.from({ length: 27 }, (_, i) => i + 1);
+			case "num":
+				return Array.from({ length: 36 }, (_, i) => i + 1);
+			case "deu":
+				return Array.from({ length: 34 }, (_, i) => i + 1);
+			case "jos":
+				return Array.from({ length: 24 }, (_, i) => i + 1);
+			case "jdg":
+				return Array.from({ length: 21 }, (_, i) => i + 1);
+			case "rut":
+				return Array.from({ length: 4 }, (_, i) => i + 1);
+			case "1sa":
+				return Array.from({ length: 31 }, (_, i) => i + 1);
+			case "2sa":
+				return Array.from({ length: 24 }, (_, i) => i + 1);
+			case "1ki":
+				return Array.from({ length: 22 }, (_, i) => i + 1);
+			case "2ki":
+				return Array.from({ length: 25 }, (_, i) => i + 1);
+			case "1ch":
+				return Array.from({ length: 29 }, (_, i) => i + 1);
+			case "2ch":
+				return Array.from({ length: 36 }, (_, i) => i + 1);
+			case "ezr":
+				return Array.from({ length: 10 }, (_, i) => i + 1);
+			case "neh":
+				return Array.from({ length: 13 }, (_, i) => i + 1);
+			case "est":
+				return Array.from({ length: 10 }, (_, i) => i + 1);
+			case "job":
+				return Array.from({ length: 42 }, (_, i) => i + 1);
+			case "psa":
+				return Array.from({ length: 150 }, (_, i) => i + 1);
+			case "pro":
+				return Array.from({ length: 31 }, (_, i) => i + 1);
+			case "ecc":
+				return Array.from({ length: 12 }, (_, i) => i + 1);
+			case "sng":
+				return Array.from({ length: 8 }, (_, i) => i + 1);
+			case "isa":
+				return Array.from({ length: 66 }, (_, i) => i + 1);
+			case "jer":
+				return Array.from({ length: 52 }, (_, i) => i + 1);
+			case "lam":
+				return Array.from({ length: 5 }, (_, i) => i + 1);
+			case "ezk":
+				return Array.from({ length: 48 }, (_, i) => i + 1);
+			case "dan":
+				return Array.from({ length: 12 }, (_, i) => i + 1);
+			case "hos":
+				return Array.from({ length: 14 }, (_, i) => i + 1);
+			case "jol":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "amo":
+				return Array.from({ length: 9 }, (_, i) => i + 1);
+			case "oba":
+				return Array.from({ length: 1 }, (_, i) => i + 1);
+			case "jon":
+				return Array.from({ length: 4 }, (_, i) => i + 1);
+			case "mic":
+				return Array.from({ length: 7 }, (_, i) => i + 1);
+			case "nam":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "hab":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "zep":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "hag":
+				return Array.from({ length: 2 }, (_, i) => i + 1);
+			case "zec":
+				return Array.from({ length: 14 }, (_, i) => i + 1);
+			case "mal":
+				return Array.from({ length: 4 }, (_, i) => i + 1);
+			case "mat":
+				return Array.from({ length: 28 }, (_, i) => i + 1);
+			case "mrk":
+				return Array.from({ length: 16 }, (_, i) => i + 1);
+			case "luk":
+				return Array.from({ length: 24 }, (_, i) => i + 1);
+			case "jhn":
+				return Array.from({ length: 21 }, (_, i) => i + 1);
+			case "act":
+				return Array.from({ length: 28 }, (_, i) => i + 1);
+			case "rom":
+				return Array.from({ length: 16 }, (_, i) => i + 1);
+			case "1co":
+				return Array.from({ length: 16 }, (_, i) => i + 1);
+			case "2co":
+				return Array.from({ length: 13 }, (_, i) => i + 1);
+			case "gal":
+				return Array.from({ length: 6 }, (_, i) => i + 1);
+			case "eph":
+				return Array.from({ length: 6 }, (_, i) => i + 1);
+			case "php":
+				return Array.from({ length: 4 }, (_, i) => i + 1);
+			case "col":
+				return Array.from({ length: 4 }, (_, i) => i + 1);
+			case "1th":
+				return Array.from({ length: 5 }, (_, i) => i + 1);
+			case "2th":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "1ti":
+				return Array.from({ length: 6 }, (_, i) => i + 1);
+			case "2ti":
+				return Array.from({ length: 4 }, (_, i) => i + 1);
+			case "tit":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "phm":
+				return Array.from({ length: 1 }, (_, i) => i + 1);
+			case "heb":
+				return Array.from({ length: 13 }, (_, i) => i + 1);
+			case "jas":
+				return Array.from({ length: 5 }, (_, i) => i + 1);
+			case "1pe":
+				return Array.from({ length: 5 }, (_, i) => i + 1);
+			case "2pe":
+				return Array.from({ length: 3 }, (_, i) => i + 1);
+			case "1jn":
+				return Array.from({ length: 5 }, (_, i) => i + 1);
+			case "2jn":
+				return Array.from({ length: 1 }, (_, i) => i + 1);
+			case "3jn":
+				return Array.from({ length: 1 }, (_, i) => i + 1);
+			case "jud":
+				return Array.from({ length: 1 }, (_, i) => i + 1);
+			case "rev":
+				return Array.from({ length: 22 }, (_, i) => i + 1);
+			default:
+				return [];
+		}
+	};
 
 	const chapters = openBook ? getChapters(openBook) : [];
 

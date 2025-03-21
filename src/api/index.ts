@@ -1,10 +1,10 @@
 import { authRouter } from "@api/auth/router";
 import { checkOrRefresh, syncR2Keys } from "@api/auth/utils";
 import {
-    HandleTranscriptionRequest,
-    HandleUpdateTranscriptionRequest,
-    transcriptionRequestSchema,
-    updateTranscriptionRequestSchema,
+	HandleTranscriptionRequest,
+	HandleUpdateTranscriptionRequest,
+	transcriptionRequestSchema,
+	updateTranscriptionRequestSchema,
 } from "@api/domain/HandleTranscriptionRequest";
 import { TranscriptionModel } from "@api/domain/TranscriptionRequest";
 import { Hono } from "hono";
@@ -18,8 +18,8 @@ import { R2ImageRepository } from "./persistence/R2ImageRepository";
 
 export const apiV1 = "/api/v1";
 const apiV1Router = new Hono<{
-    Bindings: Env;
-    Variables: JwtVariables;
+	Bindings: Env;
+	Variables: JwtVariables;
 }>();
 apiV1Router.basePath(apiV1);
 
@@ -28,95 +28,98 @@ export const updateTranscriptionRoute = "/updateTranscription/";
 
 apiV1Router.use("*", logger());
 apiV1Router.use(
-    "*",
-    except([`${apiV1}/auth/logout`], (c, next) => syncR2Keys(c, next)),
+	"*",
+	except([`${apiV1}/auth/logout`], (c, next) => syncR2Keys(c, next)),
 );
 
 // MIDDLEWARES. no response returned here.
 // This is the only ai route right now and we don't need to register middleware for the auth route itself, but if they had a common prefix, we could group as use (routePrefix, middles)
 // check for access Token first
 apiV1Router.post(transcribeRoute, async (c, next) => {
-    return await checkOrRefresh(c, next);
+	return await checkOrRefresh(c, next);
 });
 
 apiV1Router.get("checkTest", async (c, next) => {
-    const jwtPayload = c.get("jwtPayload");
-    return c.json({ jwtPayload });
+	const jwtPayload = c.get("jwtPayload");
+	return c.json({ jwtPayload });
 });
 
 apiV1Router.post(
-    `${transcribeRoute}`,
-    validator("json", (value) => {
-        // throws if invalid
-        const parsed = v.safeParse(transcriptionRequestSchema, value);
-        if (!parsed.success) {
-            console.error(`invalid transcription request`);
-            return new Response(
-                JSON.stringify({ error: "Invalid request format" }),
-                {
-                    status: 400,
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
-        }
-        return parsed.output;
-    }),
-    async (c) => {
-        const jwtPayload = c.get("jwtPayload");
-        const body = c.req.valid("json");
+	`${transcribeRoute}`,
+	validator("json", (value) => {
+		// throws if invalid
+		const parsed = v.safeParse(transcriptionRequestSchema, value);
+		if (!parsed.success) {
+			console.error("invalid transcription request");
+			return new Response(
+				JSON.stringify({ error: "Invalid request format" }),
+				{
+					status: 400,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}
+		return parsed.output;
+	}),
+	async (c) => {
+		const jwtPayload = c.get("jwtPayload");
+		const body = c.req.valid("json");
 
-        const bucket = c.env.HTR_STORAGE;
-        const repo = new D1TranscriptionRepository(c.env.HTR_DATABASE, new R2ImageRepository(bucket))
-    
-        const user = jwtPayload.sub;
+		const bucket = c.env.HTR_STORAGE;
+		const repo = new D1TranscriptionRepository(
+			c.env.HTR_DATABASE,
+			new R2ImageRepository(bucket),
+		);
 
-        const htrRes = await HandleTranscriptionRequest(
-            user,
-            createApiMap(c.env),
-            body,
-            repo
-        );
-        return htrRes;
-    },
+		const user = jwtPayload.sub;
+
+		const htrRes = await HandleTranscriptionRequest(
+			user,
+			createApiMap(c.env),
+			body,
+			repo,
+		);
+		return htrRes;
+	},
 );
 
 apiV1Router.post(
-    `${updateTranscriptionRoute}`,
-    validator("json", (value) => {
-        // throws if invalid
-        const parsed = v.safeParse(updateTranscriptionRequestSchema, value);
-        if (!parsed.success) {
-            console.error(`invalid transcription update request`);
-            return new Response(
-                JSON.stringify({ error: "Invalid request format" }),
-                {
-                    status: 400,
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
-        }
-        return parsed.output;
-    }),
-    async (c) => {
-        const body = c.req.valid("json");
+	`${updateTranscriptionRoute}`,
+	validator("json", (value) => {
+		// throws if invalid
+		const parsed = v.safeParse(updateTranscriptionRequestSchema, value);
+		if (!parsed.success) {
+			console.error("invalid transcription update request");
+			return new Response(
+				JSON.stringify({ error: "Invalid request format" }),
+				{
+					status: 400,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}
+		return parsed.output;
+	}),
+	async (c) => {
+		const body = c.req.valid("json");
 
-        const bucket = c.env.HTR_STORAGE;
-        const repo = new D1TranscriptionRepository(c.env.HTR_DATABASE, new R2ImageRepository(bucket))
+		const bucket = c.env.HTR_STORAGE;
+		const repo = new D1TranscriptionRepository(
+			c.env.HTR_DATABASE,
+			new R2ImageRepository(bucket),
+		);
 
-        const htrRes = await HandleUpdateTranscriptionRequest(
-            body,
-            repo
-        );
-        return htrRes;
-    }
+		const htrRes = await HandleUpdateTranscriptionRequest(body, repo);
+		return htrRes;
+	},
 );
 
 apiV1Router.route("/auth", authRouter);
 
 function createApiMap(env: Env): Map<TranscriptionModel, string> {
-    const keys = new Map<TranscriptionModel, string>();
-    keys.set(TranscriptionModel.OPENAI, env.OPENAI_KEY);
-    return keys;
+	const keys = new Map<TranscriptionModel, string>();
+	keys.set(TranscriptionModel.OPENAI, env.OPENAI_KEY);
+	return keys;
 }
 
 export { apiV1Router };
