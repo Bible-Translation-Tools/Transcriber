@@ -36,7 +36,7 @@
 		{
 			"binding": "HTR_DATABASE",
 			"database_name": "htr_database",
-			"database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+			"database_id": "3153b394-4b31-4a7c-9b62-232791c723c1"
 		}
 	],
 	// todo: maybe just axe this in favor of cf cache.
