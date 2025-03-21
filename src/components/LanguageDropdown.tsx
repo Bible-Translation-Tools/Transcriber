@@ -36,10 +36,63 @@ const Dropdown: React.FC<DropdownProps> = ({
         setIsOpen(false);
     };
 
+    const lowerSearchTerm = searchTerm.toLowerCase();
     const filteredOptions = options.filter((option) =>
-        option.code.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+        option.code.toLowerCase().includes(lowerSearchTerm) ||
+        option.anglicized.toLowerCase().includes(lowerSearchTerm)
+    )
+    .sort((a, b) => {
+        const aCodeExact = a.code.toLowerCase() === lowerSearchTerm;
+        const bCodeExact = b.code.toLowerCase() === lowerSearchTerm;
+        const aAnglicizedExact = a.anglicized.toLowerCase() === lowerSearchTerm;
+        const bAnglicizedExact = b.anglicized.toLowerCase() === lowerSearchTerm;
 
+        const aCodeStartsWith = a.code.toLowerCase().startsWith(lowerSearchTerm);
+        const bCodeStartsWith = b.code.toLowerCase().startsWith(lowerSearchTerm);
+        const aAnglicizedStartsWith = a.anglicized.toLowerCase().startsWith(lowerSearchTerm);
+        const bAnglicizedStartsWith = b.anglicized.toLowerCase().startsWith(lowerSearchTerm);
+
+        // Prioritize exact code matches
+        if (aCodeExact && !bCodeExact) {
+            return -1;
+        }
+        if (!aCodeExact && bCodeExact) {
+            return 1;
+        }
+
+        // Prioritize exact anglicized matches
+        if (aAnglicizedExact && !bAnglicizedExact) {
+            return -1;
+        }
+        if (!aAnglicizedExact && bAnglicizedExact) {
+            return 1;
+        }
+
+        // Prioritize code starts with matches
+        if (aCodeStartsWith && !bCodeStartsWith) {
+            return -1;
+        }
+        if (!aCodeStartsWith && bCodeStartsWith) {
+            return 1;
+        }
+
+        // Prioritize anglicized starts with matches
+        if (aAnglicizedStartsWith && !bAnglicizedStartsWith) {
+            return -1;
+        }
+        if (!aAnglicizedStartsWith && bAnglicizedStartsWith) {
+            return 1;
+        }
+
+        // If all are the same, sort alphabetically
+        if (a.code < b.code) {
+            return -1;
+        }
+        if (a.code > b.code) {
+            return 1;
+        }
+        return 0;
+    });
     const handleOutsideClick = useCallback((event: MouseEvent) => {
         if (
             dropdownRef.current &&
@@ -158,7 +211,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                             {filteredOptions.map((option) => (
                                 <button
                                     type="button"
-                                    key={option.anglicized}
+                                    key={option.code}
                                     className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between w-full"
                                     onClick={() =>
                                         handleOptionClick(
