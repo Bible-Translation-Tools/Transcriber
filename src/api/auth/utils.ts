@@ -48,7 +48,7 @@ export async function getRefreshTokenMw(ctx: Context, next: Next) {
     const refreshCookie = getCookie(ctx, WACS_API_REFRESH_TOKEN);
     // no refresh cookie and no auth token = redirect. Login again
     console.log("no refresh or access cookie, redirecting. ");
-    if (!refreshCookie) return;
+    if (!refreshCookie) return await next();
     // get new token useing refresh token
     const data = await getOauthTokens({
         env: ctx.env,
@@ -60,7 +60,7 @@ export async function getRefreshTokenMw(ctx: Context, next: Next) {
     console.error("err refreshing tokens", data);
     if (data.type === "error") {
         ctx.set("refreshError", data.error);
-        return;
+        return await next();
     }
     setLoginCookies({
         accessToken: data.accessToken,

@@ -37,7 +37,7 @@ apiV1Router.use(
 // This is the only ai route right now and we don't need to register middleware for the auth route itself, but if they had a common prefix, we could group as use (routePrefix, middles)
 // check for access Token first
 apiV1Router.post(transcribeRoute, async (c, next) => {
-    return checkOrRefresh(c, next);
+    return await checkOrRefresh(c, next);
 });
 
 apiV1Router.get("checkTest", async (c, next) => {

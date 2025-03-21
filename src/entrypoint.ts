@@ -9,18 +9,20 @@ app.route("/api/v1/", apiV1Router);
 app.get("/api/v1/test", (c) => {
     return c.text("works");
 });
-// app.get("/welcome", async (c, next) => {
-//     return checkOrRefresh(c, next);
-// });
 
-app.get('/welcome', async (c, next) => {
+app.get("/welcome", async (c, next) => {
+    return await checkOrRefresh(c, next);
+});
+
+//redirect if auth, othwerise defer to welcome page
+app.get("/welcome", async (c) => {
     const jwtPayload = c.get("jwtPayload");
     if (jwtPayload) {
-        console.log("Logged")
-        return c.redirect(transcribeRoute)
+      return c.redirect(transcribeRoute);
     }
     return c.env.ASSETS.fetch(c.req.url);
-});
+  });
+   
 // fallback to span handling of anything else
 app.all("*", (c) => c.env.ASSETS.fetch(c.req.url));
 
