@@ -93,7 +93,7 @@ export async function syncR2Keys(ctx: Context<{ Bindings: Env }>, next: Next) {
 			// we can just check the presence of the key since the expirationTtl is set below to the const
 			const lastVal =
 				await ctx.env.HTR_KV.getWithMetadata(CACHED_JWKS_KEY);
-			if (lastVal) {
+			if (lastVal.value) {
 				// console.log("last cached was", lastVal.metadata?.timeCached);
 				console.log(`last cached was ${JSON.stringify(lastVal)}`);
 				return;
