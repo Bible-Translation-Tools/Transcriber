@@ -1,5 +1,5 @@
 import type { TranscriptionImage } from "../data/TranscriptionImage";
-import type IndexedDBImageRepository from "./IndexedDbImageRepository";
+import type IndexedDBImageRepository from "./IndexedDBImageRepository";
 
 class TranscriptionRepository {
 	constructor(

@@ -21,7 +21,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": ".",
     "paths": {
 			"@api/*": ["./src/api/*"],
 			"@types": ["./src/types.ts"],
@@ -29,6 +28,6 @@
 			"@components/*": ["./src/components/*"],
 		},
   },
-  "include": ["./src"],
+  "include": ["./src/**/*"],
   "exclude": ["./src/api/**/*", "./src/entrypoint.ts"]
 }

@@ -1,3 +1,4 @@
+// @ts-ignore
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";

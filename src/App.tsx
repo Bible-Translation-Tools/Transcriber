@@ -1,11 +1,6 @@
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import {
-	Route,
-	BrowserRouter as Router,
-	Routes,
-	useNavigate,
-} from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./index.css";
 import SettingsPage from "@src/routes/SettingsPage.tsx";
 import { ImageProvider } from "./context/ImageContext.tsx";

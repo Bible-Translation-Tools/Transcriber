@@ -1,5 +1,5 @@
-import { getLanguagesPublicDataApi } from "@api/domain/languages/getLanguages";
 import type { LanguageOption } from "@src/components/LanguageDropdown";
+import { getLanguagesPublicDataApi } from "@src/data/languages";
 import { createContext, useEffect, useState } from "react";
 
 interface LanguageContextType {

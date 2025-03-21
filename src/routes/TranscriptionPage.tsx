@@ -1,7 +1,7 @@
 import "../App.css";
+// @ts-ignore
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import ImagePreviewList from "../components/ImagePreviewList";
 import NavBar from "../components/NavBar";
 import Pagination from "../components/Pagination";
@@ -19,14 +19,6 @@ function TranscriptionPage() {
 		resubmitImageForTranscription,
 	} = useImageContext();
 	const [currentPage, setCurrentPage] = useState(0);
-	const navigate = useNavigate();
-
-	// useEffect(() => {
-	//     if (images.length === 0) {
-	//         console.log("Images exist, navigating to Home");
-	//         navigate('/');
-	//     }
-	// }, [images, navigate]);
 
 	for (let i = 0; i < images.length; i++) {
 		console.log(images[i].url);

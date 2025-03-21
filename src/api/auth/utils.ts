@@ -14,7 +14,6 @@ import { some } from "hono/combine";
 import { getCookie } from "hono/cookie";
 import { jwk } from "hono/jwk";
 import { decode } from "hono/jwt";
-import type { HonoJsonWebKey } from "hono/utils/jwt/jws";
 import * as v from "valibot";
 import { getOauthTokens } from "./login";
 

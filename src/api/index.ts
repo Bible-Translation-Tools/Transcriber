@@ -39,7 +39,7 @@ apiV1Router.post(transcribeRoute, async (c, next) => {
 	return await checkOrRefresh(c, next);
 });
 
-apiV1Router.get("checkTest", async (c, next) => {
+apiV1Router.get("checkTest", async (c) => {
 	const jwtPayload = c.get("jwtPayload");
 	return c.json({ jwtPayload });
 });

@@ -130,6 +130,7 @@ export async function getOauthTokens({
 	const REDIRECT_PATH = env.SSO_REDIRECT_PATH;
 	const SSO_BASE_URL = env.SSO_BASE_URL;
 	if (!code && grantType === GRANT_CODE_FLOW) {
+		console.error("Missing code for code flow");
 		return {
 			type: "error",
 			error: "Missing code parameter",
@@ -137,6 +138,7 @@ export async function getOauthTokens({
 		};
 	}
 	if (!refreshToken && grantType === GRANT_REFRESH_TOKEN) {
+		console.error("Missing refresh token for refresh flow");
 		return {
 			type: "error",
 			error: "Missing refresh token",
@@ -164,14 +166,18 @@ export async function getOauthTokens({
 			},
 			body: JSON.stringify(requestBody),
 		});
+		const data = (await response.json()) as TokenResponse;
 		if (!response.ok) {
+			console.log({
+				oauthFetchResponse: response,
+				data,
+			});
 			return {
 				type: "error",
 				error: "fetch for token failed",
 				status: 400,
 			};
 		}
-		const data = (await response.json()) as TokenResponse;
 		// todo: should validate not assert shape of tokenData
 		// console.log(data);
 		return {

@@ -1,5 +1,4 @@
 import type React from "react";
-import { Component } from "react";
 
 import {
 	TransformComponent,

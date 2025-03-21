@@ -1,11 +1,10 @@
 import { LOGIN_PATH } from "@api/auth/router";
 import { CSRF_STATE_KEY } from "@src/constants";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
 	const navigate = useNavigate();
-	const [loading, setLoading] = useState(true);
 
 	const handleLogin = useCallback(async () => {
 		const searchParams = new URLSearchParams(window.location.search);
@@ -44,11 +43,9 @@ function Login() {
 
 	// This is a headless component, no render output
 	return (
-		loading && (
-			<div className="flex justify-center items-center h-screen">
-				Logging in...
-			</div>
-		)
+		<div className="flex justify-center items-center h-screen">
+			Logging in...
+		</div>
 	);
 }
 
