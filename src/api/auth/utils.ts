@@ -94,11 +94,15 @@ export async function syncR2Keys(ctx: Context<{ Bindings: Env }>, next: Next) {
 			const lastVal =
 				await ctx.env.HTR_KV.getWithMetadata(CACHED_JWKS_KEY);
 			if (lastVal) {
-				// console.log(`last cached was ${JSON.stringify(lastVal)}`);
+				// console.log("last cached was", lastVal.metadata?.timeCached);
+				console.log(`last cached was ${JSON.stringify(lastVal)}`);
 				return;
 			}
 			const jwksUri = `${ctx.env.SSO_BASE_URL}/login/oauth/keys`;
 			const res = await fetch(jwksUri);
+			console.log({
+				jwksUriSyncResponse: res,
+			});
 			if (res.ok) {
 				const data = await res.json();
 				const parsed = v.parse(jwksResponseSchema, data);
@@ -117,12 +121,14 @@ export async function syncR2Keys(ctx: Context<{ Bindings: Env }>, next: Next) {
 				return;
 			}
 		} catch (e) {
-			console.error(e);
+			console.error({
+				syncR2KeysError: e,
+			});
 		}
 	}
 	// A cron would be a little more sophisticated than refreshing jwks each response, but after this is cached once, it'll check these first on incoming auth requests and then refresh the cached kv store for next req.Ideally the jwks middleware would let you tap into it's response to cache it, but it doesn't right now. I.e. //https://github.com/orgs/honojs/discussions/3983
+	ctx.executionCtx.waitUntil(fetchKeys());
 	await next();
-	return ctx.executionCtx.waitUntil(fetchKeys());
 
 	// continue on middleware, non blocking
 }
