@@ -10,7 +10,7 @@ export async function HandleUpdateTranscriptionRequest(
     body: UpdateTranscriptionRequest,
     imageRepo: D1TranscriptionRepository
 ): Promise<Response> {
-    imageRepo.updateTranscriptionText(body.imageId, body.transcription);
+    await imageRepo.updateTranscriptionText(body.imageId, body.transcription);
     return Response.json({});
 }
 

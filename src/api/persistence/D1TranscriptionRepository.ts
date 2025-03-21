@@ -146,7 +146,7 @@ export class D1TranscriptionRepository {
                 .where(
                     and(
                         eq(schema.transcriptions.imageId, imageId),
-                        eq(schema.transcriptions.humanModified, 1)
+                        eq(schema.transcriptions.humanModified, 0)
                     )
                 )
                 .orderBy(desc(schema.transcriptions.date))

@@ -2,10 +2,10 @@ import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
 } from "@api/ai/TranscriptionResponse";
-import { TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
-import { apiV1, transcribeRoute } from "@api/index";
+import { TranscriptionRequest } from "@api/domain/TranscriptionRequest";
+import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@api/index";
 
-export default async function getTranscription(
+export async function getTranscription(
 	request: TranscriptionRequest,
 ): Promise<TranscriptionResponse> {
 	const response = await fetch(`${apiV1}${transcribeRoute}`, {
@@ -31,4 +31,19 @@ export default async function getTranscription(
 			errorCode: TranscriptionErrorCode.UnknownError,
 		};
 	}
+}
+
+export async function sendUpdatedTranscription(
+	imageId: string,
+    transcription: string
+): Promise<void> {
+	const response = await fetch(`${apiV1}${updateTranscriptionRoute}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({imageId: imageId, transcription: transcription}),
+	});
+
+	console.log(response);
 }

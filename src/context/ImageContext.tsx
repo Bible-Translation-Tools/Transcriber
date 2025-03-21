@@ -1,6 +1,6 @@
 import { DetaultTranscriptionPrompt, TranscriptionModel, TranscriptionRequest } from "@api/domain/TranscriptionRequest";
 import { LanguageOption } from "@src/components/LanguageDropdown";
-import getTranscription from "@src/domain/getTranscription";
+import { getTranscription, sendUpdatedTranscription } from "@src/domain/getTranscription";
 import type React from "react";
 import { createContext, useEffect, useRef, useState } from "react";
 
@@ -67,8 +67,8 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
     let restoredLanguage = null
     if (storedSelectedLanguage != null) {
         try {
-        restoredLanguage = JSON.parse(storedSelectedLanguage)
-        } catch {}
+            restoredLanguage = JSON.parse(storedSelectedLanguage)
+        } catch { }
     }
 
     const [language, updateLanguage] = useState<LanguageOption | null>(restoredLanguage);
@@ -220,6 +220,10 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
             request.onerror = (event) => {
                 console.error("Error updating image in IndexedDB:", event);
             };
+
+            if (updatedImage?.transcription) {
+                sendUpdatedTranscription(updatedImage.id, updatedImage.transcription)
+            }
 
             request.onsuccess = () => {
                 for (let i = 0; i < images.length; i++) {
