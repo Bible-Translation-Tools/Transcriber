@@ -2,7 +2,14 @@
   "extends": "./tsconfig.node.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
-    "types": ["@cloudflare/workers-types/2023-07-01", "./worker-configuration.d.ts", "vite/client"],
+    "types": ["@cloudflare/workers-types", "./worker-configuration.d.ts", "vite/client"],
+    "baseUrl": ".",
+    "paths": {
+			"@api/*": ["src/api/*"],
+			"@types": ["src/types.ts"],
+			"@src/*": ["src/*"],
+			"@components/*": ["src/components/*"],
+		},
   },
-  "include": ["api"],
+  "include": ["./src/api/**/*", "./src/entrypoint.ts"],
 }
