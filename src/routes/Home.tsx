@@ -5,12 +5,17 @@ function Home() {
     const scopes = encodeURIComponent(
         "openid email profile read:user read:repository write:repository",
     );
+    
     function generateOAuthState(length = 32): string {
+        const existingKey = sessionStorage.getItem(CSRF_STATE_KEY);
+        if (existingKey) {
+            return existingKey;
+        }
         const state = [...crypto.getRandomValues(new Uint8Array(length))]
             .map((b) => b.toString(36).padStart(2, "0"))
             .join("")
             .slice(0, length);
-        localStorage.setItem(CSRF_STATE_KEY, state);
+        sessionStorage.setItem(CSRF_STATE_KEY, state);
         return state;
     }
 

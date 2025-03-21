@@ -13,14 +13,14 @@ app.get("/api/v1/test", (c) => {
 //     return checkOrRefresh(c, next);
 // });
 
-// app.get('/welcome', async (c, next) => {
-//     const jwtPayload = c.get("jwtPayload");
-//     if (jwtPayload) {
-//         console.log("Logged")
-//         return c.redirect(transcribeRoute)
-//     }
-//     return checkOrRefresh(c, next);
-// });
+app.get('/welcome', async (c, next) => {
+    const jwtPayload = c.get("jwtPayload");
+    if (jwtPayload) {
+        console.log("Logged")
+        return c.redirect(transcribeRoute)
+    }
+    return c.env.ASSETS.fetch(c.req.url);
+});
 // fallback to span handling of anything else
 app.all("*", (c) => c.env.ASSETS.fetch(c.req.url));
 
