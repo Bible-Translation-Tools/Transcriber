@@ -77,7 +77,3 @@ function Home() {
 }
 
 export default Home;
-
-/* 
-<a class="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex flex-row items-center gap-2 justify-center" href="https://wacs-dev.bibletranslationtools.org/login/oauth/authorize?client_id=c9812108-0bbb-4917-8e1d-b952598f1c83&amp;redirect_uri=https://transcriber.wycliffe-associates-account.workers.dev/login&amp;response_type=code&amp;scope=openid%20email%20profile%20read%3Auser%20read%3Arepository%20write%3Arepository&amp;state=411p32523y5s6v3s120h1x3w6f1t2m5h"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 150 150" width="32" height="32"><path fill="#fff" d="M0 0h150v149.481H0z"></path><path fill="#726658" d="M66.542 114.481h-17.67L82.791 35h17.67l-33.92 79.481ZM135 35h-17.671l-33.895 79.481h17.67L135 35Z"></path><path fill="#B85659" d="M32.647 35H15l33.896 79.481h17.646L32.647 35Z"></path><path fill="#82A93F" d="M67.217 35H49.578l33.896 79.481h17.646L67.217 35Z"></path><path fill="#FAA83C" d="M100.43 35H82.791l33.896 79.481h17.646L100.43 35Z"></path></svg>Login with WACS</a>
-*/

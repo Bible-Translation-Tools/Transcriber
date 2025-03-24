@@ -53,7 +53,7 @@
 	 */
 	"vars": {
 		"SSO_BASE_URL": "https://wacs-dev.bibletranslationtools.org",
-		"SSO_CLIENT_ID": "c9812108-0bbb-4917-8e1d-b952598f1c83",
+		"SSO_CLIENT_ID": "7dacf0b7-f5ee-4fbc-aec2-7c701ced7c17",
 		"SSO_REDIRECT_PATH": "/Transcriber"
 	}
 	/**
