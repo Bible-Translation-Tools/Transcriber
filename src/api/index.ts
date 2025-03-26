@@ -51,6 +51,7 @@ apiV1Router.post(
 		const parsed = v.safeParse(transcriptionRequestSchema, value);
 		if (!parsed.success) {
 			console.error("invalid transcription request");
+			console.log(value);
 			return new Response(
 				JSON.stringify({ error: "Invalid request format" }),
 				{
@@ -119,6 +120,7 @@ apiV1Router.route("/auth", authRouter);
 function createApiMap(env: Env): Map<TranscriptionModel, string> {
 	const keys = new Map<TranscriptionModel, string>();
 	keys.set(TranscriptionModel.OPENAI, env.OPENAI_KEY);
+	keys.set(TranscriptionModel.PIXTRAL, env.MISTRAL_KEY);
 	return keys;
 }
 

@@ -1,6 +1,6 @@
 import {
 	DetaultTranscriptionPrompt,
-	TranscriptionModel,
+	type TranscriptionModel,
 	type TranscriptionRequest,
 } from "@api/domain/TranscriptionRequest";
 import type { LanguageOption } from "@src/components/LanguageDropdown";
@@ -32,6 +32,8 @@ interface ImageContextType {
 	setChapter: (chapter: number) => void;
 	images: ImageData[];
 	selectedImage: ImageData | null;
+	model: TranscriptionModel;
+	setModel: (model: TranscriptionModel) => void;
 	systemPrompt: string;
 	setSystemPrompt: (prompt: string) => void;
 	prompt: string;
@@ -54,6 +56,8 @@ export const ImageContext = createContext<ImageContextType>({
 	setChapter: () => {},
 	images: [],
 	selectedImage: null,
+	model: localStorage.getItem("model") as TranscriptionModel,
+	setModel: () => {},
 	systemPrompt:
 		localStorage.getItem("systemPrompt") ||
 		DetaultTranscriptionPrompt.SYSTEM,
@@ -87,6 +91,9 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [chapter, updateChapter] = useState(1);
 	const [images, setImages] = useState<ImageData[]>([]);
 	const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+	const [model, updateModel] = useState<TranscriptionModel>(
+		localStorage.getItem("model") as TranscriptionModel,
+	);
 	const [systemPrompt, updateSystemPrompt] = useState<string>(
 		localStorage.getItem("systemPrompt") ||
 			DetaultTranscriptionPrompt.SYSTEM,
@@ -203,7 +210,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 						bookCode: imageWithCurrentMetadata.bookCode,
 						languageCode: imageWithCurrentMetadata.languageCode,
 						chapter: imageWithCurrentMetadata.chapter,
-						model: TranscriptionModel.OPENAI,
+						model: model,
 						systemPrompt: systemPrompt,
 						prompt: prompt,
 					});
@@ -275,7 +282,7 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 		updateImage({ ...imageToUpdate, transcription: null, loading: true });
 		(async () => {
 			const request: TranscriptionRequest = {
-				model: TranscriptionModel.OPENAI,
+				model: model,
 				image: imageToUpdate.data,
 				imageId: imageToUpdate.id,
 				languageCode: imageToUpdate.languageCode,
@@ -318,6 +325,11 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 		updateSystemPrompt(prompt);
 	};
 
+	const setModel = (model: TranscriptionModel) => {
+		localStorage.setItem("model", JSON.stringify(model));
+		updateModel(model);
+	};
+
 	return (
 		<ImageContext.Provider
 			value={{
@@ -330,6 +342,8 @@ export const ImageProvider: React.FC<{ children: React.ReactNode }> = ({
 				setChapter,
 				images,
 				selectedImage,
+				model,
+				setModel,
 				systemPrompt,
 				setSystemPrompt,
 				prompt,

@@ -1,6 +1,5 @@
 import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 import OpenAI from "openai";
-import { ApiKeyStatus } from "./ApiKeyStatus";
 import type Model from "./Model";
 import type { TranscriptionResponse } from "./TranscriptionResponse";
 
@@ -20,30 +19,6 @@ export default class OpenAIModel implements Model {
 		this.prompt = prompt;
 	}
 
-	async keyStatus(): Promise<ApiKeyStatus> {
-		try {
-			const openai = new OpenAI({
-				apiKey: this.key,
-				baseURL: this.baseUrl,
-				dangerouslyAllowBrowser: true,
-			});
-
-			const models = await openai.models.list(); // Check key validity
-			console.log(`models are ${models.data.map((model) => model.id)}`);
-		} catch (error: any) {
-			if (
-				error.status === 401 ||
-				error.message.includes("Incorrect API key provided") ||
-				error.name === "OpenAIAuthenticationError"
-			) {
-				console.error("OpenAI API Key Invalid:", error.message);
-				return ApiKeyStatus.Invalid;
-			}
-			console.error("Other Error checking OpenAI API Key:", error);
-			return ApiKeyStatus.Invalid;
-		}
-		return ApiKeyStatus.Valid;
-	}
 	async transcribe(base64Image: any): Promise<TranscriptionResponse> {
 		return this.transcribeImpl(
 			new OpenAI({
