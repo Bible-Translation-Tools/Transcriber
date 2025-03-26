@@ -1,7 +1,10 @@
 import OpenAIModel from "@api/ai/OpenAIModel.ts";
-import type {
-	TranscriptionResponse,
-	TranscriptionSuccess,
+
+import { PixtralAIModel } from "@api/ai/PixtralAIModel.ts";
+import {
+	TranscriptionErrorCode,
+	type TranscriptionResponse,
+	type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse";
 import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
 import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
@@ -23,18 +26,42 @@ export async function HandleTranscriptionRequest(
 	imageRepo: D1TranscriptionRepository,
 ): Promise<Response> {
 	let transcriptionResponse: TranscriptionResponse | null = null;
+
 	switch (body.model) {
 		case TranscriptionModel.OPENAI: {
+			const apiKey = apiKeys.get(TranscriptionModel.OPENAI);
+			if (!apiKey) {
+				return Response.json({
+					success: false,
+					error: "Error, could not get api key from environment for Pixtral",
+					errorCode: TranscriptionErrorCode.AuthenticationError,
+				});
+			}
+			console.log("User selection: OpenAI");
 			const model = new OpenAIModel(
-				// biome-ignore lint/style/noNonNullAssertion: <explanation>
-				apiKeys.get(TranscriptionModel.OPENAI)!,
+				apiKey,
 				body.systemPrompt,
 				body.prompt,
 			);
 			transcriptionResponse = await model.transcribe(body.image);
 			break;
 		}
-		case TranscriptionModel.PIXTRAl: {
+		case TranscriptionModel.PIXTRAL: {
+			const apiKey = apiKeys.get(TranscriptionModel.PIXTRAL);
+			if (!apiKey) {
+				return Response.json({
+					success: false,
+					error: "Error, could not get api key from environment for Pixtral",
+					errorCode: TranscriptionErrorCode.AuthenticationError,
+				});
+			}
+			console.log("User selection: Pixtral");
+			const model = new PixtralAIModel(
+				apiKey,
+				body.systemPrompt,
+				body.prompt,
+			);
+			transcriptionResponse = await model.transcribe(body.image);
 			break;
 		}
 	}

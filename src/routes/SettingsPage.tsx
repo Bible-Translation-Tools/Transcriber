@@ -10,12 +10,20 @@ import { useNavigate } from "react-router-dom";
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
 
-	const { systemPrompt, setSystemPrompt, prompt, setPrompt } =
-		useImageContext();
+	const {
+		systemPrompt,
+		setSystemPrompt,
+		prompt,
+		setPrompt,
+		model,
+		setModel,
+	} = useImageContext();
 
 	const [language, setLanguage] = useState("en");
 	const [theme, setTheme] = useState("light");
-	const [model, setModel] = useState("pixtral");
+	const [updatedModel, setUpdatedModel] = useState<TranscriptionModel>(
+		model as TranscriptionModel,
+	);
 	const [updatedPrompt, setUpdatedPrompt] = useState(prompt);
 	const [updatedSystemPrompt, setUpdatedSystemPrompt] =
 		useState(systemPrompt);
@@ -31,6 +39,7 @@ const Settings: React.FC = () => {
 	const handleSave = () => {
 		setPrompt(updatedPrompt);
 		setSystemPrompt(updatedSystemPrompt);
+		setModel(updatedModel);
 		onClose();
 	};
 
@@ -154,10 +163,13 @@ const Settings: React.FC = () => {
 								<div className="flex justify-start">
 									<select
 										id="modelSelect"
-										value={model}
-										onChange={(e) =>
-											setModel(e.target.value)
-										}
+										value={updatedModel}
+										onChange={(e) => {
+											setUpdatedModel(
+												e.target
+													.value as TranscriptionModel,
+											);
+										}}
 										className="mt-1 block w-full max-w-sm border rounded p-2"
 									>
 										<option
@@ -165,7 +177,11 @@ const Settings: React.FC = () => {
 										>
 											OpenAI
 										</option>
-										{/* Add more model options here */}
+										<option
+											value={TranscriptionModel.PIXTRAL}
+										>
+											Pixtral
+										</option>
 									</select>
 								</div>
 							</div>

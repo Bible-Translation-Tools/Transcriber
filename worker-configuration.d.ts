@@ -2,16 +2,17 @@
 // Runtime types generated with workerd@1.20250317.0 2025-03-03 
 declare namespace Cloudflare {
 	interface Env {
-		HTR_KV: KVNamespace;
-		SSO_BASE_URL: "https://wacs-dev.bibletranslationtools.org";
-		SSO_CLIENT_ID: "7dacf0b7-f5ee-4fbc-aec2-7c701ced7c17";
-		SSO_REDIRECT_PATH: "/Transcriber";
-		OPENAI_KEY: string;
-		SSO_CLIENT_SECRET: string;
-		HTR_STORAGE: R2Bucket;
-		HTR_DATABASE: D1Database;
-		ASSETS: Fetcher;
-	}
+        HTR_KV: KVNamespace;
+        SSO_BASE_URL: "https://wacs-dev.bibletranslationtools.org";
+        SSO_CLIENT_ID: "7dacf0b7-f5ee-4fbc-aec2-7c701ced7c17";
+        SSO_REDIRECT_PATH: "/Transcriber";
+        OPENAI_KEY: string;
+        MISTRAL_KEY: string;
+        SSO_CLIENT_SECRET: string;
+        HTR_STORAGE: R2Bucket;
+        HTR_DATABASE: D1Database;
+        ASSETS: Fetcher;
+    }
 }
 interface Env extends Cloudflare.Env {}
 

@@ -1,59 +1,103 @@
-import { MistralClient } from "@mistralai/mistral";
-import { ApiKeyStatus } from "./ApiKeyStatus";
+import {
+	TranscriptionErrorCode,
+	type TranscriptionResponse,
+} from "@api/ai/TranscriptionResponse.ts";
+import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
+import { Mistral } from "@mistralai/mistralai";
+import type { ContentChunk } from "@mistralai/mistralai/models/components";
 import type Model from "./Model";
 
-class PixtralModel implements Model {
+export class PixtralAIModel implements Model {
 	baseUrl = "https://api.mistral.ai/v1/models";
 	key: string;
+	systemPrompt: string;
+	prompt: string;
 
-	constructor(key: string) {
+	constructor(
+		key: string,
+		systemPrompt: string = DetaultTranscriptionPrompt.SYSTEM,
+		prompt: string = DetaultTranscriptionPrompt.PROMPT,
+	) {
 		this.key = key;
+		this.systemPrompt = systemPrompt;
+		this.prompt = prompt;
 	}
 
-	async keyIsValid(key: string): Promise<ApiKeyStatus> {
-		try {
-			const mistral = new MistralClient({ apiKey: key });
+	async transcribe(base64Image: any): Promise<TranscriptionResponse> {
+		return await this.transcribeImpl(
+			new Mistral({
+				apiKey: this.key,
+			}),
+			base64Image,
+		);
+	}
 
-			// A simple request to check the key.  We'll use model list.
-			await mistral.models.list(); // Or any other simple API call.
-			return ApiKeyStatus.Valid;
-		} catch (error: any) {
-			// Mistral errors are often returned with a status code in error.response
-			if (error.response) {
-				const status = error.response.status;
-				if (status === 401) {
-					console.error("Mistral API Key Invalid:", error.message);
-					return ApiKeyStatus.Invalid;
-				}
-				if (status === 403) {
-					// Example: Check for Forbidden (might indicate rate limit or other issues)
-					console.error("Mistral API Key Forbidden:", error.message);
-					return ApiKeyStatus.RateLimited; // Or OtherError, depending on how you want to categorize it.
-				}
-				if (status === 429) {
-					console.error(
-						"Mistral API Key Rate Limited:",
-						error.message,
-					);
-					return ApiKeyStatus.RateLimited;
-				}
-				console.error(`Mistral API Error (${status}):`, error.message);
-				return ApiKeyStatus.OtherError;
-			}
-			if (error.message.includes("NetworkError")) {
-				// Check for network errors
-				console.error(
-					"Network Error checking Mistral API Key:",
-					error.message,
-				);
-				return ApiKeyStatus.NetworkError;
-			}
-			if (error.message.includes("Incorrect API key provided")) {
-				console.error("Mistral API Key Invalid:", error.message);
-				return ApiKeyStatus.Invalid;
-			}
-			console.error("Other Error checking Mistral API Key:", error);
-			return ApiKeyStatus.OtherError;
+	async transcribeImpl(
+		client: Mistral,
+		base64Image: any,
+	): Promise<TranscriptionResponse> {
+		console.log("Sending image to pixtral");
+		const response = await client.chat.complete({
+			model: "pixtral-12b",
+			messages: [
+				{ role: "system", content: this.systemPrompt },
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: this.prompt,
+						},
+						{
+							type: "image_url",
+							imageUrl: {
+								url: `${base64Image}`,
+							},
+						},
+					],
+				},
+			],
+			temperature: 0.0,
+			maxTokens: 500,
+		});
+
+		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		const messageContent = response.choices![0].message?.content;
+		const isContentValid = !!messageContent;
+		const transcription = extractTranscription(messageContent);
+		if (isContentValid) {
+			return {
+				success: isContentValid,
+				transcription: transcription,
+			};
+		} else {
+			return {
+				success: false,
+				error: "Error extracting transcription from pixtral response",
+				errorCode: TranscriptionErrorCode.UnknownError,
+			};
 		}
 	}
+}
+
+function extractTranscription(
+	content: string | ContentChunk[] | null | undefined,
+): string {
+	if (!content) {
+		return "";
+	}
+
+	if (Array.isArray(content)) {
+		return content
+			.map((chunk) => {
+				if (chunk.type === "text" && chunk.text) {
+					return chunk.text;
+				} else {
+					return "";
+				}
+			})
+			.join("");
+	}
+
+	return String(content).trim();
 }

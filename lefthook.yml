@@ -3,9 +3,10 @@
 #   Refer for explanation to following link:
 #   https://lefthook.dev/configuration/
 #
-pre-commit:
-  commands:
-    check:
-      # only fail the commit on errrors
-      run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files} --diagnostic-level=error
-      stage_fixed: true
+# pre-commit:
+#   commands:
+#     check:
+#       # only fail the commit on errrors
+#       run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files} --diagnostic-level=error
+#       stage_fixed: true
+

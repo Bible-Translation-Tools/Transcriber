@@ -20,10 +20,6 @@ function TranscriptionPage() {
 	} = useImageContext();
 	const [currentPage, setCurrentPage] = useState(0);
 
-	for (let i = 0; i < images.length; i++) {
-		console.log(images[i].url);
-	}
-
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const files = event.target.files;
 		if (files) {
@@ -132,7 +128,7 @@ function TranscriptionPage() {
 						htmlFor="imageUpload"
 						className="cursor-pointer relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center"
 					>
-						<div className="relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
+						<div className="relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center hover:outline-blue-700 hover:outline-2">
 							{" "}
 							{/* Outer container */}
 							<div className="">
