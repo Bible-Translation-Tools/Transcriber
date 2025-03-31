@@ -63,6 +63,7 @@ apiV1Router.post(
 		return parsed.output;
 	}),
 	async (c) => {
+		console.log("Recieved transcription request");
 		const jwtPayload = c.get("jwtPayload");
 		const body = c.req.valid("json");
 
@@ -102,6 +103,7 @@ apiV1Router.post(
 		return parsed.output;
 	}),
 	async (c) => {
+		console.log("Recieved update request.");
 		const body = c.req.valid("json");
 
 		const bucket = c.env.HTR_STORAGE;
@@ -110,6 +112,7 @@ apiV1Router.post(
 			new R2ImageRepository(bucket),
 		);
 
+		console.log(JSON.stringify(body));
 		const htrRes = await HandleUpdateTranscriptionRequest(body, repo);
 		return htrRes;
 	},

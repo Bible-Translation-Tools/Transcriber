@@ -25,6 +25,7 @@ export async function HandleTranscriptionRequest(
 	body: TranscriptionRequest,
 	imageRepo: D1TranscriptionRepository,
 ): Promise<Response> {
+	console.log("Handling Transcription Request");
 	let transcriptionResponse: TranscriptionResponse | null = null;
 
 	switch (body.model) {
@@ -64,7 +65,12 @@ export async function HandleTranscriptionRequest(
 			transcriptionResponse = await model.transcribe(body.image);
 			break;
 		}
+		default: {
+			console.log(`Missing model ${body.model}`);
+			console.log(`Pixtral: ${body.model == TranscriptionModel.PIXTRAL}`);
+		}
 	}
+
 
 	if (transcriptionResponse != null) {
 		const bookCode = body.bookCode;
@@ -73,6 +79,7 @@ export async function HandleTranscriptionRequest(
 
 		let transcription = "";
 		if (transcriptionResponse.success) {
+			console.log("Transcription was successful!");
 			transcription = (transcriptionResponse as TranscriptionSuccess)
 				.transcription;
 		}
@@ -100,9 +107,12 @@ export async function HandleTranscriptionRequest(
 			],
 		};
 
+		console.log("Storing transcription.");
 		await imageRepo.createTranscriptionImage(image);
+		console.log("Returning transcription response.");
 		return Response.json(transcriptionResponse);
 	}
+	console.error("Transcription request failed.");
 	return Response.json({});
 }
 
@@ -123,6 +133,11 @@ export type TranscriptionRequest = v.InferOutput<
 export const updateTranscriptionRequestSchema = v.object({
 	imageId: v.string(),
 	transcription: v.string(),
+	languageCode: v.optional(v.string()),
+	bookCode: v.optional(v.string()),
+	chapter: v.optional(v.number()),
+	startVerse: v.optional(v.number()),
+	endVerse: v.optional(v.number()),
 });
 export type UpdateTranscriptionRequest = v.InferOutput<
 	typeof updateTranscriptionRequestSchema

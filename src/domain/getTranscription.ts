@@ -20,7 +20,7 @@ export async function getTranscription(
 
 	try {
 		const json = await response.json();
-		console.log(response);
+		console.log(json);
 		return json;
 	} catch (e) {
 		console.log(response);
@@ -36,6 +36,11 @@ export async function getTranscription(
 export async function sendUpdatedTranscription(
 	imageId: string,
 	transcription: string,
+	language?: string,
+	book?: string,
+	chapter?: number,
+	startVerse?: number,
+	endVerse?: number,
 ): Promise<void> {
 	const response = await fetch(`${apiV1}${updateTranscriptionRoute}`, {
 		method: "POST",
@@ -43,8 +48,13 @@ export async function sendUpdatedTranscription(
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-			imageId: imageId,
-			transcription: transcription,
+			imageId,
+			transcription,
+			language,
+			book,
+			chapter,
+			startVerse,
+			endVerse,
 		}),
 	});
 

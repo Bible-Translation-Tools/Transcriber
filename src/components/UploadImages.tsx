@@ -2,11 +2,11 @@
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import type { ImageData } from "../context/ImageContext";
-import { useImageContext } from "../context/useImageContext";
+import type { ImageData } from "../context/TranscriptionContext.tsx";
+import { useTranscriptionContext } from "../context/useTranscriptionContext.tsx";
 
 function UploadImages() {
-	const { addImage } = useImageContext(); // Destructure only addImage
+	const { addImage } = useTranscriptionContext(); // Destructure only addImage
 	const [errorMessage, setErrorMessage] = useState("");
 
 	// todo: investigate the error thrown by biome here on more deps than necessary: addImage

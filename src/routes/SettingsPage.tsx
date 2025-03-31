@@ -2,7 +2,7 @@ import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
 } from "@api/domain/TranscriptionRequest";
-import { useImageContext } from "@src/context/useImageContext";
+import { useTranscriptionContext } from "@src/context/useTranscriptionContext.tsx";
 import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +17,7 @@ const Settings: React.FC = () => {
 		setPrompt,
 		model,
 		setModel,
-	} = useImageContext();
+	} = useTranscriptionContext();
 
 	const [language, setLanguage] = useState("en");
 	const [theme, setTheme] = useState("light");

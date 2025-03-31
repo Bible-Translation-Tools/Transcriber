@@ -1,7 +1,7 @@
 import { useLanguageContext } from "@src/context/useLanguageContext";
 import type React from "react";
 import { useNavigate } from "react-router-dom";
-import { useImageContext } from "../context/useImageContext";
+import { useTranscriptionContext } from "../context/useTranscriptionContext.tsx";
 import BookDropdown from "./BookDropdown";
 import LanguageDropdown from "./LanguageDropdown";
 
@@ -14,7 +14,7 @@ const NavBar: React.FC = () => {
 		setBookCode,
 		chapter,
 		setChapter,
-	} = useImageContext();
+	} = useTranscriptionContext();
 
 	const { languages } = useLanguageContext();
 	const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./index.css";
 import SettingsPage from "@src/routes/SettingsPage.tsx";
-import { ImageProvider } from "./context/ImageContext.tsx";
+import { TranscriptionProvider } from "./context/TranscriptionContext.tsx";
 import { LanguageProvider } from "./context/LanguageContext.tsx";
 import Home from "./routes/Home.tsx";
 import Login from "./routes/Login.tsx";
@@ -34,9 +34,9 @@ const App = () => {
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<LanguageProvider>
-			<ImageProvider>
+			<TranscriptionProvider>
 				<App />
-			</ImageProvider>
+			</TranscriptionProvider>
 		</LanguageProvider>
 	</StrictMode>,
 );
