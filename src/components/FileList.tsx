@@ -1,0 +1,153 @@
+import React, {useEffect, useRef, useState} from 'react';
+import {ImageData} from "@src/context/TranscriptionContext.tsx";
+
+interface FileListItemProps {
+    fileName: string;
+    id: string;
+    index: number;
+    onImageSelected: (imageNumber: number) => void;
+    onMoveImage: (image: number) => void;
+    onDeleteImage: (image:number) => void;
+    isLoading?: boolean;
+}
+
+const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading, onImageSelected, onMoveImage, onDeleteImage }) => {
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        if (isMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
+    const handleMenuClick = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleMoveClick = () => {
+        onMoveImage(index);
+        setIsMenuOpen(false);
+    };
+
+    const handleDeleteClick = () => {
+        onDeleteImage(index);
+        setIsMenuOpen(false);
+    };
+
+    const handleImageSelected = () => {
+        onImageSelected(index);
+    }
+
+    return (
+        <div className="w-[240px] p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between" >
+                <div className="flex items-center"  onClick={handleImageSelected}>
+                    <span className="truncate">{fileName}</span>
+                </div>
+                {isLoading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blue-500"></div>
+                ) : (
+                    <button onClick={handleMenuClick} className="text-gray-500 hover:text-gray-700">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                        </svg>
+                    </button>
+                )}
+            </div>
+
+            {isMenuOpen && (
+                <div ref={menuRef} className="absolute z-1 ml-52 mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                        <button
+                            onClick={handleMoveClick}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-2 text-blue-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                                />
+                            </svg>
+                            Move Image...
+                        </button>
+                        <button
+                            onClick={handleDeleteClick}
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-2 text-red-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                            </svg>
+                            Delete Image
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+interface FileListProps {
+    images: ImageData[];
+    onImageSelected: (imageNumber: number) => void;
+    onMoveImage: (image: number) => void;
+    onDeleteImage: (image: number) => void;
+}
+
+const FileList: React.FC<FileListProps> = ({ images, onImageSelected, onMoveImage, onDeleteImage }) => {
+
+
+    return (
+        <div className="max-w-xs h-screen shadow-md rounded-md overflow-hidden">
+            {images.map((image, index) => (
+                <FileListItem
+                    key={index}
+                    id={image.id}
+                    index={index}
+                    fileName={`Image ${index + 1}`}
+                    isLoading={image.loading}
+                    onImageSelected={onImageSelected}
+                    onMoveImage={onMoveImage}
+                    onDeleteImage={onDeleteImage}
+                />
+            ))}
+        </div>
+    );
+};
+
+export default FileList;
