@@ -35,6 +35,7 @@ function TranscriptionPage() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setModalImage(null);
     };
 
     const handleSaveModal = (
@@ -50,7 +51,8 @@ function TranscriptionPage() {
             return;
         }
         console.log('Saved:', language, book, chapter, startVerse, endVerse);
-        updateImage({...image, languageCode: language, bookCode: book, chapter: chapter, startVerse: startVerse, endVerse: endVerse});
+        updateImage({...image, languageCode: language, bookCode: book, chapter: chapter, startVerse: startVerse, endVerse: endVerse}, true);
+        setModalImage(null);
     };
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

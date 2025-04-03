@@ -1,7 +1,7 @@
 import ZoomableImage from "./ZoomableImage";
 
 interface PaginationProps {
-	image: any;
+	image: ImageData | null;
 	currentPage: number;
 	totalImages: number;
 	onPageChange: (page: number) => void;
@@ -18,6 +18,7 @@ const Pagination: React.FC<PaginationProps> = ({
 			<div className="grow relative flex-start group ">
 				{image ? <ZoomableImage src={image.data} /> : <div />}
 			</div>
+			{ image ?
 			<div className="flex-end flex">
 				<button
 					type="button"
@@ -36,7 +37,7 @@ const Pagination: React.FC<PaginationProps> = ({
 				>
 					Next
 				</button>
-			</div>
+			</div> : <></> }
 		</div>
 	);
 };
