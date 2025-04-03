@@ -242,6 +242,7 @@ function TranscriptionPage() {
             </div>
             {modalImage?
             <MoveImageModal
+                key={modalImage?.id}
                 image={modalImage}
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}

@@ -10,11 +10,6 @@ interface MoveImageModalProps {
     onClose: () => void;
     onSave: (image: ImageData, languageCode: string, bookCode: string, chapter: number, startVerse: number, endVerse: number) => void;
     image: ImageData;
-    initialLanguage?: string;
-    initialBook?: string;
-    initialChapter?: number;
-    initialStartVerse?: number;
-    initialEndVerse?: number;
 }
 
 const MoveImageModal: React.FC<MoveImageModalProps> = (
@@ -22,23 +17,26 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
         isOpen,
         onClose,
         onSave,
-        image,
-        initialLanguage = 'en',
-        initialBook = 'mat',
-        initialChapter = 1,
-        initialStartVerse = 8,
-        initialEndVerse = 15,
+        image
     }
 ) => {
 
     const {recentLanguages} = useTranscriptionContext();
     const {languages} = useLanguageContext();
 
-    const [language, setLanguage] = useState<LanguageOption>(initialLanguage);
-    const [book, setBook] = useState(initialBook);
-    const [chapter, setChapter] = useState(initialChapter);
-    const [startVerse, setStartVerse] = useState(initialStartVerse);
-    const [endVerse, setEndVerse] = useState(initialEndVerse);
+    const [language, setLanguage] = useState<LanguageOption>(
+        languages.find(
+            (lang) => {
+                return lang.code === image.languageCode
+            }
+        ) ?? languages[0]
+    );
+
+    const [book, setBook] = useState(image.bookCode);
+    const [chapter, setChapter] = useState(image.chapter);
+    const [startVerse, setStartVerse] = useState(image?.startVerse ?? 1);
+    const [endVerse, setEndVerse] = useState(image?.endVerse ?? 1);
+    const [error, setError] = useState();
 
     const handleBookChapterSelect = (book: string, chapter: number) => {
         setBook(book);
@@ -57,7 +55,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
     return (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
             <div className="bg-white rounded-lg p-6 flex">
-            {/*<div className="bg-white rounded-lg p-6">*/}
+                {/*<div className="bg-white rounded-lg p-6">*/}
                 <div className="flex flex-row items-center justify-between">
                     <div className="pr-4 max-w-fit">
                         <img src={image.data} alt="Image to Move" className="rounded-lg object-contain w-[25vw]"/>
@@ -118,8 +116,8 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
                         </div>
                     </div>
                 </div>
-            {/*</div>*/}
-        </div>
+                {/*</div>*/}
+            </div>
         </div>
     );
 };
