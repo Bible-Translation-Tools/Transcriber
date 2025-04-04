@@ -77,7 +77,7 @@ function UploadImages() {
 						const _this = e.target;
 						if (_this?.result != null) {
 							const converter = new pdf2image({
-								filename: `${file.name} yyyy-MM-DD`,
+								filename: `${file.name}<ctrl98>-MM-DD`,
 								file: _this.result,
 								scale: 4,
 								type: "jpeg",
@@ -105,50 +105,22 @@ function UploadImages() {
 
 	return (
 		<div
-			{...getRootProps()} // Connect to react-dropzone
-			style={{
-				width: "868px",
-				height: "492px",
-				padding: "40px",
-				background: "#EEF0FF",
-				borderRadius: "40px",
-				border: "1px #0056D1 dashed",
-				display: "flex",
-				flexDirection: "column",
-				alignItems: "center",
-				justifyContent: "center",
-				gap: "16px",
-				cursor: "pointer", // Indicate that the area is clickable/droppable
-			}}
+			{...getRootProps()}
+			className="flex-1 h-[95%] p-10 bg-[#EEF0FF] rounded-[40px] border-2 border-dashed border-[#0056D1] flex flex-col items-center justify-center gap-4 cursor-pointer"
 		>
 			<input
 				{...getInputProps()}
 				id="fileInput"
 				className="hidden"
 				onChange={handleFileInputChange}
-			/>{" "}
-			{/* Hidden file input */}
+			/>
 			{isDragActive ? (
-				<p
-					style={{
-						color: "#0F2F4C",
-						fontSize: "26px",
-						fontFamily: "Noto Sans",
-						fontWeight: "600",
-						lineHeight: "29.90px",
-					}}
-				>
+				<p className="text-[26px] text-[#0F2F4C] font-semibold leading-[29.90px] font-noto-sans">
 					Drop the files here ...
 				</p>
 			) : (
 				<>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}
-					>
+					<div className="flex justify-center items-center">
 						<svg
 							width="80"
 							height="80"
@@ -156,7 +128,6 @@ function UploadImages() {
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							{/* ... SVG Path Data ... */}
 							<path
 								opacity="0.5"
 								d="M63.3332 6.66669H16.6665C14.017 6.67547 11.4786 7.73186 9.60514 9.60533C7.73168 11.4788 6.67529 14.0172 6.6665 16.6667V46.2L19.5998 33.2667C21.5055 31.4529 24.0356 30.4413 26.6665 30.4413C29.2974 30.4413 31.8275 31.4529 33.7332 33.2667L43.3032 42.89L46.2632 39.93C48.1427 38.0634 50.6842 37.0159 53.3332 37.0159C55.9821 37.0159 58.5236 38.0634 60.4032 39.93L73.3332 52.8667V16.6667C73.3244 14.0172 72.268 11.4788 70.3945 9.60533C68.5211 7.73186 65.9826 6.67547 63.3332 6.66669Z"
@@ -173,70 +144,31 @@ function UploadImages() {
 							/>
 						</svg>
 					</div>
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
-							gap: "8px",
-						}}
-					>
-						<div
-							style={{
-								textAlign: "center",
-								color: "#0F2F4C",
-								fontSize: "26px",
-								fontFamily: "Noto Sans",
-								fontWeight: "600",
-								lineHeight: "29.90px",
-							}}
-						>
+					<div className="flex flex-col items-center gap-2">
+						<div className="text-center text-[26px] text-[#0F2F4C] font-semibold leading-[29.90px] font-noto-sans">
 							Drag and Drop Images Here
 						</div>
-						<div style={{ textAlign: "center" }}>
+						<div className="text-center">
+                            <span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
+                                Or{" "}
+                            </span>
 							<span
-								style={{
-									color: "#516B86",
-									fontSize: "20px",
-									fontFamily: "Noto Sans",
-									fontWeight: "400",
-									lineHeight: "40px",
-								}}
+								className="text-[20px] text-[#0056D1] font-normal underline leading-[40px] font-noto-sans cursor-pointer"
+								onClick={handleBrowseClick}
+								onKeyUp={handleBrowseClick}
 							>
-								Or{" "}
-							</span>
-							<span
-								style={{
-									color: "#0056D1",
-									fontSize: "20px",
-									fontFamily: "Noto Sans",
-									fontWeight: "400",
-									textDecoration: "underline",
-									lineHeight: "40px",
-									cursor: "pointer", // Indicate that it's clickable
-								}}
-								onClick={handleBrowseClick} // Attach click handler
-								onKeyUp={handleBrowseClick} // Attach keydown handler
-							>
-								click to browse
-							</span>
-							<span
-								style={{
-									color: "#516B86",
-									fontSize: "20px",
-									fontFamily: "Noto Sans",
-									fontWeight: "400",
-									lineHeight: "40px",
-								}}
-							>
-								{" "}
+                                click to browse
+                            </span>
+							<span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
+                                {" "}
 								instead. This app supports most image formats,
-								such as: PNG, JPG, PDF.
-							</span>
+                                such as: PNG, JPG, PDF.
+                            </span>
 						</div>
 					</div>
 				</>
 			)}
+			{errorMessage && <p className="text-red-500">{errorMessage}</p>}
 		</div>
 	);
 }
