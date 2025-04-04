@@ -5,7 +5,6 @@ import {
 } from "@api/domain/TranscriptionRequest";
 import type {LanguageOption} from "@src/components/LanguageDropdown";
 import {getTranscription, sendUpdatedTranscription,} from "@src/domain/getTranscription";
-import type React from "react";
 import {createContext, useEffect, useRef, useState} from "react";
 
 export interface ImageData {
@@ -40,17 +39,17 @@ interface TranscriptionContextType {
     setImages: (images: ImageData[]) => void;
     setSelectedImage: (image: ImageData | null) => void;
     addImage: (image: ImageData) => void;
-    updateImage: (updatedImage: ImageData) => void; // For updating transcription
+    updateImage: (updatedImage: ImageData, reloadOnSuccess: boolean) => void; // For updating transcription
     updateTranscription: (updatedImage: ImageData) => void; // For updating transcription
     resubmitImageForTranscription: (imageToUpdate: ImageData) => void;
 }
 
 export const TranscriptionContext = createContext<TranscriptionContextType>({
-    language: null,
+    language: {anglicized: "English", code: "en"},
     setLanguage: () => {
     },
     recentLanguages: [],
-    bookCode: "gen",
+    bookCode: "mat",
     setBookCode: () => {
     },
     chapter: 1,
@@ -84,8 +83,8 @@ export const TranscriptionContext = createContext<TranscriptionContextType>({
 });
 
 export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
-                                                                           children,
-                                                                       }) => {
+                                                                                   children,
+                                                                               }) => {
     const storedSelectedLanguage = localStorage.getItem("selectedLanguage");
     let restoredLanguage = null;
     if (storedSelectedLanguage != null) {
@@ -95,12 +94,15 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
+    const storedBookCode = localStorage.getItem("bookCode");
+    const storedChapter = parseInt(localStorage.getItem("chapter") ?? "1");
+
     const [language, updateLanguage] = useState<LanguageOption | null>(
         restoredLanguage,
     );
     const [recentLanguages, setRecentLanguages] = useState<string[]>([]);
-    const [bookCode, updateBookCode] = useState("gen");
-    const [chapter, updateChapter] = useState(1);
+    const [bookCode, updateBookCode] = useState(storedBookCode ?? "mat");
+    const [chapter, updateChapter] = useState(storedChapter ?? 1);
     const [images, setImages] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
     const [model, updateModel] = useState<TranscriptionModel>(
@@ -134,7 +136,8 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
             dbRef.current = (event.target as IDBOpenDBRequest).result;
             loadImagesFromDB();
         };
-    }, []);
+    }, [language, bookCode, chapter]);
+
 
     const loadImagesFromDB = (
         languageToLoad = language.code,
@@ -189,6 +192,8 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const addImage = (image: ImageData) => {
         if (dbRef.current) {
+            setSelectedImage(image);
+
             const transaction = dbRef.current.transaction(
                 "images",
                 "readwrite",
@@ -227,12 +232,22 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                         prompt: prompt,
                     });
                     if (transcription.success) {
-                        // imageWithCurrentMetadata.transcription =
-                        //   transcription.transcription;
-                        updateImage({
+                        const newImage = {
                             ...imageWithCurrentMetadata,
                             transcription: transcription.transcription,
+                        }
+
+                        setImages((prevImages) => {
+                            return prevImages.map((image) => {
+                                if (image.id === imageWithCurrentMetadata.id) {
+                                    return newImage;
+                                } else {
+                                    return image;
+                                }
+                            })
                         });
+
+                        setSelectedImage(newImage);
                     }
                 })();
             };
@@ -243,7 +258,6 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
         updatedImage: ImageData,
         reloadOnSuccess = true
     ) => {
-        debugger
         if (dbRef.current) {
             const transaction = dbRef.current.transaction(
                 "images",
@@ -277,18 +291,37 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
 
                 if (reloadOnSuccess) {
-                    setImages((prevImages) =>
-                        prevImages.map((image) =>
+                    const selectedImageMoved = updatedImage.languageCode !== language?.code || updatedImage.bookCode !== bookCode || updatedImage.chapter !== chapter;
+
+                    function updatedImagesList(prevImages: ImageData[]) {
+                        const updated = prevImages.map((image) =>
                             image.url === updatedImage.url
                                 ? updatedImage
                                 : image,
-                        ),
-                    );
+                        ).filter(
+                            (image) => {
+                                return image.languageCode === language?.code && image.bookCode === bookCode && image.chapter === chapter;
+                            }
+                        )
+                        console.log(updated.map((lang: ImageData) => {
+                            lang.languageCode
+                        }))
+                        return updated;
+                    }
+
+                    setImages((prevImages) => {
+                        return updatedImagesList(prevImages)
+                    });
+                    
                     if (
+                        !selectedImageMoved &&
                         selectedImage &&
-                        selectedImage.url === updatedImage.url
+                        selectedImage.id === updatedImage.id
                     ) {
                         setSelectedImage(updatedImage);
+                    } else {
+                        console.log("nulling out selectedImage");
+                        setSelectedImage(null);
                     }
                 }
             };
@@ -296,7 +329,6 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     const updateTranscription = (imageToUpdate: ImageData) => {
-        debugger
         updateImage(imageToUpdate, false);
     };
 
@@ -328,11 +360,13 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     const setBookCode = (bookCode: string) => {
+        localStorage.setItem("bookCode", bookCode);
         updateBookCode(bookCode);
         //loadImagesFromDB(languageCode)
     };
 
     const setChapter = (chapter: number) => {
+        localStorage.setItem("chapter", chapter)
         updateChapter(chapter);
         loadImagesFromDB(language.code, bookCode, chapter);
     };

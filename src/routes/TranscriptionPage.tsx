@@ -2,13 +2,14 @@ import "../App.css";
 // @ts-ignore
 import {pdf2image} from "@pardnchiu/pdf2image";
 import {useState} from "react";
-import ImagePreviewList from "../components/ImagePreviewList";
 import NavBar from "../components/NavBar";
 import Pagination from "../components/Pagination";
 import TextEditor from "../components/TextEditor";
 import type {ImageData} from "../context/TranscriptionContext.tsx";
 import {useTranscriptionContext} from "../context/useTranscriptionContext.tsx";
 import RangeInput from "@components/RangeInput.tsx";
+import FileList from "@components/FileList.tsx";
+import MoveImageModal from "@components/MoveImageModal.tsx";
 
 function TranscriptionPage() {
     const {
@@ -16,10 +17,43 @@ function TranscriptionPage() {
         selectedImage,
         setSelectedImage,
         addImage,
+        updateImage,
         updateTranscription,
         resubmitImageForTranscription,
     } = useTranscriptionContext();
     const [currentPage, setCurrentPage] = useState(0);
+
+    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [modalImage, setModalImage] = useState<ImageData | null>(null);
+
+    const handleOpenModal = (page: number) => {
+        setModalImage(images[page]);
+        setIsModalOpen(true);
+
+        console.log(page);
+    }
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setModalImage(null);
+    };
+
+    const handleSaveModal = (
+        image: ImageData,
+        language: string,
+        book: string,
+        chapter: number,
+        startVerse: number,
+        endVerse: number
+    ) => {
+        if (language == null || book == null || chapter == null || startVerse == null || endVerse == null) {
+            console.log("Incomplete information for moving image, aborting.");
+            return;
+        }
+        console.log('Saved:', language, book, chapter, startVerse, endVerse);
+        updateImage({...image, languageCode: language, bookCode: book, chapter: chapter, startVerse: startVerse, endVerse: endVerse}, true);
+        setModalImage(null);
+    };
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -141,37 +175,18 @@ function TranscriptionPage() {
     return (
         <div className="flex flex-col h-screen bg-gray-100">
             <NavBar/>
-            <div className="flex grow">
-                <div className="flex flex-col gap-2 w-24 p-4 overflow-y-auto">
+            <div className="flex overflow-y-auto">
+                <div className="flex flex-col p-4 overflow-y-auto">
                     <label
                         htmlFor="imageUpload"
-                        className="cursor-pointer relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center"
+                        className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold mb-4 py-2 px-4 rounded-lg flex items-center justify-center"
                     >
-                        <div
-                            className="relative w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center hover:outline-blue-700 hover:outline-2">
-                            {" "}
-                            {/* Outer container */}
-                            <div className="">
-                                <svg
-                                    width="64"
-                                    height="64"
-                                    viewBox="0 0 64 64"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <rect
-                                        width="64"
-                                        height="64"
-                                        rx="8"
-                                        fill="#EEF0FF"
-                                    />
-                                    <path
-                                        d="M25 41C24.45 41 23.9793 40.8043 23.588 40.413C23.1967 40.0217 23.0007 39.5507 23 39V25C23 24.45 23.196 23.9793 23.588 23.588C23.98 23.1967 24.4507 23.0007 25 23H32.45C32.7833 23 33.0377 23.146 33.213 23.438C33.3883 23.73 33.409 24.0423 33.275 24.375C33.1917 24.6417 33.125 24.9083 33.075 25.175C33.025 25.4417 33 25.7167 33 26C33 27.3833 33.4877 28.5627 34.463 29.538C35.4383 30.5133 36.6173 31.0007 38 31C38.2833 31 38.5583 30.975 38.825 30.925C39.0917 30.875 39.3583 30.8083 39.625 30.725C39.9583 30.6083 40.271 30.6333 40.563 30.8C40.855 30.9667 41.0007 31.2167 41 31.55V39C41 39.55 40.8043 40.021 40.413 40.413C40.0217 40.805 39.5507 41.0007 39 41H25ZM26 37H38L34.25 32L31.25 36L29 33L26 37ZM38 29C37.7167 29 37.4793 28.904 37.288 28.712C37.0967 28.52 37.0007 28.2827 37 28V27H36C35.7167 27 35.4793 26.904 35.288 26.712C35.0967 26.52 35.0007 26.2827 35 26C34.9993 25.7173 35.0953 25.48 35.288 25.288C35.4807 25.096 35.718 25 36 25H37V24C37 23.7167 37.096 23.4793 37.288 23.288C37.48 23.0967 37.7173 23.0007 38 23C38.2827 22.9993 38.5203 23.0953 38.713 23.288C38.9057 23.4807 39.0013 23.718 39 24V25H40C40.2833 25 40.521 25.096 40.713 25.288C40.905 25.48 41.0007 25.7173 41 26C40.9993 26.2827 40.9033 26.5203 40.712 26.713C40.5207 26.9057 40.2833 27.0013 40 27H39V28C39 28.2833 38.904 28.521 38.712 28.713C38.52 28.905 38.2827 29.0007 38 29Z"
-                                        fill="#0056D1"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="material-symbols:add-photo-alternate-rounded">
+                                <path id="Vector" d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97934 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H12.45C12.7833 3 13.0377 3.146 13.213 3.438C13.3883 3.73 13.409 4.04234 13.275 4.375C13.1917 4.64167 13.125 4.90834 13.075 5.175C13.025 5.44167 13 5.71667 13 6C13 7.38334 13.4877 8.56267 14.463 9.538C15.4383 10.5133 16.6173 11.0007 18 11C18.2833 11 18.5583 10.975 18.825 10.925C19.0917 10.875 19.3583 10.8083 19.625 10.725C19.9583 10.6083 20.271 10.6333 20.563 10.8C20.855 10.9667 21.0007 11.2167 21 11.55V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17ZM18 9C17.7167 9 17.4793 8.904 17.288 8.712C17.0967 8.52 17.0007 8.28267 17 8V7H16C15.7167 7 15.4793 6.904 15.288 6.712C15.0967 6.52 15.0007 6.28267 15 6C14.9993 5.71734 15.0953 5.48 15.288 5.288C15.4807 5.096 15.718 5 16 5H17V4C17 3.71667 17.096 3.47934 17.288 3.288C17.48 3.09667 17.7173 3.00067 18 3C18.2827 2.99934 18.5203 3.09534 18.713 3.288C18.9057 3.48067 19.0013 3.718 19 4V5H20C20.2833 5 20.521 5.096 20.713 5.288C20.905 5.48 21.0007 5.71734 21 6C20.9993 6.28267 20.9033 6.52034 20.712 6.713C20.5207 6.90567 20.2833 7.00134 20 7H19V8C19 8.28334 18.904 8.521 18.712 8.713C18.52 8.905 18.2827 9.00067 18 9Z" fill="white"/>
+                            </g>
+                        </svg>
+                        Add Images...
                         <input
                             type="file"
                             id="imageUpload"
@@ -180,10 +195,11 @@ function TranscriptionPage() {
                             onChange={handleImageUpload}
                         />
                     </label>
-                    <ImagePreviewList
+                    <FileList
                         images={images}
-                        currentImage={currentPage}
                         onImageSelected={handlePageChange}
+                        onMoveImage={handleOpenModal}
+                        onDeleteImage={handleOpenModal}
                     />
                 </div>
                 <Pagination
@@ -193,10 +209,17 @@ function TranscriptionPage() {
                     onPageChange={handlePageChange}
                 />
                 <div className="relative flex-1 p-4 grow overflow-y-auto">
-                    {" "}
-                    {/* Relative wrapper for positioning */}
                     <div className="h-full flex flex-col">
-                        {selectedImage? <RangeInput key={selectedImage?.id} startVerse={selectedImage?.startVerse} endVerse={selectedImage?.endVerse} onRangeChange={handleVerseRangeChange}></RangeInput> : <></>}
+                        {selectedImage?
+                            <RangeInput
+                                key={selectedImage?.id}
+                                startVerse={selectedImage?.startVerse}
+                                endVerse={selectedImage?.endVerse}
+                                onRangeChange={handleVerseRangeChange}>
+                            </RangeInput>
+                            :
+                            <></>
+                        }
                         <button
                             onClick={handleResubmitImage}
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2"
@@ -214,13 +237,19 @@ function TranscriptionPage() {
                     {selectedImage?.transcription == null && (
                         <div
                             className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg">
-                            {" "}
-                            {/* Overlay with rounded corners */}
                             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"/>
                         </div>
                     )}
                 </div>
             </div>
+            {modalImage?
+            <MoveImageModal
+                key={modalImage?.id}
+                image={modalImage}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSave={handleSaveModal}
+            /> : <></>}
         </div>
     );
 }

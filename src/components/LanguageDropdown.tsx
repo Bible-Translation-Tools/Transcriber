@@ -122,13 +122,13 @@ const Dropdown: React.FC<DropdownProps> = ({
 	}, [handleOutsideClick]);
 
 	return (
-		<div className="relative min-w-64 max-w-128" ref={dropdownRef}>
+		<div className="relative min-w-96 max-w-128" ref={dropdownRef}>
 			<button
 				type="button"
-				className="min-w-64 max-w-128 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-center items-center gap-2"
+				className="min-w-96 max-w-128 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-center items-center gap-2"
 				onClick={toggleDropdown}
 			>
-				<div className="min-w-64 max-w-128 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
+				<div className="min-w-96 max-w-128 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
 					<div className="flex-1 p-4 flex justify-start items-center gap-2">
 						<div className="w-6 h-6 relative overflow-hidden">
 							<div className="w-5 h-5 bg-color-on-surface-secondary">
