@@ -51,7 +51,7 @@ const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading,
     }
 
     return (
-        <div className="w-[240px] p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 hover:bg-gray-200">
             <div className="flex items-center justify-between" >
                 <div className="flex items-center"  onClick={handleImageSelected}>
                     <span className="truncate">{fileName}</span>
@@ -59,10 +59,10 @@ const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading,
                 {isLoading ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blue-500"></div>
                 ) : (
-                    <button onClick={handleMenuClick} className="text-gray-500 hover:text-gray-700">
+                    <button onClick={handleMenuClick} className="w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-400">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
+                            className="h-6 w-6"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                         >
@@ -73,7 +73,7 @@ const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading,
             </div>
 
             {isMenuOpen && (
-                <div ref={menuRef} className="absolute z-1 ml-52 mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div ref={menuRef} className="absolute z-1 ml-[18vw] mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                     <div className="py-1">
                         <button
                             onClick={handleMoveClick}
@@ -130,17 +130,15 @@ interface FileListProps {
 }
 
 const FileList: React.FC<FileListProps> = ({ images, onImageSelected, onMoveImage, onDeleteImage }) => {
-
-
     return (
-        <div className="max-w-xs h-screen shadow-md rounded-md overflow-hidden">
+        <div className="w-[20vw] h-screen overflow-y-scroll">
             {images.map((image, index) => (
                 <FileListItem
                     key={index}
                     id={image.id}
                     index={index}
                     fileName={`Image ${index + 1}`}
-                    isLoading={image.loading}
+                    isLoading={image?.loading ?? true}
                     onImageSelected={onImageSelected}
                     onMoveImage={onMoveImage}
                     onDeleteImage={onDeleteImage}

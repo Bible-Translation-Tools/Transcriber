@@ -179,7 +179,7 @@ function TranscriptionPage() {
                 <div className="flex flex-col p-4 overflow-y-auto">
                     <label
                         htmlFor="imageUpload"
-                        className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center"
+                        className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold mb-4 py-2 px-4 rounded-lg flex items-center justify-center"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g id="material-symbols:add-photo-alternate-rounded">

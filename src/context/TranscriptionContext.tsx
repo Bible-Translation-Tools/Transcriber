@@ -139,7 +139,6 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [language, bookCode, chapter]);
 
 
-
     const loadImagesFromDB = (
         languageToLoad = language.code,
         bookToLoad = bookCode,
@@ -193,6 +192,8 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const addImage = (image: ImageData) => {
         if (dbRef.current) {
+            setSelectedImage(image);
+
             const transaction = dbRef.current.transaction(
                 "images",
                 "readwrite",
@@ -231,12 +232,22 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                         prompt: prompt,
                     });
                     if (transcription.success) {
-                        // imageWithCurrentMetadata.transcription =
-                        //   transcription.transcription;
-                        updateImage({
+                        const newImage = {
                             ...imageWithCurrentMetadata,
                             transcription: transcription.transcription,
+                        }
+
+                        setImages((prevImages) => {
+                            return prevImages.map((image) => {
+                                if (image.id === imageWithCurrentMetadata.id) {
+                                    return newImage;
+                                } else {
+                                    return image;
+                                }
+                            })
                         });
+
+                        setSelectedImage(newImage);
                     }
                 })();
             };
@@ -297,17 +308,19 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                         }))
                         return updated;
                     }
+
                     setImages((prevImages) => {
                         return updatedImagesList(prevImages)
                     });
-
+                    
                     if (
                         !selectedImageMoved &&
                         selectedImage &&
-                        selectedImage.url === updatedImage.url
+                        selectedImage.id === updatedImage.id
                     ) {
                         setSelectedImage(updatedImage);
                     } else {
+                        console.log("nulling out selectedImage");
                         setSelectedImage(null);
                     }
                 }
