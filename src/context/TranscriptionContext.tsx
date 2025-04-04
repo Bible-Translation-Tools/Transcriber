@@ -45,7 +45,7 @@ interface TranscriptionContextType {
 }
 
 export const TranscriptionContext = createContext<TranscriptionContextType>({
-    language: {anglicized: "English", code: "en"},
+    language: { anglicized: "English", code: "en" },
     setLanguage: () => {
     },
     recentLanguages: [],
@@ -83,8 +83,8 @@ export const TranscriptionContext = createContext<TranscriptionContextType>({
 });
 
 export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
-                                                                                   children,
-                                                                               }) => {
+    children,
+}) => {
     const storedSelectedLanguage = localStorage.getItem("selectedLanguage");
     let restoredLanguage = null;
     if (storedSelectedLanguage != null) {
@@ -92,6 +92,8 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
             restoredLanguage = JSON.parse(storedSelectedLanguage);
         } catch {
         }
+    } else {
+        restoredLanguage = { code: "en", anglicized: "English", nationalName: "English" }
     }
 
     const storedBookCode = localStorage.getItem("bookCode");
@@ -106,7 +108,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     const [images, setImages] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
     const [model, updateModel] = useState<TranscriptionModel>(
-        localStorage.getItem("model") as TranscriptionModel,
+        localStorage.getItem("model") as TranscriptionModel ?? "openai"
     );
     const [systemPrompt, updateSystemPrompt] = useState<string>(
         localStorage.getItem("systemPrompt") ||
@@ -128,7 +130,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
             const db = (event.target as IDBOpenDBRequest).result;
             if (event.oldVersion < 2) {
                 // Only create the object store if it doesn't exist
-                db.createObjectStore("images", {keyPath: "url"});
+                db.createObjectStore("images", { keyPath: "url" });
             }
         };
 
@@ -312,7 +314,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                     setImages((prevImages) => {
                         return updatedImagesList(prevImages)
                     });
-                    
+
                     if (
                         !selectedImageMoved &&
                         selectedImage &&
@@ -333,7 +335,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     const resubmitImageForTranscription = (imageToUpdate: ImageData) => {
-        updateImage({...imageToUpdate, transcription: null, loading: true});
+        updateImage({ ...imageToUpdate, transcription: null, loading: true });
         (async () => {
             const request: TranscriptionRequest = {
                 model: model,
