@@ -237,6 +237,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                         const newImage = {
                             ...imageWithCurrentMetadata,
                             transcription: transcription.transcription,
+                            loading: false,
                         }
 
                         setImages((prevImages) => {
@@ -250,6 +251,8 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                         });
 
                         setSelectedImage(newImage);
+
+                        updateTranscription(newImage);
                     }
                 })();
             };
