@@ -3,7 +3,8 @@ import BookDropdown from "@components/BookDropdown.tsx";
 import LanguageDropdown, {LanguageOption} from "@components/LanguageDropdown.tsx";
 import {useTranscriptionContext} from "@src/context/useTranscriptionContext.tsx";
 import {useLanguageContext} from "@src/context/useLanguageContext.tsx";
-import {ImageData} from "@src/context/TranscriptionContext.tsx";
+
+import {ImageData} from "@src/data/ImageData.tsx";
 
 interface MoveImageModalProps {
     isOpen: boolean;

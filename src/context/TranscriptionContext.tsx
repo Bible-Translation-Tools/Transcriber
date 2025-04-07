@@ -5,20 +5,8 @@ import {
 } from "@api/domain/TranscriptionRequest";
 import type {LanguageOption} from "@src/components/LanguageDropdown";
 import {getTranscription, sendUpdatedTranscription,} from "@src/domain/getTranscription";
-import {createContext, useEffect, useRef, useState} from "react";
-
-export interface ImageData {
-    id: string;
-    url: string; // Key for IndexedDB
-    data: any;
-    transcription: string | undefined | null; // Optional transcription
-    languageCode: string;
-    bookCode: string;
-    chapter: number;
-    startVerse?: number | undefined;
-    endVerse?: number | undefined;
-    loading?: boolean;
-}
+import {createContext, useEffect, useMemo, useRef, useState} from "react";
+import {ImageData} from "@src/data/ImageData.tsx";
 
 interface TranscriptionContextType {
     language: LanguageOption | null;
@@ -117,6 +105,14 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
     const [prompt, updatePrompt] = useState<string>(
         localStorage.getItem("prompt") || DetaultTranscriptionPrompt.PROMPT,
     );
+
+    const sortedImages: ImageData[] = useMemo<ImageData[]>(() => {
+        return [...images].sort((a: ImageData, b: ImageData) => {
+            return a.created - b.created;
+        })
+    }, [images])
+
+
     const dbRef = useRef<IDBDatabase | null>(null);
 
     useEffect(() => {
@@ -401,7 +397,7 @@ export const TranscriptionProvider: React.FC<{ children: React.ReactNode }> = ({
                 setBookCode,
                 chapter,
                 setChapter,
-                images,
+                images: sortedImages,
                 selectedImage,
                 model,
                 setModel,
