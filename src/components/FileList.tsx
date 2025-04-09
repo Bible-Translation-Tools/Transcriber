@@ -1,8 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ImageData} from "@src/context/TranscriptionContext.tsx";
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+
+import {ImageData} from "@src/data/ImageData.tsx";
 
 interface FileListItemProps {
     fileName: string;
+    selected: boolean;
     id: string;
     index: number;
     onImageSelected: (imageNumber: number) => void;
@@ -11,7 +13,7 @@ interface FileListItemProps {
     isLoading?: boolean;
 }
 
-const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading, onImageSelected, onMoveImage, onDeleteImage }) => {
+const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, isLoading, onImageSelected, onMoveImage, onDeleteImage }) => {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -32,26 +34,34 @@ const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading,
         };
     }, [isMenuOpen]);
 
-    const handleMenuClick = () => {
+    const handleMenuClick = (): void => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleMoveClick = () => {
+    const handleMoveClick = (): void => {
         onMoveImage(index);
         setIsMenuOpen(false);
     };
 
-    const handleDeleteClick = () => {
+    const handleDeleteClick = (): void => {
         onDeleteImage(index);
         setIsMenuOpen(false);
     };
 
-    const handleImageSelected = () => {
+    const handleImageSelected = (): void => {
         onImageSelected(index);
     }
 
+    const selectedStyle = (): string => {
+        if (selected) {
+            return "rounded-2xl bg-white";
+        } else {
+            return "";
+        }
+    }
+
     return (
-        <div className="p-4 border-b border-gray-200 hover:bg-gray-200">
+        <div className={`p-4 border-b border-gray-200 hover:bg-gray-200 ${selectedStyle()}`}>
             <div className="flex items-center justify-between" >
                 <div className="flex items-center"  onClick={handleImageSelected}>
                     <span className="truncate">{fileName}</span>
@@ -123,27 +133,31 @@ const FileListItem: React.FC<FileListItemProps> = ({ fileName, index, isLoading,
 };
 
 interface FileListProps {
+    selectedId: string | undefined;
     images: ImageData[];
     onImageSelected: (imageNumber: number) => void;
     onMoveImage: (image: number) => void;
     onDeleteImage: (image: number) => void;
 }
 
-const FileList: React.FC<FileListProps> = ({ images, onImageSelected, onMoveImage, onDeleteImage }) => {
+const FileList: React.FC<FileListProps> = ({ selectedId, images, onImageSelected, onMoveImage, onDeleteImage }) => {
     return (
         <div className="w-[20vw] h-screen overflow-y-scroll">
-            {images.map((image, index) => (
+            {images.map((image, index) =>
+            { console.log(selectedId, image.id, index)
+                return (
                 <FileListItem
                     key={index}
+                    selected={selectedId === image.id}
                     id={image.id}
                     index={index}
-                    fileName={`Image ${index + 1}`}
+                    fileName={image.filename}
                     isLoading={image?.loading ?? true}
                     onImageSelected={onImageSelected}
                     onMoveImage={onMoveImage}
                     onDeleteImage={onDeleteImage}
                 />
-            ))}
+            )})}
         </div>
     );
 };

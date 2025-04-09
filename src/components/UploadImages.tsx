@@ -2,8 +2,8 @@
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import type { ImageData } from "../context/TranscriptionContext.tsx";
 import { useTranscriptionContext } from "../context/useTranscriptionContext.tsx";
+import uploadFiles from "@src/domain/uploadFiles.ts";
 
 function UploadImages() {
 	const { addImage } = useTranscriptionContext(); // Destructure only addImage
@@ -37,70 +37,7 @@ function UploadImages() {
 	};
 
 	const handleFiles = (files: File[]) => {
-		setErrorMessage("");
-
-		const validFiles = files.filter((file) => {
-			const fileType = file.type;
-			return (
-				fileType === "image/jpeg" ||
-				fileType === "image/png" ||
-				fileType === "application/pdf"
-			);
-		});
-
-		if (validFiles.length !== files.length) {
-			setErrorMessage("Only JPEG, PNG, and PDF files are allowed.");
-		}
-
-		validFiles.forEach((file) => {
-			if (file.type !== "application/pdf") {
-				const reader = new FileReader();
-
-				reader.onloadend = () => {
-					const base64String = reader.result;
-					const url = URL.createObjectURL(file);
-					const image: ImageData = {
-						url,
-						data: base64String,
-						transcription: null,
-					}; // Type the image object
-
-					addImage(image);
-				};
-
-				reader.readAsDataURL(file);
-			} else {
-				const reader = new FileReader();
-
-				(async () => {
-					reader.onload = async (e) => {
-						const _this = e.target;
-						if (_this?.result != null) {
-							const converter = new pdf2image({
-								filename: `${file.name}<ctrl98>-MM-DD`,
-								file: _this.result,
-								scale: 4,
-								type: "jpeg",
-							});
-
-							await converter.convert();
-
-							converter.images.forEach((imageData: any) => {
-								const url = URL.createObjectURL(file);
-								const image: ImageData = {
-									url,
-									data: imageData,
-									transcription: null,
-								}; // Type the image object
-								addImage(image);
-							});
-						}
-					};
-				})();
-
-				reader.readAsArrayBuffer(file);
-			}
-		});
+		uploadFiles(files, addImage);
 	};
 
 	return (

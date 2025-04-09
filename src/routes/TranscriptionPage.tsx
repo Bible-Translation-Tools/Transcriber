@@ -5,12 +5,13 @@ import {useState} from "react";
 import NavBar from "../components/NavBar";
 import Pagination from "../components/Pagination";
 import TextEditor from "../components/TextEditor";
-import type {ImageData} from "../context/TranscriptionContext.tsx";
 import {useTranscriptionContext} from "../context/useTranscriptionContext.tsx";
 import RangeInput from "@components/RangeInput.tsx";
 import FileList from "@components/FileList.tsx";
 import MoveImageModal from "@components/MoveImageModal.tsx";
 import EmptyProject from "@src/context/EmptyProject.tsx";
+import uploadFiles from "@src/domain/uploadFiles.ts";
+import {ImageData} from "@src/data/ImageData.tsx";
 
 function TranscriptionPage() {
     const {
@@ -72,68 +73,7 @@ function TranscriptionPage() {
     };
 
     const handleFiles = (files: File[]) => {
-        const validFiles = files.filter((file) => {
-            const fileType = file.type;
-            return (
-                fileType === "image/jpeg" ||
-                fileType === "image/png" ||
-                fileType === "application/pdf"
-            );
-        });
-
-        if (validFiles.length !== files.length) {
-            console.log("Only JPEG, PNG, and PDF files are allowed.");
-        }
-
-        validFiles.forEach((file) => {
-            if (file.type !== "application/pdf") {
-                const reader = new FileReader();
-
-                reader.onloadend = () => {
-                    const base64String = reader.result;
-                    const url = URL.createObjectURL(file);
-                    const image: ImageData = {
-                        url,
-                        data: base64String,
-                        transcription: null,
-                    }; // Type the image object
-
-                    addImage(image);
-                };
-
-                reader.readAsDataURL(file);
-            } else {
-                const reader = new FileReader();
-
-                (async () => {
-                    reader.onload = async (e) => {
-                        const _this = e.target;
-                        if (_this?.result != null) {
-                            const converter = new pdf2image({
-                                filename: `${file.name} yyyy-MM-DD`,
-                                file: _this.result,
-                                scale: 4,
-                                type: "jpeg",
-                            });
-
-                            await converter.convert();
-
-                            converter.images.forEach((imageData: any) => {
-                                const url = URL.createObjectURL(file);
-                                const image: ImageData = {
-                                    url,
-                                    data: imageData,
-                                    transcription: null,
-                                }; // Type the image object
-                                addImage(image);
-                            });
-                        }
-                    };
-                })();
-
-                reader.readAsArrayBuffer(file);
-            }
-        });
+        uploadFiles(files, addImage);
     };
 
     const handleResubmitImage = () => {
@@ -206,6 +146,7 @@ function TranscriptionPage() {
                         />
                     </label>
                     <FileList
+                        selectedId={selectedImage?.id}
                         images={images}
                         onImageSelected={handlePageChange}
                         onMoveImage={handleOpenModal}
