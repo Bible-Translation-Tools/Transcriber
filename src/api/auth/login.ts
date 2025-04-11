@@ -166,6 +166,10 @@ export async function getOauthTokens({
 			},
 			body: JSON.stringify(requestBody),
 		});
+
+		const body = response.body
+		console.log("body is ", body)
+
 		const data = (await response.json()) as TokenResponse;
 		if (!response.ok) {
 			console.log({
@@ -196,3 +200,4 @@ export async function getOauthTokens({
 		};
 	}
 }
+

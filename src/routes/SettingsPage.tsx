@@ -2,10 +2,10 @@ import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
 } from "@api/domain/TranscriptionRequest";
-import { useTranscriptionContext } from "@src/context/useTranscriptionContext.tsx";
 import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Settings: React.FC = () => {
 		setPrompt,
 		model,
 		setModel,
-	} = useTranscriptionContext();
+	} = useTranscriptionStore();
 
 	const [language, setLanguage] = useState("en");
 	const [theme, setTheme] = useState("light");

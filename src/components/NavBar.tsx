@@ -1,9 +1,9 @@
 import { useLanguageContext } from "@src/context/useLanguageContext";
 import type React from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranscriptionContext } from "../context/useTranscriptionContext.tsx";
 import BookDropdown from "./BookDropdown";
 import LanguageDropdown from "./LanguageDropdown";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 
 const NavBar: React.FC = () => {
 	const {
@@ -14,7 +14,9 @@ const NavBar: React.FC = () => {
 		setBookCode,
 		chapter,
 		setChapter,
-	} = useTranscriptionContext();
+	} = useTranscriptionStore();
+
+	console.log("Nav bar language", language);
 
 	const { languages } = useLanguageContext();
 	const navigate = useNavigate();

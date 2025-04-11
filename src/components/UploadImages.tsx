@@ -2,11 +2,13 @@
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useTranscriptionContext } from "../context/useTranscriptionContext.tsx";
 import uploadFiles from "@src/domain/uploadFiles.ts";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import {addImage} from "@src/domain/useTranscription.ts";
 
 function UploadImages() {
-	const { addImage } = useTranscriptionContext(); // Destructure only addImage
+	const store = useTranscriptionStore();
+
 	const [errorMessage, setErrorMessage] = useState("");
 
 	// todo: investigate the error thrown by biome here on more deps than necessary: addImage
@@ -37,7 +39,7 @@ function UploadImages() {
 	};
 
 	const handleFiles = (files: File[]) => {
-		uploadFiles(files, addImage);
+		uploadFiles(store, files, addImage);
 	};
 
 	return (
