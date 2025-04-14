@@ -10,8 +10,6 @@ export const addImage = (
     store: TranscriptionStore,
     image: ImageData
 ) => {
-    console.log(store);
-
     if (store.language == null) {
         console.error("Language is null, cannot add image!");
         return;
@@ -35,10 +33,15 @@ export const addImage = (
     console.log(`Adding image: ${imageWithCurrentMetadata.id}.`);
     store.setSelectedImage(imageWithCurrentMetadata);
 
-    store.setImages([
-        ...store.images,
-        imageWithCurrentMetadata,
-    ]);
+    console.log(`Images in store: ${store.images.length}`)
+
+    store.setImages((prev: any) => {
+        console.log(`Updating: images in previous store: ${prev.length}`)
+        return [
+            ...prev,
+            imageWithCurrentMetadata,
+        ]
+    });
 
     (async () => {
         await imageRepo.storeImage(imageWithCurrentMetadata.id, imageWithCurrentMetadata)
@@ -59,14 +62,13 @@ export const addImage = (
                 transcription: transcription.transcription,
                 loading: false,
             }
-
-            store.setImages(store.images.map((image) => {
+            store.setImages((prev: any) => (prev.map((image: ImageData) => {
                 if (image.id === imageWithCurrentMetadata.id) {
                     return newImage;
                 } else {
                     return image;
                 }
-            }));
+            })));
 
             store.setSelectedImage(newImage);
             updateTranscription(store, newImage);
@@ -74,15 +76,16 @@ export const addImage = (
     })();
 };
 
-export const updateImage = (
+export const updateImage = async (
     store: TranscriptionStore,
     updatedImage: ImageData,
     reloadOnSuccess = true
 ) => {
-    imageRepo.storeImage(updatedImage.id, updatedImage.data)
+    console.log(`Updating image: ${updatedImage.id}.`);
+    await imageRepo.storeImage(updatedImage.id, updatedImage)
 
     if (updatedImage?.transcription) {
-        sendUpdatedTranscription(
+        await sendUpdatedTranscription(
             updatedImage.id,
             updatedImage.transcription,
             updatedImage.languageCode,
@@ -100,7 +103,9 @@ export const updateImage = (
     }
 
     if (reloadOnSuccess) {
+        console.log(`Reloading on successful transcription: ${updatedImage.id}.`);
         const selectedImageMoved = updatedImage.languageCode !== store.language?.code || updatedImage.bookCode !== store.bookCode || updatedImage.chapter !== store.chapter;
+        console.log(`selectedImageMoved: ${selectedImageMoved}`);
 
         function updatedImagesList(prevImages: ImageData[]) {
             const updated = prevImages.map((image) =>
@@ -125,6 +130,7 @@ export const updateImage = (
             store.selectedImage &&
             store.selectedImage.id === updatedImage.id
         ) {
+            console.log(`Updating selected image: ${updatedImage.id}.`);
             store.setSelectedImage(updatedImage);
         } else {
             console.log("nulling out selectedImage");

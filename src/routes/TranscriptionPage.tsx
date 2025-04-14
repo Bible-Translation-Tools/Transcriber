@@ -40,7 +40,7 @@ function TranscriptionPage() {
         setModalImage(null);
     };
 
-    const handleSaveModal = (
+    const handleSaveModal = async (
         image: ImageData,
         language: string,
         book: string,
@@ -53,7 +53,7 @@ function TranscriptionPage() {
             return;
         }
         console.log('Saved:', language, book, chapter, startVerse, endVerse);
-        updateImage(
+        await updateImage(
             store,
             {
                 ...image,
@@ -62,7 +62,10 @@ function TranscriptionPage() {
                 chapter: chapter,
                 startVerse: startVerse,
                 endVerse: endVerse
-            }, true);
+            },
+            true
+        );
+        store.refreshProject();
         setModalImage(null);
     };
 
@@ -108,7 +111,6 @@ function TranscriptionPage() {
     };
 
     const handleVerseRangeChange = (start: number, end: number) => {
-        debugger
         const validVerseRange = validateVerseRange(start, end);
         if (validVerseRange && selectedImage) {
             selectedImage.startVerse = start;
@@ -118,7 +120,6 @@ function TranscriptionPage() {
     }
 
     const validateVerseRange = (start: number, end: number) => {
-        debugger
         if (end < start) return false;
         if (end > 176) return false;
         if (start < 0) return false;
