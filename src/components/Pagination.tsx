@@ -1,4 +1,5 @@
 import ZoomableImage from "./ZoomableImage";
+import {ImageData} from "@src/data/ImageData.tsx";
 
 interface PaginationProps {
 	image: ImageData | null;

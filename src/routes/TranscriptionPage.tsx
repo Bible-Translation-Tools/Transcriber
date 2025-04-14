@@ -5,24 +5,24 @@ import {useState} from "react";
 import NavBar from "../components/NavBar";
 import Pagination from "../components/Pagination";
 import TextEditor from "../components/TextEditor";
-import {useTranscriptionContext} from "../context/useTranscriptionContext.tsx";
 import RangeInput from "@components/RangeInput.tsx";
 import FileList from "@components/FileList.tsx";
 import MoveImageModal from "@components/MoveImageModal.tsx";
 import EmptyProject from "@src/context/EmptyProject.tsx";
 import uploadFiles from "@src/domain/uploadFiles.ts";
 import {ImageData} from "@src/data/ImageData.tsx";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import {
+    addImage,
+    resubmitImageForTranscription,
+    updateImage,
+    updateTranscription
+} from "@src/domain/useTranscription.ts";
 
 function TranscriptionPage() {
-    const {
-        images,
-        selectedImage,
-        setSelectedImage,
-        addImage,
-        updateImage,
-        updateTranscription,
-        resubmitImageForTranscription,
-    } = useTranscriptionContext();
+    const store = useTranscriptionStore();
+    const {images, selectedImage, setSelectedImage} = store;
+
     const [currentPage, setCurrentPage] = useState(0);
 
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -40,7 +40,7 @@ function TranscriptionPage() {
         setModalImage(null);
     };
 
-    const handleSaveModal = (
+    const handleSaveModal = async (
         image: ImageData,
         language: string,
         book: string,
@@ -53,14 +53,19 @@ function TranscriptionPage() {
             return;
         }
         console.log('Saved:', language, book, chapter, startVerse, endVerse);
-        updateImage({
-            ...image,
-            languageCode: language,
-            bookCode: book,
-            chapter: chapter,
-            startVerse: startVerse,
-            endVerse: endVerse
-        }, true);
+        await updateImage(
+            store,
+            {
+                ...image,
+                languageCode: language,
+                bookCode: book,
+                chapter: chapter,
+                startVerse: startVerse,
+                endVerse: endVerse
+            },
+            true
+        );
+        store.refreshProject();
         setModalImage(null);
     };
 
@@ -73,22 +78,25 @@ function TranscriptionPage() {
     };
 
     const handleFiles = (files: File[]) => {
-        uploadFiles(files, addImage);
+        uploadFiles(store, files, addImage);
     };
 
     const handleResubmitImage = () => {
         if (selectedImage != null) {
-            resubmitImageForTranscription(selectedImage);
+            resubmitImageForTranscription(store, selectedImage);
         }
     };
 
     // change to explicitly be a useCallback?
     const handleTextChange = (newText: string) => {
         if (selectedImage != null) {
-            updateTranscription({
-                ...selectedImage,
-                transcription: newText,
-            });
+            updateTranscription(
+                store,
+                {
+                    ...selectedImage,
+                    transcription: newText,
+                }
+            );
         }
     };
 
@@ -103,17 +111,15 @@ function TranscriptionPage() {
     };
 
     const handleVerseRangeChange = (start: number, end: number) => {
-        debugger
         const validVerseRange = validateVerseRange(start, end);
         if (validVerseRange && selectedImage) {
             selectedImage.startVerse = start;
             selectedImage.endVerse = end;
-            updateTranscription(selectedImage);
+            updateTranscription(store, selectedImage);
         }
     }
 
     const validateVerseRange = (start: number, end: number) => {
-        debugger
         if (end < start) return false;
         if (end > 176) return false;
         if (start < 0) return false;

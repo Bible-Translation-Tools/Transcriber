@@ -144,7 +144,7 @@ const FileList: React.FC<FileListProps> = ({ selectedId, images, onImageSelected
     return (
         <div className="w-[20vw] h-screen overflow-y-scroll">
             {images.map((image, index) =>
-            { console.log(selectedId, image.id, index)
+            {
                 return (
                 <FileListItem
                     key={index}

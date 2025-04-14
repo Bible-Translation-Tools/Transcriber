@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
 import BookDropdown from "@components/BookDropdown.tsx";
 import LanguageDropdown, {LanguageOption} from "@components/LanguageDropdown.tsx";
-import {useTranscriptionContext} from "@src/context/useTranscriptionContext.tsx";
 import {useLanguageContext} from "@src/context/useLanguageContext.tsx";
-
 import {ImageData} from "@src/data/ImageData.tsx";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 
 interface MoveImageModalProps {
     isOpen: boolean;
@@ -22,7 +21,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
     }
 ) => {
 
-    const {recentLanguages} = useTranscriptionContext();
+    const {recentLanguages} = useTranscriptionStore();
     const {languages} = useLanguageContext();
 
     const [language, setLanguage] = useState<LanguageOption>(
