@@ -1,15 +1,15 @@
-import "../App.css";
+import "../../App.css";
 // @ts-ignore
 import {pdf2image} from "@pardnchiu/pdf2image";
 import {useState} from "react";
-import NavBar from "../components/NavBar";
-import Pagination from "../components/Pagination";
-import TextEditor from "../components/TextEditor";
-import RangeInput from "@components/RangeInput.tsx";
-import FileList from "@components/FileList.tsx";
-import MoveImageModal from "@components/MoveImageModal.tsx";
-import EmptyProject from "@src/context/EmptyProject.tsx";
-import uploadFiles from "@src/domain/uploadFiles.ts";
+import NavBar from "@components/navigation/NavBar.tsx";
+import Pagination from "@components/image/Pagination.tsx";
+import TextEditor from "@components/forms/TextEditor.tsx";
+import RangeInput from "@components/forms/RangeInput.tsx";
+import FileList from "@components/image/FileList.tsx";
+import MoveImageModal from "@components/forms/MoveImageModal.tsx";
+import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
+import uploadFiles from "@src/domain/UploadFiles.ts";
 import {ImageData} from "@src/data/ImageData.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import {
@@ -17,7 +17,7 @@ import {
     resubmitImageForTranscription,
     updateImage,
     updateTranscription
-} from "@src/domain/useTranscription.ts";
+} from "@src/domain/ImageActions.ts";
 
 function TranscriptionPage() {
     const store = useTranscriptionStore();

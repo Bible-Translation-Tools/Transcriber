@@ -2,9 +2,9 @@
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import uploadFiles from "@src/domain/uploadFiles.ts";
+import uploadFiles from "@src/domain/UploadFiles.ts";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {addImage} from "@src/domain/useTranscription.ts";
+import {addImage} from "@src/domain/ImageActions.ts";
 
 function UploadImages() {
 	const store = useTranscriptionStore();

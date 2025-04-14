@@ -1,8 +1,8 @@
-import { useLanguageContext } from "@src/context/useLanguageContext";
+import { useLanguageContext } from "@src/context/useLanguageContext.tsx";
 import type React from "react";
 import { useNavigate } from "react-router-dom";
-import BookDropdown from "./BookDropdown";
-import LanguageDropdown from "./LanguageDropdown";
+import BookDropdown from "./BookDropdown.tsx";
+import LanguageDropdown from "./LanguageDropdown.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 
 const NavBar: React.FC = () => {

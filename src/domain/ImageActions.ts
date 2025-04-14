@@ -1,5 +1,5 @@
 import {ImageData} from "@src/data/ImageData.tsx";
-import {getTranscription, sendUpdatedTranscription} from "@src/domain/getTranscription.ts";
+import {getTranscription, sendUpdatedTranscription} from "@src/services/TranscriptionApi.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";

@@ -1,6 +1,6 @@
-import type {LanguageOption} from "@components/LanguageDropdown.tsx";
 import type {ImageData} from "@src/data/ImageData.tsx";
 import type {TranscriptionModel} from "@api/domain/TranscriptionRequest.ts";
+import {LanguageOption} from "@src/data/LanguageOption.tsx";
 
 export interface TranscriptionState {
     language: LanguageOption | null;

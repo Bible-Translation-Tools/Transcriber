@@ -1,6 +1,6 @@
-import type { LanguageOption } from "@src/components/LanguageDropdown";
-import { getLanguagesPublicDataApi } from "@src/data/languages";
+import { getLanguagesPublicDataApi } from "@src/services/LanguageApi.ts";
 import { createContext, useEffect, useState } from "react";
+import {LanguageOption} from "@src/data/LanguageOption.tsx";
 
 interface LanguageContextType {
 	languages: LanguageOption[];

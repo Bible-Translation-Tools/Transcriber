@@ -8,7 +8,7 @@ import {
 } from "@api/ai/TranscriptionResponse";
 import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
 import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
-import type { TranscriptionImage } from "@src/data/TranscriptionImage";
+import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
 import * as v from "valibot";
 
 export async function HandleUpdateTranscriptionRequest(

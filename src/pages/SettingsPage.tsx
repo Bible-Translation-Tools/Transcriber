@@ -1,7 +1,7 @@
 import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
-} from "@api/domain/TranscriptionRequest";
+} from "@api/domain/TranscriptionRequest.ts";
 import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
