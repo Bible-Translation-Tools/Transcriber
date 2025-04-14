@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
-import BookDropdown from "@components/BookDropdown.tsx";
-import LanguageDropdown, {LanguageOption} from "@components/LanguageDropdown.tsx";
+import BookDropdown from "@components/navigation/BookDropdown.tsx";
+import LanguageDropdown from "@components/navigation/LanguageDropdown.tsx";
 import {useLanguageContext} from "@src/context/useLanguageContext.tsx";
 import {ImageData} from "@src/data/ImageData.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import {LanguageOption} from "@src/data/LanguageOption.tsx";
 
 interface MoveImageModalProps {
     isOpen: boolean;
@@ -36,7 +37,6 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
     const [chapter, setChapter] = useState(image.chapter);
     const [startVerse, setStartVerse] = useState(image?.startVerse ?? 1);
     const [endVerse, setEndVerse] = useState(image?.endVerse ?? 1);
-    const [error, setError] = useState();
 
     const handleBookChapterSelect = (book: string, chapter: number) => {
         setBook(book);
@@ -55,7 +55,6 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
     return (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
             <div className="bg-white rounded-lg p-6 flex">
-                {/*<div className="bg-white rounded-lg p-6">*/}
                 <div className="flex flex-row items-center justify-between">
                     <div className="pr-4 max-w-fit">
                         <img src={image.data} alt="Image to Move" className="rounded-lg object-contain w-[25vw]"/>
@@ -116,7 +115,6 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
                         </div>
                     </div>
                 </div>
-                {/*</div>*/}
             </div>
         </div>
     );

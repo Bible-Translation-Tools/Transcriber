@@ -1,12 +1,12 @@
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 import {DetaultTranscriptionPrompt, TranscriptionModel} from "@api/domain/TranscriptionRequest";
-import type {LanguageOption} from "@src/components/LanguageDropdown";
 import type {ImageData} from "@src/data/ImageData.tsx";
 import {TranscriptionState} from "@src/persistence/store/TranscriptionState.ts";
 import {TranscriptionActions} from "@src/persistence/store/TranscriptionActions.ts";
 import {transcriptionStateStorage} from "@src/persistence/store/PersistTranscriptionState.tsx";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
+import {LanguageOption} from "@src/data/LanguageOption.tsx";
 
 export type TranscriptionStore = TranscriptionState & TranscriptionActions;
 

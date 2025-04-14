@@ -1,4 +1,4 @@
-import ImagePreview from "./ImagePreview";
+import ImagePreview from "./ImagePreview.tsx";
 
 interface ImagePreviewListProps {
 	images: any[];

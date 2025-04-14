@@ -1,4 +1,4 @@
-import type { LanguageOption } from "@src/components/LanguageDropdown";
+import {LanguageOption} from "@src/data/LanguageOption.tsx";
 const query = `
 query MyQuery {
   language {

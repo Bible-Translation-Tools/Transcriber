@@ -1,5 +1,5 @@
-import { LOGIN_PATH } from "@api/auth/router";
-import { CSRF_STATE_KEY } from "@src/constants";
+import { LOGIN_PATH } from "@api/auth/router.ts";
+import { CSRF_STATE_KEY } from "@src/constants.ts";
 import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 

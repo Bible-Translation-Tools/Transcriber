@@ -3,7 +3,7 @@ import * as schema from "@api/persistence/schema";
 import type {
 	Transcription,
 	TranscriptionImage,
-} from "@src/data/TranscriptionImage";
+} from "@api/data/TranscriptionImage.ts";
 import { and, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 

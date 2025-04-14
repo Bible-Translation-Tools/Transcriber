@@ -1,9 +1,9 @@
 import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
-} from "@api/ai/TranscriptionResponse";
-import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest";
-import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@api/index";
+} from "@api/ai/TranscriptionResponse.ts";
+import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
+import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@src/api";
 
 export async function getTranscription(
 	request: TranscriptionRequest,

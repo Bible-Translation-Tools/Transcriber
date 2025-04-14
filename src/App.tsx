@@ -2,11 +2,11 @@ import {StrictMode, useEffect} from "react";
 import {createRoot} from "react-dom/client";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import "./index.css";
-import SettingsPage from "@src/routes/SettingsPage.tsx";
+import SettingsPage from "@src/pages/SettingsPage.tsx";
 import {LanguageProvider} from "./context/LanguageContext.tsx";
-import Home from "./routes/Home.tsx";
-import Login from "./routes/Login.tsx";
-import TranscriptionPage from "./routes/TranscriptionPage.tsx";
+import Home from "./pages/Home.tsx";
+import Login from "./pages/Login.tsx";
+import TranscriptionPage from "./pages/transcription/TranscriptionPage.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 
 const App = () => {

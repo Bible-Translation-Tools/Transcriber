@@ -1,4 +1,4 @@
-import { CSRF_STATE_KEY } from "@src/constants";
+import { CSRF_STATE_KEY } from "@src/constants.ts";
 
 function Home() {
 	const scopes = encodeURIComponent(
