@@ -67,10 +67,11 @@ export async function HandleTranscriptionRequest(
 		}
 		default: {
 			console.log(`Missing model ${body.model}`);
-			console.log(`Pixtral: ${body.model == TranscriptionModel.PIXTRAL}`);
+			console.log(
+				`Pixtral: ${body.model === TranscriptionModel.PIXTRAL}`,
+			);
 		}
 	}
-
 
 	if (transcriptionResponse != null) {
 		const bookCode = body.bookCode;

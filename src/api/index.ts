@@ -10,23 +10,24 @@ import { TranscriptionModel } from "@api/domain/TranscriptionRequest";
 import { Hono } from "hono";
 import { except } from "hono/combine";
 import type { JwtVariables } from "hono/jwt";
-import { logger } from "hono/logger";
 import { validator } from "hono/validator";
 import * as v from "valibot";
 import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
 import { R2ImageRepository } from "./persistence/R2ImageRepository";
+import { mockHandleTranscriptionRequest } from "./domain/mock";
 
 export const apiV1 = "/api/v1";
 const apiV1Router = new Hono<{
 	Bindings: Env;
-	Variables: JwtVariables;
+	Variables: JwtVariables & {
+		user: string | null;
+	};
 }>();
 apiV1Router.basePath(apiV1);
 
 export const transcribeRoute = "/transcriber/";
 export const updateTranscriptionRoute = "/updateTranscription/";
 
-apiV1Router.use("*", logger());
 apiV1Router.use(
 	"*",
 	except([`${apiV1}/auth/logout`], (c, next) => syncR2Keys(c, next)),
@@ -37,11 +38,6 @@ apiV1Router.use(
 // check for access Token first
 apiV1Router.post(transcribeRoute, async (c, next) => {
 	return await checkOrRefresh(c, next);
-});
-
-apiV1Router.get("checkTest", async (c) => {
-	const jwtPayload = c.get("jwtPayload");
-	return c.json({ jwtPayload });
 });
 
 apiV1Router.post(
@@ -64,7 +60,12 @@ apiV1Router.post(
 	}),
 	async (c) => {
 		console.log("Recieved transcription request");
-		const jwtPayload = c.get("jwtPayload");
+		const userStringified = c.get("user");
+		const user = userStringified ? JSON.parse(userStringified) : null;
+		if (!user) {
+			console.error("No user found in request");
+			return c.redirect("/");
+		}
 		const body = c.req.valid("json");
 
 		const bucket = c.env.HTR_STORAGE;
@@ -72,15 +73,18 @@ apiV1Router.post(
 			c.env.HTR_DATABASE,
 			new R2ImageRepository(bucket),
 		);
-
-		const user = jwtPayload.sub;
-
-		const htrRes = await HandleTranscriptionRequest(
-			user,
-			createApiMap(c.env),
-			body,
-			repo,
-		);
+		let htrRes: Response;
+		// todo: give a more granular toggle for mocking search as a query param?
+		if (import.meta.env.DEV) {
+			htrRes = await mockHandleTranscriptionRequest();
+		} else {
+			htrRes = await HandleTranscriptionRequest(
+				user,
+				createApiMap(c.env),
+				body,
+				repo,
+			);
+		}
 		return htrRes;
 	},
 );

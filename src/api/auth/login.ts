@@ -3,10 +3,11 @@ import {
 	GRANT_REFRESH_TOKEN,
 	WACS_API_REFRESH_TOKEN,
 	WACS_API_TOKEN,
-	WACS_USER_TOKEN,
+	WACS_USER,
 } from "@src/constants";
 import type { Context } from "hono";
 import { setCookie } from "hono/cookie";
+import { getUser, type UserGitea } from "./getUser";
 
 type GetSsoResponseArgs = {
 	ctx: Context;
@@ -16,6 +17,7 @@ type GetSsoResponseArgs = {
 type TokenArgs = {
 	request: Request;
 	code: string;
+	codeVerifier: string;
 	env: Env;
 	grantType?: string;
 	refreshToken?: string;
@@ -38,8 +40,8 @@ type SuccessResponse = {
 	type: "ok";
 	accessToken: string;
 	accessExpires: number;
+	user: UserGitea;
 	refresh: string;
-	idToken: string;
 };
 
 type ApiResponse = ErrorResponse | SuccessResponse;
@@ -51,10 +53,12 @@ export async function getSsoResponse({
 }: GetSsoResponseArgs): Promise<Response> {
 	const request = ctx.req.raw;
 	const code = ctx.req.query("code") as string; //we return err below if not present
+	const codeVerifier = ctx.req.query("codeVerifier") as string;
 	const env = ctx.env;
 	const oauthResponse = await getOauthTokens({
 		request,
 		code,
+		codeVerifier,
 		env,
 		grantType,
 		refreshToken,
@@ -64,11 +68,19 @@ export async function getSsoResponse({
 			status: oauthResponse.status,
 		});
 	}
+	// no Id token with pkce: fetch from api and save
+	const user = await getUser({
+		bearerToken: oauthResponse.accessToken,
+		SSO_BASE_URL: env.SSO_BASE_URL,
+	});
+	if (!user) {
+		throw new Error("Failed to fetch user data");
+	}
 	setLoginCookies({
 		accessToken: oauthResponse.accessToken,
 		accessExpires: oauthResponse.accessExpires,
 		ctx,
-		idToken: oauthResponse.idToken,
+		user: user,
 		refresh: oauthResponse.refresh,
 	});
 	// todo: should probably be more consistnet with ctx responses and new Response. ctx isn't that large of a wrapper around a web standard request and response object.  But if you use stuff like ctx.setCookies you need to send a res through ctx.
@@ -83,7 +95,7 @@ type SetCookieArgs = {
 	accessToken: string;
 	accessExpires: number;
 	refresh: string;
-	idToken: string;
+	user: UserGitea;
 	ctx: Context;
 };
 
@@ -91,8 +103,8 @@ export async function setLoginCookies({
 	accessExpires,
 	accessToken,
 	ctx,
-	idToken,
 	refresh,
+	user,
 }: SetCookieArgs) {
 	setCookie(ctx, WACS_API_TOKEN, accessToken, {
 		path: "/",
@@ -108,7 +120,8 @@ export async function setLoginCookies({
 		maxAge: 60 * 60 * 24 * 30, // 30 days
 		sameSite: "lax",
 	});
-	setCookie(ctx, WACS_USER_TOKEN, idToken, {
+	// todo: rename this cookie?
+	setCookie(ctx, WACS_USER, JSON.stringify(user), {
 		path: "/",
 		secure: true,
 		httpOnly: true,
@@ -120,6 +133,7 @@ export async function setLoginCookies({
 export async function getOauthTokens({
 	request,
 	code,
+	codeVerifier,
 	env,
 	grantType = "authorization_code",
 	refreshToken,
@@ -129,8 +143,8 @@ export async function getOauthTokens({
 	const redirectUrl = new URL(request.url);
 	const REDIRECT_PATH = env.SSO_REDIRECT_PATH;
 	const SSO_BASE_URL = env.SSO_BASE_URL;
-	if (!code && grantType === GRANT_CODE_FLOW) {
-		console.error("Missing code for code flow");
+	if ((!code || !codeVerifier) && grantType === GRANT_CODE_FLOW) {
+		console.error("Missing code  or code verifier for code flow");
 		return {
 			type: "error",
 			error: "Missing code parameter",
@@ -147,18 +161,21 @@ export async function getOauthTokens({
 	}
 	const requestBody: Record<string, string> = {
 		client_id: CLIENT_ID,
-		client_secret: CLIENT_SECRET,
 		redirect_uri: `${redirectUrl.origin}${REDIRECT_PATH}`,
 	};
 	if (grantType === GRANT_CODE_FLOW) {
 		requestBody.code = code as string; //validated above
 		requestBody.grant_type = grantType;
+		requestBody.code_verifier = codeVerifier; //pkce forces reauth
 	} else {
+		// refresh token flow
 		requestBody.grant_type = grantType;
 		requestBody.refresh_token = refreshToken as string; //validated above
+		requestBody.client_secret = CLIENT_SECRET;
 	}
 	try {
 		const authUrl = `${SSO_BASE_URL}/login/oauth/access_token`;
+		console.log({ requestBody });
 		const response = await fetch(authUrl, {
 			method: "POST",
 			headers: {
@@ -167,9 +184,8 @@ export async function getOauthTokens({
 			body: JSON.stringify(requestBody),
 		});
 
-		const body = response.body
-		console.log("body is ", body)
-
+		const body = response.body;
+		console.log("fn: getOauthTokens: body is ", body);
 		const data = (await response.json()) as TokenResponse;
 		if (!response.ok) {
 			console.log({
@@ -183,13 +199,20 @@ export async function getOauthTokens({
 			};
 		}
 		// todo: should validate not assert shape of tokenData
-		// console.log(data);
+		console.log({ oauthData: data });
+		const user = await getUser({
+			bearerToken: data.access_token,
+			SSO_BASE_URL,
+		});
+		if (!user) {
+			throw new Error("user not found");
+		}
 		return {
 			type: "ok",
 			accessToken: data.access_token,
 			accessExpires: data.expires_in,
 			refresh: data.refresh_token,
-			idToken: data.id_token,
+			user: user,
 		};
 	} catch (error) {
 		console.error(error);
@@ -200,4 +223,3 @@ export async function getOauthTokens({
 		};
 	}
 }
-

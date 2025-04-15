@@ -10,7 +10,7 @@ function Login() {
 		const searchParams = new URLSearchParams(window.location.search);
 		const code = searchParams.get("code");
 		const state = searchParams.get("state");
-
+		const codeVerifier = sessionStorage.getItem("code_verifier");
 		// Verify state
 		const storedState = sessionStorage.getItem(CSRF_STATE_KEY);
 		if (!state || !storedState || state !== storedState) {
@@ -21,9 +21,11 @@ function Login() {
 		}
 
 		// If code is present, redirect to API endpoint
-		if (code) {
+		if (code && codeVerifier) {
 			const response = await fetch(
-				`${LOGIN_PATH}?code=${encodeURIComponent(code)}`,
+				`${LOGIN_PATH}?code=${encodeURIComponent(code)}&codeVerifier=${encodeURIComponent(
+					codeVerifier,
+				)}`,
 			);
 			if (response.ok) {
 				navigate("/transcriber");

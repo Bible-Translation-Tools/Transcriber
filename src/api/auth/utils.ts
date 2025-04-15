@@ -7,13 +7,11 @@ import {
 	R2_JWKS_SYNC_SECONDS,
 	WACS_API_REFRESH_TOKEN,
 	WACS_API_TOKEN,
-	WACS_USER_TOKEN,
 } from "@src/constants";
 import type { Context, Next } from "hono";
 import { some } from "hono/combine";
 import { getCookie } from "hono/cookie";
 import { jwk } from "hono/jwk";
-import { decode } from "hono/jwt";
 import * as v from "valibot";
 import { getOauthTokens } from "./login";
 
@@ -36,7 +34,7 @@ export async function checkAccessToken(
 	next: Next,
 ) {
 	const check = jwk({
-		cookie: WACS_USER_TOKEN,
+		cookie: WACS_API_TOKEN,
 		jwks_uri: `${ctx.env.SSO_BASE_URL}/login/oauth/keys`,
 		keys: await getR2Keys(ctx),
 	});
@@ -52,6 +50,7 @@ export async function getRefreshTokenMw(ctx: Context, next: Next) {
 	const data = await getOauthTokens({
 		env: ctx.env,
 		code: ctx.req.query("code") as string,
+		codeVerifier: ctx.req.query("codeVerifier") as string,
 		request: ctx.req.raw,
 		grantType: GRANT_REFRESH_TOKEN,
 		refreshToken: refreshCookie,
@@ -65,13 +64,11 @@ export async function getRefreshTokenMw(ctx: Context, next: Next) {
 		accessToken: data.accessToken,
 		accessExpires: data.accessExpires,
 		ctx,
-		idToken: data.idToken,
+		user: data.user,
 		refresh: data.refresh,
 	});
-	// no need to verify, we just fetched it
-	const decoded = decode(data.idToken);
-	console.log("setting jwt payload", decoded);
-	ctx.set("jwtPayload", decoded);
+	// if we made it to refreshing and refetching user, we should reset this value
+	ctx.set("user", data.user);
 	await next();
 }
 
@@ -86,7 +83,6 @@ export async function getR2Keys(ctx: Context<{ Bindings: Env }>) {
 }
 
 export async function syncR2Keys(ctx: Context<{ Bindings: Env }>, next: Next) {
-	console.log(`calling syncR2Keys, ${ctx.req.url}`);
 	// this is a non response blocking middlware
 	async function fetchKeys() {
 		try {
@@ -94,14 +90,13 @@ export async function syncR2Keys(ctx: Context<{ Bindings: Env }>, next: Next) {
 			const lastVal =
 				await ctx.env.HTR_KV.getWithMetadata(CACHED_JWKS_KEY);
 			if (lastVal.value) {
-				// console.log("last cached was", lastVal.metadata?.timeCached);
-				console.log(`last cached was ${JSON.stringify(lastVal)}`);
+				// noop when there is a cached value
 				return;
 			}
 			const jwksUri = `${ctx.env.SSO_BASE_URL}/login/oauth/keys`;
 			const res = await fetch(jwksUri);
 			console.log({
-				jwksUriSyncResponse: res,
+				jwksUriSyncResponse: res.status,
 			});
 			if (res.ok) {
 				const data = await res.json();
