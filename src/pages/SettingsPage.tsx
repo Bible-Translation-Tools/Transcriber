@@ -6,11 +6,14 @@ import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import { toast } from 'react-toastify';
+import { toast, ToastContentProps } from 'react-toastify';
+import {
+    resubmitImageForTranscription,
+} from "@src/domain/ImageActions.ts";
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
-
+    const store = useTranscriptionStore();
 	const {
 		systemPrompt,
 		setSystemPrompt,
@@ -18,7 +21,7 @@ const Settings: React.FC = () => {
 		setPrompt,
 		model,
 		setModel,
-	} = useTranscriptionStore();
+	} = store;
 
 	const [language, setLanguage] = useState("en");
 	const [theme, setTheme] = useState("light");
@@ -53,12 +56,21 @@ const Settings: React.FC = () => {
 		setUpdatedSystemPrompt(DetaultTranscriptionPrompt.SYSTEM);
 	};
 	
-	const SettingsNotification = () => {
+	const SettingsNotification = ({ closeToast }: ToastContentProps) => {
+		const transcribeAgain = () => {
+			closeToast();
+			const selectedImage = store.selectedImage;
+			if (selectedImage != null) {
+				resubmitImageForTranscription(store, selectedImage);
+			}
+		};
+
 		return (
 		  <div className="flex items-center justify-between max-w-xl mx-auto">
 			<div className="text-sm text-blue-900">
 			  Your transcription settings have changed.
-			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor">
+			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor"
+			  	onClick={transcribeAgain}>
 				Transcribe Again
 			  </button>
 			</div>
