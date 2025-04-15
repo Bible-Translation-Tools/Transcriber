@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { toast } from 'react-toastify';
 import BookDropdown from "@components/navigation/BookDropdown.tsx";
 import LanguageDropdown from "@components/navigation/LanguageDropdown.tsx";
 import {useLanguageContext} from "@src/context/useLanguageContext.tsx";
@@ -47,6 +48,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
     const handleSave = () => {
         console.log("moving to: ", language.code, book, chapter, startVerse, endVerse);
         onSave(image, language.code, book, chapter, startVerse, endVerse);
+        toast.success("Your progress has been saved!", { position: 'bottom-center', autoClose: 5000, hideProgressBar: true });
         onClose();
     };
 

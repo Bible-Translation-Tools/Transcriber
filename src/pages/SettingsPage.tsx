@@ -44,7 +44,12 @@ const Settings: React.FC = () => {
 		setPrompt(updatedPrompt);
 		setSystemPrompt(updatedSystemPrompt);
 		setModel(updatedModel);
-		toast(SettingsNotificationToast, { position: 'bottom-center', autoClose: 5000, hideProgressBar: true });
+		toast(SettingsNotificationToast, { 
+			className: 'w-[800px]',
+			position: 'bottom-center', 
+			autoClose: 50000, 
+			hideProgressBar: true 
+		});
 		onClose();
 	};
 
@@ -66,7 +71,7 @@ const Settings: React.FC = () => {
 		};
 
 		return (
-		  <div className="flex items-center justify-between max-w-xl mx-auto">
+		  <div className="flex flex-col w-full">
 			<div className="text-sm text-blue-900">
 			  Your transcription settings have changed.
 			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor"
