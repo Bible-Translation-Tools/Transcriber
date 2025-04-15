@@ -44,7 +44,7 @@ const Settings: React.FC = () => {
 		setPrompt(updatedPrompt);
 		setSystemPrompt(updatedSystemPrompt);
 		setModel(updatedModel);
-		toast(SettingsNotification, { position: 'bottom-center', autoClose: 5000, hideProgressBar: true });
+		toast(SettingsNotificationToast, { position: 'bottom-center', autoClose: 5000, hideProgressBar: true });
 		onClose();
 	};
 
@@ -56,7 +56,7 @@ const Settings: React.FC = () => {
 		setUpdatedSystemPrompt(DetaultTranscriptionPrompt.SYSTEM);
 	};
 	
-	const SettingsNotification = ({ closeToast }: ToastContentProps) => {
+	const SettingsNotificationToast = ({ closeToast }: ToastContentProps) => {
 		const transcribeAgain = () => {
 			closeToast();
 			const selectedImage = store.selectedImage;
