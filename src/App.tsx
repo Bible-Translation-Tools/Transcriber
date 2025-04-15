@@ -1,6 +1,7 @@
 import {StrictMode, useEffect} from "react";
 import {createRoot} from "react-dom/client";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
 import "./index.css";
 import SettingsPage from "@src/pages/SettingsPage.tsx";
 import {LanguageProvider} from "./context/LanguageContext.tsx";
@@ -32,6 +33,7 @@ const App = () => {
                 <Route path="/settings" element={<SettingsPage/>}/>
                 <Route path="/transcriber" element={<TranscriptionPage/>}/>
             </Routes>
+            <ToastContainer />
         </Router>
     );
 };

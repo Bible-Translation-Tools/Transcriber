@@ -6,6 +6,7 @@ import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import { toast } from 'react-toastify';
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
@@ -40,6 +41,7 @@ const Settings: React.FC = () => {
 		setPrompt(updatedPrompt);
 		setSystemPrompt(updatedSystemPrompt);
 		setModel(updatedModel);
+		toast(SettingsNotification, { position: 'bottom-center', autoClose: 5000, hideProgressBar: true });
 		onClose();
 	};
 
@@ -49,6 +51,19 @@ const Settings: React.FC = () => {
 
 	const resetSystemPrompt = () => {
 		setUpdatedSystemPrompt(DetaultTranscriptionPrompt.SYSTEM);
+	};
+	
+	const SettingsNotification = () => {
+		return (
+		  <div className="flex items-center justify-between max-w-xl mx-auto">
+			<div className="text-sm text-blue-900">
+			  Your transcription settings have changed.
+			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor">
+				Transcribe Again
+			  </button>
+			</div>
+		  </div>
+		);
 	};
 
 	return (
