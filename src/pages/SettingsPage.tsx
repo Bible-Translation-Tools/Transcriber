@@ -5,7 +5,8 @@ import {
 import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { WacsBasicAuth } from "@src/components/util/WacsBasicAuth";
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
@@ -238,6 +239,10 @@ const Settings: React.FC = () => {
 								</div>
 							</div>
 						</div>
+					</section>
+					<section className="py-4 border-t border-gray-300 flex flex-col gap-4">
+						<h2 className="text-2xl font-semibold mb-2">Logout</h2>
+						<WacsBasicAuth action={"logout"} />
 					</section>
 				</div>
 			</div>

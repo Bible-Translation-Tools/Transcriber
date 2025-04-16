@@ -3,9 +3,9 @@ import type React from "react";
 import { useNavigate } from "react-router-dom";
 import BookDropdown from "./BookDropdown.tsx";
 import LanguageDropdown from "./LanguageDropdown.tsx";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 
-const NavBar: React.FC = () => {
+const NavBar: React.FC = ({ username }: { username: string }) => {
 	const {
 		language,
 		setLanguage,
@@ -47,7 +47,10 @@ const NavBar: React.FC = () => {
 					selectedChapter={chapter}
 				/>
 			</div>
-			<div>
+			<div class="flex gap-4 items-center">
+				<p>
+					User: <span>{username}</span>
+				</p>
 				<button
 					type="button"
 					className="flex flex-row text-xl bg-transparent hover:bg-gray-200 py-2 px-4 rounded items-center justify-items-center gap-2"

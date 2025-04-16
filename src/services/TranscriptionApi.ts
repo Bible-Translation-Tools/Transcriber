@@ -3,7 +3,8 @@ import {
 	type TranscriptionResponse,
 } from "@api/ai/TranscriptionResponse.ts";
 import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
-import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@src/api";
+import { apiV1 } from "@src/api";
+import { transcribeRoute, updateTranscriptionRoute } from "@src/constants";
 
 export async function getTranscription(
 	request: TranscriptionRequest,

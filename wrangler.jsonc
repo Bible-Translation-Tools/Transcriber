@@ -52,7 +52,7 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
 	"vars": {
-		"SSO_BASE_URL": "https://wacs-dev.bibletranslationtools.org",
+		"SSO_BASE_URL": "https://content.wacsdev.org",
 		"SSO_CLIENT_ID": "7dacf0b7-f5ee-4fbc-aec2-7c701ced7c17",
 		"SSO_REDIRECT_PATH": "/Transcriber"
 	}
