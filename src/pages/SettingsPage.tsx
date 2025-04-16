@@ -6,10 +6,14 @@ import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import { toast, ToastContentProps } from 'react-toastify';
+import {
+    resubmitImageForTranscription,
+} from "@src/domain/ImageActions.ts";
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
-
+    const store = useTranscriptionStore();
 	const {
 		systemPrompt,
 		setSystemPrompt,
@@ -17,7 +21,7 @@ const Settings: React.FC = () => {
 		setPrompt,
 		model,
 		setModel,
-	} = useTranscriptionStore();
+	} = store;
 
 	const [language, setLanguage] = useState("en");
 	const [theme, setTheme] = useState("light");
@@ -40,6 +44,12 @@ const Settings: React.FC = () => {
 		setPrompt(updatedPrompt);
 		setSystemPrompt(updatedSystemPrompt);
 		setModel(updatedModel);
+		toast(SettingsNotificationToast, { 
+			className: 'w-[800px]',
+			position: 'bottom-center', 
+			autoClose: 50000, 
+			hideProgressBar: true 
+		});
 		onClose();
 	};
 
@@ -49,6 +59,28 @@ const Settings: React.FC = () => {
 
 	const resetSystemPrompt = () => {
 		setUpdatedSystemPrompt(DetaultTranscriptionPrompt.SYSTEM);
+	};
+	
+	const SettingsNotificationToast = ({ closeToast }: ToastContentProps) => {
+		const transcribeAgain = () => {
+			closeToast();
+			const selectedImage = store.selectedImage;
+			if (selectedImage != null) {
+				resubmitImageForTranscription(store, selectedImage);
+			}
+		};
+
+		return (
+		  <div className="flex flex-col w-full">
+			<div className="text-sm text-blue-900">
+			  Your transcription settings have changed.
+			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor"
+			  	onClick={transcribeAgain}>
+				Transcribe Again
+			  </button>
+			</div>
+		  </div>
+		);
 	};
 
 	return (
