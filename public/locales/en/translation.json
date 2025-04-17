@@ -42,6 +42,9 @@
     "Write In Block message": "Write in block letters with even spacing between letters and words.",
     "Do not use superscripts or subscripts.": "Do not use superscripts or subscripts.",
     "Verify Your Results": "Verify Your Results",
-    "Always Check message": "Always check your results for missing content or incorrect words."
-  
+    "Always Check message": "Always check your results for missing content or incorrect words.",
+    "Drag and Drop Images Here": "Drag and Drop Images Here",
+    "Upload Image text part 1": "Or ",
+    "Upload Image text part 2": "click to browse",
+    "Upload Image text part 3": " instead. This app supports most image formats, such as: PNG, JPG, PDF."
 }

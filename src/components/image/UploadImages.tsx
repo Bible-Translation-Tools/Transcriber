@@ -1,4 +1,5 @@
 // @ts-ignore
+import { useTranslation } from "react-i18next";
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -7,6 +8,7 @@ import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.t
 import {addImage} from "@src/domain/ImageActions.ts";
 
 function UploadImages() {
+	const { t } = useTranslation();
 	const store = useTranscriptionStore();
 
 	const [errorMessage, setErrorMessage] = useState("");
@@ -85,23 +87,21 @@ function UploadImages() {
 					</div>
 					<div className="flex flex-col items-center gap-2">
 						<div className="text-center text-[26px] text-[#0F2F4C] font-semibold leading-[29.90px] font-noto-sans">
-							Drag and Drop Images Here
+							{t('Drag and Drop Images Here')}
 						</div>
 						<div className="text-center">
                             <span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
-                                Or{" "}
+                                {t('Upload Image text part 1')}
                             </span>
 							<span
 								className="text-[20px] text-[#0056D1] font-normal underline leading-[40px] font-noto-sans cursor-pointer"
 								onClick={handleBrowseClick}
 								onKeyUp={handleBrowseClick}
 							>
-                                click to browse
+                                {t('Upload Image text part 2')}
                             </span>
 							<span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
-                                {" "}
-								instead. This app supports most image formats,
-                                such as: PNG, JPG, PDF.
+								{t('Upload Image text part 3')}
                             </span>
 						</div>
 					</div>

@@ -34,6 +34,11 @@ const Settings: React.FC = () => {
 	const [updatedSystemPrompt, setUpdatedSystemPrompt] =
 		useState(systemPrompt);
 
+	const handleLanguageChange = (lang: string) => {
+		setLanguage(lang);
+		i18n.changeLanguage(lang); // 👈 updates i18n language
+	};	
+
 	const handleThemeChange = (selectedTheme: "light" | "dark") => {
 		setTheme(selectedTheme);
 	};
@@ -88,7 +93,9 @@ const Settings: React.FC = () => {
 	return (
 		<div className="h-screen flex flex-col bg-gray-100 mx-auto">
 			<div className="flex justify-between items-center px-8 pt-8">
-				<h1 className="text-4xl font-semibold">Settings</h1>
+				<h1 className="text-4xl font-semibold">
+					{t('Settings')}
+				</h1>
 				<div className="space-x-4">
 					<button
 						type="button"
@@ -122,11 +129,12 @@ const Settings: React.FC = () => {
 								<select
 									value={language}
 									onChange={(e) =>
-										setLanguage(e.target.value)
+										handleLanguageChange(e.target.value)
 									}
 									className="border rounded p-2 w-full max-w-sm"
 								>
 									<option value="en">English</option>
+									<option value="fr">Français</option>
 									{/* Add more language options here */}
 								</select>
 							</div>
