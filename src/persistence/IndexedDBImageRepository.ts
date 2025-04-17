@@ -105,9 +105,9 @@ class IndexedDBImageRepository {
     async getImages(languageCode: string, bookCode: string, chapter: number): Promise<ImageData[]> {
         const images = await this.retrieveAllImages();
         return images?.filter((item) => {
-            return item.languageCode == languageCode &&
-                item.bookCode == bookCode &&
-                item.chapter == chapter
+            return item.languageCode === languageCode &&
+                item.bookCode === bookCode &&
+                item.chapter === chapter
         }) ?? [];
     }
 

@@ -15,6 +15,7 @@ import { validator } from "hono/validator";
 import * as v from "valibot";
 import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
 import { R2ImageRepository } from "./persistence/R2ImageRepository";
+import {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 
 export const apiV1 = "/api/v1";
 const apiV1Router = new Hono<{
@@ -73,8 +74,17 @@ apiV1Router.post(
 			new R2ImageRepository(bucket),
 		);
 
-		const user = jwtPayload.sub;
-
+		let user = undefined;
+		try {
+			user = jwtPayload.sub;
+		} catch (e) {
+			console.log(e);
+			return Response.json({
+				success: false,
+				error: "User not found, try logging back in.",
+				errorCode: TranscriptionErrorCode.NoUserFound,
+			});
+		}
 		const htrRes = await HandleTranscriptionRequest(
 			user,
 			createApiMap(c.env),

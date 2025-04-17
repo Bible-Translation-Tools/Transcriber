@@ -1,11 +1,17 @@
 import {pdf2image} from "@pardnchiu/pdf2image";
 import {ImageData} from "@src/data/ImageData.tsx";
 import {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 
 export default function uploadFiles(
     store: TranscriptionStore,
     files: File[],
-    addImage: (store: TranscriptionStore, image: ImageData) => void,
+    addImage: (
+        store: TranscriptionStore,
+        image: ImageData,
+        onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
+    ) => void,
+    onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
 ){
     const validFiles = files.filter((file) => {
         const fileType = file.type;
@@ -35,7 +41,7 @@ export default function uploadFiles(
                     transcription: null,
                 }; // Type the image object
 
-                addImage(store, image);
+                addImage(store, image, onError);
             };
 
             reader.readAsDataURL(file);
@@ -71,7 +77,7 @@ export default function uploadFiles(
                                 data: imageData,
                                 transcription: null,
                             }; // Type the image object
-                            addImage(store, image);
+                            addImage(store, image, onError);
                         });
                     }
                 };
