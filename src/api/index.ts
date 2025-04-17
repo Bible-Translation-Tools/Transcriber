@@ -14,6 +14,7 @@ import { D1TranscriptionRepository } from "./persistence/D1TranscriptionReposito
 import { R2ImageRepository } from "./persistence/R2ImageRepository";
 import type { HonoBindings } from "./auth/utils";
 import { transcribeRoute, updateTranscriptionRoute } from "@src/constants";
+import { mockHandleTranscriptionRequest } from "./domain/mock";
 
 export const apiV1 = "/api/v1";
 const apiV1Router = new Hono<HonoBindings>();
@@ -47,13 +48,17 @@ apiV1Router.post(
 			c.env.HTR_DATABASE,
 			new R2ImageRepository(bucket),
 		);
-
-		const htrRes = await HandleTranscriptionRequest(
-			String(user.wacsUserId),
-			createApiMap(c.env),
-			body,
-			repo,
-		);
+		let htrRes: Response;
+		if (import.meta.env.DEV) {
+			htrRes = await mockHandleTranscriptionRequest();
+		} else {
+			htrRes = await HandleTranscriptionRequest(
+				String(user.wacsUserId),
+				createApiMap(c.env),
+				body,
+				repo,
+			);
+		}
 		return htrRes;
 	},
 );

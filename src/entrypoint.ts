@@ -1,7 +1,6 @@
 import type { HonoBindings, WacsTokenAndUser } from "@api/auth/utils";
 import { Hono } from "hono";
 import { apiV1Router } from "./api";
-import { getRouterName, showRoutes } from "hono/dev";
 import { except } from "hono/combine";
 import { getCookie } from "hono/cookie";
 import { WACS_API_TOKEN } from "./constants";

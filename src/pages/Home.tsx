@@ -1,4 +1,3 @@
-import { LOGIN_PATH } from "@api/auth/router";
 import { WacsBasicAuth } from "@src/components/util/WacsBasicAuth";
 
 function Home() {

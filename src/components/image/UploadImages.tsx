@@ -2,22 +2,18 @@
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import uploadFiles from "@src/domain/UploadFiles.ts";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {addImage} from "@src/domain/ImageActions.ts";
 
-function UploadImages() {
-	const store = useTranscriptionStore();
-
+type UploadImgsProps = {
+	handleFiles: (files: File[]) => Promise<void>;
+};
+function UploadImages({ handleFiles }: UploadImgsProps) {
 	const [errorMessage, setErrorMessage] = useState("");
 
-	// todo: investigate the error thrown by biome here on more deps than necessary: addImage
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onDrop = useCallback(
 		(acceptedFiles: File[]) => {
 			handleFiles(acceptedFiles);
 		},
-		[addImage],
+		[handleFiles],
 	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -36,10 +32,6 @@ function UploadImages() {
 			const fileArray = Array.from(files);
 			handleFiles(fileArray);
 		}
-	};
-
-	const handleFiles = (files: File[]) => {
-		uploadFiles(store, files, addImage);
 	};
 
 	return (
@@ -88,21 +80,21 @@ function UploadImages() {
 							Drag and Drop Images Here
 						</div>
 						<div className="text-center">
-                            <span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
-                                Or{" "}
-                            </span>
+							<span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
+								Or{" "}
+							</span>
 							<span
 								className="text-[20px] text-[#0056D1] font-normal underline leading-[40px] font-noto-sans cursor-pointer"
 								onClick={handleBrowseClick}
 								onKeyUp={handleBrowseClick}
 							>
-                                click to browse
-                            </span>
+								click to browse
+							</span>
 							<span className="text-[20px] text-[#516B86] font-normal leading-[40px] font-noto-sans">
-                                {" "}
+								{" "}
 								instead. This app supports most image formats,
-                                such as: PNG, JPG, PDF.
-                            </span>
+								such as: PNG, JPG, PDF.
+							</span>
 						</div>
 					</div>
 				</>

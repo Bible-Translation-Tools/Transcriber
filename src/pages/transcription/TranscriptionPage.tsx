@@ -9,33 +9,48 @@ import RangeInput from "@components/forms/RangeInput.tsx";
 import FileList from "@components/image/FileList.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
-import uploadFiles from "@src/domain/UploadFiles.ts";
-import type { ImageData } from "@src/data/ImageData.tsx";
+import { getFilesAsImages } from "@src/domain/UploadFiles.ts";
+import type { ImageData } from "@src/data/ImageData";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+// import {
+// 	resubmitImageForTranscription,
+// 	updateTranscription,
+// } from "@src/domain/ImageActions.ts";
 import {
-	addImage,
-	resubmitImageForTranscription,
-	updateImage,
-	updateTranscription,
-} from "@src/domain/ImageActions.ts";
-import { useSearchParams } from "react-router-dom";
+	getIndexedDbImages,
+	useAddImage,
+	updateImg,
+	getTranscriptionRequestPayload,
+} from "@src/services/TranscriptionApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 function TranscriptionPage() {
-	const [searchParams, setSearchParams] = useSearchParams();
-	let username: string | null | undefined = localStorage.getItem("username");
-	if (!username) {
-		username = searchParams.get("username");
-		if (username) {
-			localStorage.setItem("username", username);
-		}
-	}
+	const queryClient = useQueryClient();
 	const store = useTranscriptionStore();
-	const { images, selectedImage, setSelectedImage } = store;
+	const { selectedImage, setSelectedImage, bookCode, language, chapter } =
+		store;
+	const {
+		data: images,
+		isPending: imagesArePending,
+		isError: imagesFetchDidErr,
+		error: imagesFetchError,
+	} = getIndexedDbImages({
+		bookCode,
+		languageCode: language?.code || "en",
+		chapter,
+	});
 
 	const [currentPage, setCurrentPage] = useState(0);
-
 	const [isModalOpen, setIsModalOpen] = useState(true);
 	const [modalImage, setModalImage] = useState<ImageData | null>(null);
+
+	if (imagesArePending) {
+		return <span>Loading...</span>;
+	}
+
+	if (imagesFetchDidErr) {
+		return <span>Error: {imagesFetchError.message}</span>;
+	}
 
 	const handleOpenModal = (page: number) => {
 		setModalImage(images[page]);
@@ -68,9 +83,8 @@ function TranscriptionPage() {
 			return;
 		}
 		console.log("Saved:", language, book, chapter, startVerse, endVerse);
-		await updateImage(
-			store,
-			{
+		await updateImg({
+			image: {
 				...image,
 				languageCode: language,
 				bookCode: book,
@@ -78,9 +92,10 @@ function TranscriptionPage() {
 				startVerse: startVerse,
 				endVerse: endVerse,
 			},
-			true,
-		);
-		store.refreshProject();
+			queryClient,
+		});
+		// todo: see if this will be needed
+		// store.refreshProject();
 		setModalImage(null);
 	};
 
@@ -92,23 +107,59 @@ function TranscriptionPage() {
 		}
 	};
 
-	const handleFiles = (files: File[]) => {
-		uploadFiles(store, files, addImage);
+	const handleFiles = async (files: File[]) => {
+		const imagesToProcess = await getFilesAsImages(files);
+		for await (const image of imagesToProcess) {
+			const completeImg: ImageData = {
+				...image,
+				id: crypto.randomUUID(),
+				languageCode: language.code,
+				bookCode: bookCode,
+				chapter: chapter,
+			};
+			await useAddImage({
+				image: completeImg,
+				transcriptionRequest: getTranscriptionRequestPayload({
+					image: completeImg,
+					store,
+				}),
+				queryClient,
+			});
+		}
 	};
 
 	const handleResubmitImage = () => {
 		if (selectedImage != null) {
-			resubmitImageForTranscription(store, selectedImage);
+			// resubmitImageForTranscription(store, selectedImage);
+			// add will do indexed with updatedImg, then server, then updated indexedAgain with transcription success
+			useAddImage({
+				image: {
+					...selectedImage,
+					transcription: null,
+				},
+				transcriptionRequest: getTranscriptionRequestPayload({
+					image: selectedImage,
+					store,
+				}),
+				queryClient,
+			});
 		}
 	};
 
 	// change to explicitly be a useCallback?
 	const handleTextChange = (newText: string) => {
 		if (selectedImage != null) {
-			updateTranscription(store, {
-				...selectedImage,
-				transcription: newText,
+			updateImg({
+				image: {
+					...selectedImage,
+					transcription: newText,
+				},
+				queryClient,
 			});
+			// updateTranscription(store, {
+			// 	...selectedImage,
+			// 	transcription: newText,
+			// });
 		}
 	};
 
@@ -125,9 +176,17 @@ function TranscriptionPage() {
 	const handleVerseRangeChange = (start: number, end: number) => {
 		const validVerseRange = validateVerseRange(start, end);
 		if (validVerseRange && selectedImage) {
-			selectedImage.startVerse = start;
-			selectedImage.endVerse = end;
-			updateTranscription(store, selectedImage);
+			// selectedImage.startVerse = start;
+			// selectedImage.endVerse = end;
+			updateImg({
+				image: {
+					...selectedImage,
+					startVerse: start,
+					endVerse: end,
+				},
+				queryClient,
+			});
+			// updateTranscription(store, selectedImage);
 		}
 	};
 
@@ -140,7 +199,7 @@ function TranscriptionPage() {
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-100">
-			<NavBar username={username} />
+			<NavBar />
 			<div className="flex overflow-y-auto">
 				<div className="flex flex-col p-4 overflow-y-auto">
 					<label
@@ -195,7 +254,7 @@ function TranscriptionPage() {
 										startVerse={selectedImage?.startVerse}
 										endVerse={selectedImage?.endVerse}
 										onRangeChange={handleVerseRangeChange}
-									></RangeInput>
+									/>
 								) : (
 									<></>
 								)}
@@ -221,7 +280,7 @@ function TranscriptionPage() {
 						</div>
 					</div>
 				) : (
-					<EmptyProject />
+					<EmptyProject handleFiles={handleFiles} />
 				)}
 				{modalImage ? (
 					<MoveImageModal
@@ -230,7 +289,7 @@ function TranscriptionPage() {
 						isOpen={isModalOpen}
 						onClose={handleCloseModal}
 						onSave={handleSaveModal}
-					></MoveImageModal>
+					/>
 				) : (
 					<></>
 				)}

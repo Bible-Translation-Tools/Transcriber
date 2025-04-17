@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import BookDropdown from "./BookDropdown.tsx";
 import LanguageDropdown from "./LanguageDropdown.tsx";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { useSearchParams } from "react-router-dom";
 
-const NavBar: React.FC = ({ username }: { username: string }) => {
+const NavBar: React.FC = () => {
 	const {
 		language,
 		setLanguage,
@@ -15,7 +16,14 @@ const NavBar: React.FC = ({ username }: { username: string }) => {
 		chapter,
 		setChapter,
 	} = useTranscriptionStore();
-
+	const [searchParams] = useSearchParams();
+	let username: string | null | undefined = localStorage.getItem("username");
+	if (!username) {
+		username = searchParams.get("username");
+		if (username) {
+			localStorage.setItem("username", username);
+		}
+	}
 	console.log("Nav bar language", language);
 
 	const { languages } = useLanguageContext();
@@ -47,7 +55,7 @@ const NavBar: React.FC = ({ username }: { username: string }) => {
 					selectedChapter={chapter}
 				/>
 			</div>
-			<div class="flex gap-4 items-center">
+			<div className="flex gap-4 items-center">
 				<p>
 					User: <span>{username}</span>
 				</p>

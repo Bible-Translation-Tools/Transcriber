@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
 interface BookDropdownProps {
-	onSelect: (book: string, chapter?: number) => void;
+	onSelect: (book: string, chapter: number) => void;
 	selectedBook: string;
 	selectedChapter?: number | null;
 }
@@ -280,7 +280,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 				className="w-96 max-w-96 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-start items-center"
 				onClick={toggleDropdown}
 			>
-				<div className="w-96 max-w-96 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
+				<div className="w-96 max-w-96 max-h-12 bg-color-surface-secondary rounded-xl  outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
 					<div className="flex-1 p-4 flex justify-start items-center gap-2">
 						<div className="w-6 h-6 relative overflow-hidden">
 							<div className="w-4 h-5 bg-color-on-surface-secondary">
@@ -358,7 +358,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 											<button
 												type="button"
 												key={chapter}
-												className="flex-1 flex-none max-w-20 min-w-14 p-2 bg-zinc-100 hover:bg-neutral-400 rounded-lg inline-flex flex-col justify-center items-center gap-2"
+												className="flex-none max-w-20 min-w-14 p-2 bg-zinc-100 hover:bg-neutral-400 rounded-lg inline-flex flex-col justify-center items-center gap-2"
 												onClick={() =>
 													handleChapterClick(chapter)
 												}
