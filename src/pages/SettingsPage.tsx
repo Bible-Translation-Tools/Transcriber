@@ -11,6 +11,7 @@ import { toast, ToastContentProps } from 'react-toastify';
 import {
     resubmitImageForTranscription,
 } from "@src/domain/ImageActions.ts";
+import i18n from 'i18next';
 
 const Settings: React.FC = () => {
 	const { t, i18n } = useTranslation();
@@ -25,7 +26,7 @@ const Settings: React.FC = () => {
 		setModel,
 	} = store;
 
-	const [language, setLanguage] = useState("en");
+	const [language, setLanguage] = useState(i18n.language || 'en'); // Default to 'en' if no language is set
 	const [theme, setTheme] = useState("light");
 	const [updatedModel, setUpdatedModel] = useState<TranscriptionModel>(
 		model as TranscriptionModel,
@@ -134,7 +135,11 @@ const Settings: React.FC = () => {
 									className="border rounded p-2 w-full max-w-sm"
 								>
 									<option value="en">English</option>
+									<option value="es">Español</option>
 									<option value="fr">Français</option>
+									<option value="de">Deutsch</option>
+									<option value="pt">Português</option>
+									<option value="vi">Tiếng Việt</option>
 									{/* Add more language options here */}
 								</select>
 							</div>
