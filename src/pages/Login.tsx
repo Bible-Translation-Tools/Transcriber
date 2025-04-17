@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { LOGIN_PATH } from "@api/auth/router.ts";
 import { CSRF_STATE_KEY } from "@src/constants.ts";
 import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 
 	const handleLogin = useCallback(async () => {
@@ -44,7 +46,7 @@ function Login() {
 	// This is a headless component, no render output
 	return (
 		<div className="flex justify-center items-center h-screen">
-			Logging in...
+			{t('Logging in...')}
 		</div>
 	);
 }

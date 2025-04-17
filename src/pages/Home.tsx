@@ -1,6 +1,9 @@
 import { CSRF_STATE_KEY } from "@src/constants.ts";
+import { useTranslation } from 'react-i18next';
 
 function Home() {
+	const { t } = useTranslation();
+
 	const scopes = encodeURIComponent(
 		"openid email profile read:user read:repository write:repository",
 	);
@@ -29,10 +32,10 @@ function Home() {
                     /> */}
 				</div>
 				<h2 className="text-2xl font-semibold mb-4">
-					Transcriber Login
+					{t('Transcriber Login')}
 				</h2>
 				<p className="mb-6">
-					Please log in using your WA Content Services (WACS) account.
+					{t('Please Login message')}
 				</p>
 				<a
 					className="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex flex-row items-center gap-2 justify-center"
@@ -69,7 +72,7 @@ function Home() {
 							d="M100.43 35H82.791l33.896 79.481h17.646L100.43 35Z"
 						/>
 					</svg>
-					Login with WACS
+					{t('Login with WACS')}
 				</a>
 			</div>
 		</div>

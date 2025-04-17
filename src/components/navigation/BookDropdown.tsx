@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
 interface BookDropdownProps {
@@ -85,6 +86,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 		{ label: "Revelation", value: "rev" },
 	];
 
+	const { t } = useTranslation();
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [openBook, setOpenBook] = useState<string | null>(null);
@@ -334,7 +336,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 				<div className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border">
 					<input
 						type="text"
-						placeholder="Search “Genesis” or “1jhn”..."
+						placeholder={t('Search Book placeholder')}
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
 						className="w-full p-2 border-b focus:outline-none text-color-on-surface-tertiary text-l italic font-[Noto_Sans] leading-10"

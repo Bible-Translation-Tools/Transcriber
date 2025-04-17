@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 import {LanguageOption} from "@src/data/LanguageOption.tsx";
 import {Dropdown} from "@components/navigation/Dropdown.tsx";
 
@@ -15,6 +16,8 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
 	languageOptions,
 	recentLanguages,
 }) => {
+
+	const { t } = useTranslation();
 	const recentLangs: LanguageOption[] = languageOptions.filter((option) => {
 		if (recentLanguages.includes(option.code ?? "")) return true;
 	});
@@ -31,7 +34,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
 	return (
 		<Dropdown
 			options={languageOptions}
-			placeholder="Select Language"
+			placeholder={t('Select Language')}
 			onSelect={handleSelect} // Use handleSelect here
 			recentOptions={recentLangs}
 			selectedLabel={selectedLanguage?.anglicized ?? ""} // Pass selectedLabel
