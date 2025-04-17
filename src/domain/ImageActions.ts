@@ -1,14 +1,16 @@
-import {ImageData} from "@src/data/ImageData.tsx";
+import type {ImageData} from "@src/data/ImageData.tsx";
 import {getTranscription, sendUpdatedTranscription} from "@src/services/TranscriptionApi.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
+import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 
 const imageRepo = IndexedDBImageRepository.getInstance()
 
 export const addImage = (
     store: TranscriptionStore,
-    image: ImageData
+    image: ImageData,
+    onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
 ) => {
     if (store.language == null) {
         console.error("Language is null, cannot add image!");
@@ -65,13 +67,14 @@ export const addImage = (
             store.setImages((prev: any) => (prev.map((image: ImageData) => {
                 if (image.id === imageWithCurrentMetadata.id) {
                     return newImage;
-                } else {
-                    return image;
                 }
+                return image;
             })));
 
             store.setSelectedImage(newImage);
             updateTranscription(store, newImage);
+        } else {
+            onError(transcription.errorCode, transcription.error)
         }
     })();
 };
@@ -148,7 +151,8 @@ export const updateTranscription = (
 
 export async function resubmitImageForTranscription(
     store: TranscriptionStore,
-    imageToUpdate: ImageData
+    imageToUpdate: ImageData,
+    onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
 ): Promise<void> {
     updateImage(store, {...imageToUpdate, transcription: null, loading: true});
 
@@ -166,5 +170,7 @@ export async function resubmitImageForTranscription(
     if (transcription.success) {
         imageToUpdate.transcription = transcription.transcription;
         updateImage(store, imageToUpdate, true);
+    } else {
+        onError(transcription.errorCode, transcription.error)
     }
 }

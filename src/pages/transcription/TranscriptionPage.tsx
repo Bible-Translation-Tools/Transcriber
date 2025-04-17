@@ -20,6 +20,8 @@ import {
     updateImage,
     updateTranscription
 } from "@src/domain/ImageActions.ts";
+import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
+import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
 
 function TranscriptionPage() {
     const { t } = useTranslation();
@@ -81,12 +83,12 @@ function TranscriptionPage() {
     };
 
     const handleFiles = (files: File[]) => {
-        uploadFiles(store, files, addImage);
+        uploadFiles(store, files, addImage, handleTranscriptionError);
     };
 
     const handleResubmitImage = () => {
         if (selectedImage != null) {
-            resubmitImageForTranscription(store, selectedImage);
+            resubmitImageForTranscription(store, selectedImage, handleTranscriptionError);
         }
     };
 
@@ -112,6 +114,10 @@ function TranscriptionPage() {
             setCurrentPage(0);
         }
     };
+
+    const handleTranscriptionError = (err: TranscriptionErrorCode, errorMessage: string): void => {
+        toast.error(UploadFileErrorToast, {data: errorMessage})
+    }
 
     const handleVerseRangeChange = (start: number, end: number) => {
         const validVerseRange = validateVerseRange(start, end);
@@ -169,6 +175,7 @@ function TranscriptionPage() {
                             currentPage={currentPage}
                             totalImages={images.length}
                             onPageChange={handlePageChange}
+                            onRetryTranscription={handleResubmitImage}
                         />
                         <div className="flex-2 relative p-4 overflow-y-auto">
                             <div className="h-full flex flex-col">
@@ -182,13 +189,6 @@ function TranscriptionPage() {
                                     :
                                     <></>
                                 }
-                                <button
-                                    onClick={handleResubmitImage}
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2"
-                                    type="button"
-                                >
-                                    {t('Clear Document and Refresh Transcription')}
-                                </button>
                                 <TextEditor
                                     text={selectedImage?.transcription ?? ""}
                                     onChange={(text) => {
