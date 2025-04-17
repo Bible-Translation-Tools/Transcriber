@@ -3,7 +3,7 @@ import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
 import { apiV1 } from "@src/api";
 import { transcribeRoute, updateTranscriptionRoute } from "@src/constants";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
-import { type QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ImageData } from "@src/data/ImageData";
 // import { getTranscription } from "@src/services/TranscriptionApi.ts";
 import type { TranscriptionStore } from "@src/persistence/store/TranscriptionStore";
@@ -15,7 +15,7 @@ type getIndexedDbImagesArgs = {
 	bookCode: string;
 	chapter: number;
 };
-export const getIndexedDbImages = ({
+export const useIndexedDbImages = ({
 	languageCode,
 	bookCode,
 	chapter,
@@ -25,17 +25,22 @@ export const getIndexedDbImages = ({
 		queryFn: () => imageRepo.getImages(languageCode, bookCode, chapter),
 	});
 };
-export const useMutateIndexedDbImage = (
-	queryClient: QueryClient,
-	imageId: string,
-	imageData: ImageData,
-) => {
+
+type useMutateIndexedDbImageArgs = {
+	imageId: string;
+	imageData: ImageData;
+};
+export const useMutateIndexedDbImage = () => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: () => imageRepo.storeImage(imageId, imageData),
-		onMutate: async () => {
+		mutationFn: ({ imageData, imageId }: useMutateIndexedDbImageArgs) =>
+			imageRepo.storeImage(imageId, imageData),
+		onMutate: async ({ imageData, imageId }) => {
 			// Cancel any outgoing refetches
 			// (so they don't overwrite our optimistic update)
-			await queryClient.cancelQueries({ queryKey: ["todos"] });
+			await queryClient.cancelQueries({
+				queryKey: ["getIndexedDbImages"],
+			});
 			// Snapshot the previous value
 			const previousImages = queryClient.getQueryData([
 				"getIndexedDbImages",
@@ -44,6 +49,7 @@ export const useMutateIndexedDbImage = (
 			queryClient.setQueryData(
 				["getIndexedDbImages"],
 				(old: Array<ImageData>) => {
+					if (!old) return [imageData];
 					return old.map((image: ImageData) => {
 						if (image.id === imageId) {
 							return { ...image, ...imageData };
@@ -58,6 +64,7 @@ export const useMutateIndexedDbImage = (
 		onError: (_err, _newImages, context) => {
 			// If the mutation fails, use the context we returned above
 			// to roll back to the previous value
+
 			if (!context) return;
 			queryClient.setQueryData(
 				["getIndexedDbImages"],
@@ -65,17 +72,178 @@ export const useMutateIndexedDbImage = (
 			);
 		},
 		onSuccess: () => {
+			console.log("Image updated successfully");
+
 			// Invalidate and refetch
 			queryClient.invalidateQueries({ queryKey: ["getIndexedDbImages"] });
 		},
 	});
 };
-export const mutationGetTranscription = (request: TranscriptionRequest) => {
+export const useMutationGetTranscription = () => {
 	return useMutation({
-		mutationFn: () => getTranscription(request),
+		mutationFn: (request: TranscriptionRequest) =>
+			getTranscription(request),
 	});
 };
 
+export const useMutationSendUpdatedTranscription = () => {
+	return useMutation({
+		mutationFn: (args: sendUpdatedTranscriptionArgs) =>
+			sendUpdatedTranscription(args),
+	});
+};
+type sendUpdatedTranscriptionArgs = {
+	imageId: string;
+	transcription: string;
+	language?: string;
+	book?: string;
+	chapter?: number;
+	startVerse?: number;
+	endVerse?: number;
+};
+
+type AddImageArgs = {
+	image: ImageData;
+	transcriptionRequest: TranscriptionRequest;
+};
+
+type TranscriptionServiceArgs = {
+	image: ImageData;
+	transcriptionRequest: TranscriptionRequest;
+	mutateImage: ReturnType<typeof useMutateIndexedDbImage>;
+	getTranscription: ReturnType<typeof useMutationGetTranscription>;
+};
+type MutateServerTranscript = ReturnType<
+	typeof useMutationSendUpdatedTranscription
+>;
+async function addImage({
+	image,
+	transcriptionRequest,
+	mutateImage,
+	getTranscription,
+}: TranscriptionServiceArgs) {
+	await mutateImage.mutateAsync({
+		imageData: image,
+		imageId: image.id,
+	});
+
+	let transcriptionResult: TranscriptionResponse;
+	try {
+		transcriptionResult =
+			await getTranscription.mutateAsync(transcriptionRequest);
+	} catch (err) {
+		console.error("Transcription failed", err);
+		return;
+	}
+
+	if (transcriptionResult.success) {
+		const updatedImage: ImageData = {
+			...image,
+			transcription: transcriptionResult.transcription,
+		};
+		await mutateImage.mutateAsync({
+			imageData: updatedImage,
+			imageId: image.id,
+		});
+	}
+}
+
+export const useTranscriptionService = () => {
+	const mutateImage = useMutateIndexedDbImage();
+	const getTranscription = useMutationGetTranscription();
+	const mutateServerTranscription = useMutationSendUpdatedTranscription();
+
+	const addImg = ({ image, transcriptionRequest }: AddImageArgs) =>
+		addImage({
+			image,
+			transcriptionRequest,
+			mutateImage,
+			getTranscription,
+		});
+	const updateImg = ({
+		image,
+	}: Omit<AddImageArgs, "transcriptionRequest">) => {
+		return updateImage({
+			image,
+			mutateImage,
+			mutateServerTranscription,
+		});
+	};
+	const resubmitImageForTranscription = (args: AddImageArgs) =>
+		resubmitImgForTranscription({
+			...args,
+			mutateImage,
+			getTranscription,
+		});
+
+	return {
+		// bind function as hook vals
+		addImage: addImg,
+		updateImage: updateImg,
+		resubmitImageForTranscription,
+	};
+};
+
+async function updateImage({
+	image,
+	mutateImage,
+	mutateServerTranscription,
+}: Omit<
+	TranscriptionServiceArgs,
+	"transcriptionRequest" | "getTranscription"
+> & { mutateServerTranscription: MutateServerTranscript }) {
+	await mutateImage.mutateAsync({
+		imageData: image,
+		imageId: image.id,
+	});
+	// Step 2: Update remote transcription
+	if (image.transcription) {
+		await mutateServerTranscription.mutateAsync({
+			imageId: image.id,
+			transcription: image.transcription,
+			language: image.languageCode,
+			book: image.bookCode,
+			chapter: image.chapter,
+			startVerse: image.startVerse,
+			endVerse: image.endVerse,
+		});
+	}
+}
+
+async function resubmitImgForTranscription({
+	image,
+	transcriptionRequest,
+	mutateImage,
+	getTranscription,
+}: TranscriptionServiceArgs) {
+	// mutate indexed db
+	await mutateImage.mutateAsync({
+		imageData: image,
+		imageId: image.id,
+	});
+	// 2: Get transcription again from llm
+	let transcriptionResult: TranscriptionResponse;
+	try {
+		transcriptionResult =
+			await getTranscription.mutateAsync(transcriptionRequest);
+		console.log({ transcriptionResult });
+	} catch (err) {
+		console.error("Transcription failed", err);
+		return;
+	}
+	if (transcriptionResult.success) {
+		const updatedImage: ImageData = {
+			...image,
+			transcription: transcriptionResult.transcription,
+		};
+		await mutateImage.mutateAsync({
+			imageData: updatedImage,
+			imageId: image.id,
+		});
+	}
+}
+
+// ACROSS THE NETWORK FUNCTIONS
 export async function getTranscription(
 	request: TranscriptionRequest,
 ): Promise<TranscriptionResponse> {
@@ -92,107 +260,6 @@ export async function getTranscription(
 	const json = await res.json();
 	return json; // Assume server returns { success: true | false, ... }
 }
-
-export const mutationSendUpdatedTranscription = (
-	args: sendUpdatedTranscriptionArgs,
-) => {
-	return useMutation({
-		mutationFn: () => sendUpdatedTranscription(args),
-	});
-};
-type sendUpdatedTranscriptionArgs = {
-	imageId: string;
-	transcription: string;
-	language?: string;
-	book?: string;
-	chapter?: number;
-	startVerse?: number;
-	endVerse?: number;
-};
-
-type AddImageArgs = {
-	image: ImageData;
-	transcriptionRequest: TranscriptionRequest;
-	queryClient: QueryClient;
-};
-
-export const useAddImage = async ({
-	image,
-	queryClient,
-	transcriptionRequest,
-}: AddImageArgs) => {
-	// Step 1: Save image to IndexedDB even before OCR, in case it fails
-	await useMutateIndexedDbImage(queryClient, image.id, image).mutateAsync();
-
-	// Step 2: Get transcription
-	let transcriptionResult: TranscriptionResponse;
-	try {
-		transcriptionResult =
-			await mutationGetTranscription(transcriptionRequest).mutateAsync();
-	} catch (err) {
-		console.error("Transcription failed", err);
-		return;
-	}
-
-	// Step 3: Update image in IndexedDB with transcription
-	if (transcriptionResult.success) {
-		const updatedImage: ImageData = {
-			...image,
-			transcription: transcriptionResult.transcription,
-		};
-		await useMutateIndexedDbImage(
-			queryClient,
-			image.id,
-			updatedImage,
-		).mutateAsync();
-	}
-};
-
-type updateImgArgs = {
-	image: ImageData;
-	queryClient: QueryClient;
-};
-export const updateImg = async ({ image, queryClient }: updateImgArgs) => {
-	// Step 1: Save updated image to IndexedDB
-	await useMutateIndexedDbImage(queryClient, image.id, image).mutateAsync();
-
-	// Step 2: Update remote transcription
-	if (image.transcription) {
-		await mutationSendUpdatedTranscription({
-			imageId: image.id,
-			transcription: image.transcription,
-			language: image.languageCode,
-			book: image.bookCode,
-			chapter: image.chapter,
-			startVerse: image.startVerse,
-			endVerse: image.endVerse,
-		}).mutateAsync();
-	}
-
-	// Step 3: We already have the mutated transcription that we passed to server, so now just invalidate the react query reading from indexed
-	queryClient.invalidateQueries({ queryKey: ["getIndexedDbImages"] });
-};
-
-export const resubmitImageForTranscription = async ({
-	image,
-	queryClient,
-	transcriptionRequest,
-}: AddImageArgs) => {
-	// Step 1: Save image to IndexedDB even before OCR, in case it fails
-	await useMutateIndexedDbImage(queryClient, image.id, image).mutateAsync();
-
-	// 2: Get transcription again from llm
-	let transcriptionResult: TranscriptionResponse;
-	try {
-		transcriptionResult =
-			await mutationGetTranscription(transcriptionRequest).mutateAsync();
-		console.log({ transcriptionResult });
-	} catch (err) {
-		console.error("Transcription failed", err);
-		return;
-	}
-	// 3: If success
-};
 
 export async function sendUpdatedTranscription({
 	imageId,
@@ -221,6 +288,8 @@ export async function sendUpdatedTranscription({
 
 	console.log(response);
 }
+
+// UTILS
 export const getTranscriptionRequestPayload = ({
 	image,
 	store,

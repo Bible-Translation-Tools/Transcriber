@@ -1,36 +1,44 @@
 import { getLanguagesPublicDataApi } from "@src/services/LanguageApi.ts";
 import { createContext, useEffect, useState } from "react";
-import {LanguageOption} from "@src/data/LanguageOption.tsx";
+import type { LanguageOption } from "@src/data/LanguageOption.tsx";
+import { useQuery } from "@tanstack/react-query";
 
 interface LanguageContextType {
 	languages: LanguageOption[];
+	isError: boolean;
+	isPending: boolean;
+	error: Error | null;
 }
 
 export const LanguageContext = createContext<LanguageContextType>({
 	languages: [],
+	error: null,
+	isError: false,
+	isPending: false,
 });
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [languages, setLanguages] = useState<LanguageOption[]>([]);
-
-	useEffect(() => {
-		const getLangs = async () => {
-			const data = await getLanguagesPublicDataApi();
-			console.log("Got the languages!");
-			if (data != null) {
-				setLanguages(data);
-			}
-		};
-		console.log("ran the hook");
-		getLangs();
-	}, []);
+	const initialData = [{ anglicized: "English", code: "en" }];
+	const {
+		data: languages,
+		isError,
+		isPending,
+		error,
+	} = useQuery({
+		initialData,
+		queryKey: ["pubDataLangs"],
+		queryFn: getLanguagesPublicDataApi,
+	});
 
 	return (
 		<LanguageContext.Provider
 			value={{
-				languages,
+				languages: languages || [],
+				isError,
+				isPending,
+				error,
 			}}
 		>
 			{children}

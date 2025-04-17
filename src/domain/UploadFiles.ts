@@ -14,10 +14,10 @@ export async function getFilesAsImages(files: File[]) {
 	if (validFiles.length !== files.length) {
 		console.log("Only JPEG, PNG, and PDF files are allowed.");
 	}
-	const promises: Array<Promise<PartialImageData>> = validFiles.map(
-		(file) => {
-			const reader = new FileReader();
+	const promises: Array<Promise<PartialImageData[]>> = validFiles.flatMap(
+		async (file) => {
 			if (file.type !== "application/pdf") {
+				const reader = new FileReader();
 				return new Promise((resolve) => {
 					reader.onloadend = () => {
 						const base64String = reader.result;
@@ -29,49 +29,49 @@ export async function getFilesAsImages(files: File[]) {
 							data: base64String,
 							transcription: null,
 						};
-						resolve(image);
+						resolve([image]);
 					};
 					reader.readAsDataURL(file);
 				});
 			}
+			// pdfs:
 			return new Promise((resolve) => {
+				const reader = new FileReader();
 				reader.onload = async (e) => {
-					const _this = e.target;
-					if (_this?.result != null) {
-						const converter = new pdf2image({
-							filename: `${file.name} yyyy-MM-DD`,
-							file: _this.result,
-							scale: 4,
-							type: "jpeg",
-						});
-						await converter.convert();
-						const createdTime = Date.now();
-						converter.images.forEach(
-							(imageData: string, index: number) => {
-								const url = URL.createObjectURL(file);
-								const pageNumber = index + 1;
-								const parts = file.name.split(".");
-								const baseName = parts.slice(0, -1).join(".");
-								const extension =
-									parts.length > 1 ? `.${parts.pop()}` : "";
-								const image: PartialImageData = {
-									url: url,
-									filename: `${baseName}-${pageNumber}${extension}`,
-									created: createdTime + index, // pad out a little for the number of pages so they sort correctly
-									data: imageData,
-									transcription: null,
-								}; // Type the image object
-								resolve(image);
-							},
-						);
-					}
+					const buffer = e.target?.result;
+					if (!buffer) return;
+
+					const converter = new pdf2image({
+						filename: `${file.name} yyyy-MM-DD`,
+						file: buffer,
+						scale: 4,
+						type: "jpeg",
+					});
+					await converter.convert();
+
+					const createdTime = Date.now();
+					const parts = file.name.split(".");
+					const baseName = parts.slice(0, -1).join(".");
+					const extension = parts.length > 1 ? `.${parts.pop()}` : "";
+
+					const images: ImageData[] = converter.images.map(
+						(imageData: string, index: number) => ({
+							url: URL.createObjectURL(file),
+							filename: `${baseName}-${index + 1}${extension}`,
+							created: createdTime + index,
+							data: imageData,
+							transcription: null,
+						}),
+					);
+
+					resolve(images);
 				};
 				reader.readAsArrayBuffer(file);
 			});
 		},
 	);
-	const images = await Promise.all(promises);
-	return images;
+	const imgs = (await Promise.all(promises)).flat();
+	return imgs;
 }
 
 type PartialImageData = Omit<

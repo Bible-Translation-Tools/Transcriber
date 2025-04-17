@@ -1,7 +1,7 @@
 import "../../App.css";
 // @ts-ignore
 import { pdf2image } from "@pardnchiu/pdf2image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NavBar from "@components/navigation/NavBar.tsx";
 import Pagination from "@components/image/Pagination.tsx";
 import TextEditor from "@components/forms/TextEditor.tsx";
@@ -17,15 +17,15 @@ import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore
 // 	updateTranscription,
 // } from "@src/domain/ImageActions.ts";
 import {
-	getIndexedDbImages,
-	useAddImage,
-	updateImg,
+	useIndexedDbImages,
+	useTranscriptionService,
 	getTranscriptionRequestPayload,
 } from "@src/services/TranscriptionApi";
 import { useQueryClient } from "@tanstack/react-query";
+import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
+import { LoadingWrapper } from "@src/components/util/LoadingWrapper";
 
 function TranscriptionPage() {
-	const queryClient = useQueryClient();
 	const store = useTranscriptionStore();
 	const { selectedImage, setSelectedImage, bookCode, language, chapter } =
 		store;
@@ -34,26 +34,25 @@ function TranscriptionPage() {
 		isPending: imagesArePending,
 		isError: imagesFetchDidErr,
 		error: imagesFetchError,
-	} = getIndexedDbImages({
+	} = useIndexedDbImages({
 		bookCode,
 		languageCode: language?.code || "en",
 		chapter,
 	});
+	const { addImage, resubmitImageForTranscription, updateImage } =
+		useTranscriptionService();
 
 	const [currentPage, setCurrentPage] = useState(0);
 	const [isModalOpen, setIsModalOpen] = useState(true);
 	const [modalImage, setModalImage] = useState<ImageData | null>(null);
 
-	if (imagesArePending) {
-		return <span>Loading...</span>;
-	}
+	const handleOpenModal = async (page: number) => {
+		if (!images) return;
+		const img = images[page];
+		const repo = IndexedDBImageRepository.getInstance();
+		const fullImage = await repo.retrieveImage(img.id);
+		setModalImage(fullImage);
 
-	if (imagesFetchDidErr) {
-		return <span>Error: {imagesFetchError.message}</span>;
-	}
-
-	const handleOpenModal = (page: number) => {
-		setModalImage(images[page]);
 		setIsModalOpen(true);
 
 		console.log(page);
@@ -83,16 +82,16 @@ function TranscriptionPage() {
 			return;
 		}
 		console.log("Saved:", language, book, chapter, startVerse, endVerse);
-		await updateImg({
-			image: {
-				...image,
-				languageCode: language,
-				bookCode: book,
-				chapter: chapter,
-				startVerse: startVerse,
-				endVerse: endVerse,
-			},
-			queryClient,
+		const updatedImgPayload = {
+			...image,
+			languageCode: language,
+			bookCode: book,
+			chapter: chapter,
+			startVerse: startVerse,
+			endVerse: endVerse,
+		};
+		await updateImage({
+			image: updatedImgPayload,
 		});
 		// todo: see if this will be needed
 		// store.refreshProject();
@@ -117,22 +116,50 @@ function TranscriptionPage() {
 				bookCode: bookCode,
 				chapter: chapter,
 			};
-			await useAddImage({
+			await addImage({
 				image: completeImg,
 				transcriptionRequest: getTranscriptionRequestPayload({
 					image: completeImg,
 					store,
 				}),
-				queryClient,
 			});
 		}
 	};
+	useEffect(() => {
+		if (!selectedImage && images) {
+			setSelectedImage(images[0]);
+		} else {
+			const newMatchingIdImg = images?.find(
+				(image) => image.id === selectedImage?.id,
+			);
+			const keysToMatch: (keyof ImageData)[] = [
+				"bookCode",
+				"chapter",
+				"startVerse",
+				"endVerse",
+				"languageCode",
+				"transcription",
+			];
+			const isEqual = keysToMatch.every((key) => {
+				return newMatchingIdImg?.[key] === selectedImage?.[key];
+			});
+			if (newMatchingIdImg && !isEqual) {
+				console.log("useEffect setting newMatchingIdImg");
+				setSelectedImage(newMatchingIdImg);
+			}
+		}
+	}, [images, selectedImage, setSelectedImage]);
 
-	const handleResubmitImage = () => {
+	const textEditorKey = () => {
+		// console.log(`sel image trans: ${selectedImage?.transcription}`);
+		return selectedImage?.transcription;
+	};
+
+	const handleResubmitImage = async () => {
 		if (selectedImage != null) {
 			// resubmitImageForTranscription(store, selectedImage);
 			// add will do indexed with updatedImg, then server, then updated indexedAgain with transcription success
-			useAddImage({
+			await resubmitImageForTranscription({
 				image: {
 					...selectedImage,
 					transcription: null,
@@ -141,29 +168,25 @@ function TranscriptionPage() {
 					image: selectedImage,
 					store,
 				}),
-				queryClient,
 			});
 		}
 	};
 
 	// change to explicitly be a useCallback?
-	const handleTextChange = (newText: string) => {
+	const handleTextChange = async (newText: string) => {
 		if (selectedImage != null) {
-			updateImg({
-				image: {
-					...selectedImage,
-					transcription: newText,
-				},
-				queryClient,
+			const updatedImg = {
+				...selectedImage,
+				transcription: newText,
+			};
+			await updateImage({
+				image: updatedImg,
 			});
-			// updateTranscription(store, {
-			// 	...selectedImage,
-			// 	transcription: newText,
-			// });
 		}
 	};
 
 	const handlePageChange = (page: number) => {
+		if (!images) return;
 		if (page < images.length && page >= 0) {
 			setSelectedImage(images[page]);
 			setCurrentPage(page);
@@ -173,20 +196,17 @@ function TranscriptionPage() {
 		}
 	};
 
-	const handleVerseRangeChange = (start: number, end: number) => {
+	const handleVerseRangeChange = async (start: number, end: number) => {
 		const validVerseRange = validateVerseRange(start, end);
 		if (validVerseRange && selectedImage) {
-			// selectedImage.startVerse = start;
-			// selectedImage.endVerse = end;
-			updateImg({
-				image: {
-					...selectedImage,
-					startVerse: start,
-					endVerse: end,
-				},
-				queryClient,
+			const imgToUpdate = {
+				...selectedImage,
+				startVerse: start,
+				endVerse: end,
+			};
+			await updateImage({
+				image: imgToUpdate,
 			});
-			// updateTranscription(store, selectedImage);
 		}
 	};
 
@@ -230,15 +250,25 @@ function TranscriptionPage() {
 							onChange={handleImageUpload}
 						/>
 					</label>
-					<FileList
-						selectedId={selectedImage?.id}
-						images={images}
-						onImageSelected={handlePageChange}
-						onMoveImage={handleOpenModal}
-						onDeleteImage={handleOpenModal}
-					/>
+					{images && images?.length > 0 ? (
+						<FileList
+							selectedId={selectedImage?.id}
+							images={images}
+							onImageSelected={handlePageChange}
+							onMoveImage={handleOpenModal}
+							onDeleteImage={handleOpenModal}
+						/>
+					) : (
+						<div className="w-[20vw] h-screen overflow-y-scroll" />
+					)}
 				</div>
-				{images?.length > 0 ? (
+				{/* todo: refactor out. This much logic in template is gross */}
+				{imagesArePending ? (
+					// Show a loading spinner or placeholder while fetching images
+					<div className="grow flex flex-row">
+						{/* <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500" /> */}
+					</div>
+				) : images && images.length > 0 ? (
 					<div className="grow flex flex-row">
 						<Pagination
 							image={selectedImage}
@@ -266,22 +296,20 @@ function TranscriptionPage() {
 									Clear Document and Refresh Transcription
 								</button>
 								<TextEditor
+									// key={textEditorKey()}
 									text={selectedImage?.transcription ?? ""}
 									onChange={(text) => {
 										handleTextChange(text);
 									}}
 								/>
 							</div>
-							{selectedImage?.transcription == null && (
-								<div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg">
-									<div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500" />
-								</div>
-							)}
 						</div>
 					</div>
 				) : (
+					// Show EmptyProject only when images are not pending and there's no data
 					<EmptyProject handleFiles={handleFiles} />
 				)}
+
 				{modalImage ? (
 					<MoveImageModal
 						key={modalImage?.id}

@@ -26,6 +26,8 @@
 		"drizzle-kit": "^0.31.0",
 		"drizzle-orm": "^0.42.0",
 		"hono": "^4.7.7",
+		"idb": "^8.0.2",
+		"idb-keyval": "^6.2.1",
 		"openai": "^4.94.0",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",

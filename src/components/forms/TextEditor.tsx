@@ -7,6 +7,7 @@ interface TextEditorProps {
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
+	// console.log("Text changed", text);
 	const [inputValue, setInputValue] = useState(text);
 	const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
 		null,
@@ -31,6 +32,7 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 	};
 
 	useEffect(() => {
+		console.log("Text changed", text);
 		setInputValue(text);
 	}, [text]);
 

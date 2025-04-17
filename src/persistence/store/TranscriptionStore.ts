@@ -9,6 +9,7 @@ import type { TranscriptionState } from "@src/persistence/store/TranscriptionSta
 import type { TranscriptionActions } from "@src/persistence/store/TranscriptionActions.ts";
 import { transcriptionStateStorage } from "@src/persistence/store/PersistTranscriptionState.tsx";
 import type { LanguageOption } from "@src/data/LanguageOption.tsx";
+import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
 
 export type TranscriptionStore = TranscriptionState & TranscriptionActions;
 
@@ -45,8 +46,24 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
 			// 		};
 			// 	});
 			// },
-			setSelectedImage: (image: ImageData | null) =>
-				set(() => ({ selectedImage: image })),
+			setSelectedImage: async (image: ImageData | null) => {
+				if (!image) {
+					set({ selectedImage: null });
+					return;
+				}
+
+				// If it already has data, just use it
+				if (image.data) {
+					console.log("Image already has data, using it.");
+					set({ selectedImage: image });
+					return;
+				}
+
+				// Else load full image from IndexedDB
+				const repo = IndexedDBImageRepository.getInstance();
+				const fullImage = await repo.retrieveImage(image.id);
+				set({ selectedImage: fullImage ?? null });
+			},
 			setModel: (model: TranscriptionModel) => set(() => ({ model })),
 			setSystemPrompt: (prompt: string) =>
 				set(() => ({ systemPrompt: prompt })),

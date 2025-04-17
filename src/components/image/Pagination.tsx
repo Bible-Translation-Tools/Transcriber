@@ -1,5 +1,5 @@
 import ZoomableImage from "./ZoomableImage.tsx";
-import {ImageData} from "@src/data/ImageData.tsx";
+import type { ImageData } from "@src/data/ImageData.tsx";
 
 interface PaginationProps {
 	image: ImageData | null;
@@ -19,26 +19,29 @@ const Pagination: React.FC<PaginationProps> = ({
 			<div className="grow relative flex-start group ">
 				{image ? <ZoomableImage src={image.data} /> : <div />}
 			</div>
-			{ image ?
-			<div className="flex-end flex">
-				<button
-					type="button"
-					onClick={() => onPageChange(currentPage - 1)}
-					disabled={currentPage === 0}
-					className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50"
-				>
-					Previous
-				</button>
-				<span className="mx-2">{`${currentPage + 1} / ${totalImages}`}</span>
-				<button
-					type="button"
-					onClick={() => onPageChange(currentPage + 1)}
-					disabled={currentPage === totalImages - 1} // Disable "Next" on the last page
-					className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-				>
-					Next
-				</button>
-			</div> : <></> }
+			{image ? (
+				<div className="flex-end flex">
+					<button
+						type="button"
+						onClick={() => onPageChange(currentPage - 1)}
+						disabled={currentPage === 0}
+						className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50"
+					>
+						Previous
+					</button>
+					<span className="mx-2">{`${currentPage + 1} / ${totalImages}`}</span>
+					<button
+						type="button"
+						onClick={() => onPageChange(currentPage + 1)}
+						disabled={currentPage === totalImages - 1} // Disable "Next" on the last page
+						className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+					>
+						Next
+					</button>
+				</div>
+			) : (
+				<></>
+			)}
 		</div>
 	);
 };
