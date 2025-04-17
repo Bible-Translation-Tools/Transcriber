@@ -213,7 +213,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
 						<div className="p-2">
 							<h3 className="text-sm font-semibold mb-1">
-								{t('All Languages title')}
+								{t('All Languages title') /* "All Language" seems to be a restricted key */}
 							</h3>
 							{filteredOptions.map((option) => (
 								<button
