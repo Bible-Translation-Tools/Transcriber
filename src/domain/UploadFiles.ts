@@ -1,6 +1,6 @@
 // @ts-ignore.  no types
 import { pdf2image } from "@pardnchiu/pdf2image";
-import type { ImageData } from "@src/data/ImageData.tsx";
+import type { ProjectImageData } from "@src/data/ImageData.tsx";
 
 export async function getFilesAsImages(files: File[]) {
 	const validFiles = files.filter((file) => {
@@ -54,7 +54,7 @@ export async function getFilesAsImages(files: File[]) {
 					const baseName = parts.slice(0, -1).join(".");
 					const extension = parts.length > 1 ? `.${parts.pop()}` : "";
 
-					const images: ImageData[] = converter.images.map(
+					const images: ProjectImageData[] = converter.images.map(
 						(imageData: string, index: number) => ({
 							url: URL.createObjectURL(file),
 							filename: `${baseName}-${index + 1}${extension}`,
@@ -75,6 +75,6 @@ export async function getFilesAsImages(files: File[]) {
 }
 
 type PartialImageData = Omit<
-	ImageData,
+	ProjectImageData,
 	"id" | "languageCode" | "bookCode" | "chapter"
 >;

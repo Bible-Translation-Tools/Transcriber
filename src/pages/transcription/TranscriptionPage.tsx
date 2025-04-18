@@ -10,7 +10,7 @@ import FileList from "@components/image/FileList.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import { getFilesAsImages } from "@src/domain/UploadFiles.ts";
-import type { ImageData } from "@src/data/ImageData";
+import type { ProjectImageData } from "@src/data/ImageData";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 // import {
 // 	resubmitImageForTranscription,
@@ -24,6 +24,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
 import { LoadingWrapper } from "@src/components/util/LoadingWrapper";
+import { ShowWhen } from "@src/components/util/ShowWhen";
 
 function TranscriptionPage() {
 	const store = useTranscriptionStore();
@@ -44,7 +45,7 @@ function TranscriptionPage() {
 
 	const [currentPage, setCurrentPage] = useState(0);
 	const [isModalOpen, setIsModalOpen] = useState(true);
-	const [modalImage, setModalImage] = useState<ImageData | null>(null);
+	const [modalImage, setModalImage] = useState<ProjectImageData | null>(null);
 
 	const handleOpenModal = async (page: number) => {
 		if (!images) return;
@@ -64,7 +65,7 @@ function TranscriptionPage() {
 	};
 
 	const handleSaveModal = async (
-		image: ImageData,
+		image: ProjectImageData,
 		language: string,
 		book: string,
 		chapter: number,
@@ -109,7 +110,7 @@ function TranscriptionPage() {
 	const handleFiles = async (files: File[]) => {
 		const imagesToProcess = await getFilesAsImages(files);
 		for await (const image of imagesToProcess) {
-			const completeImg: ImageData = {
+			const completeImg: ProjectImageData = {
 				...image,
 				id: crypto.randomUUID(),
 				languageCode: language.code,
@@ -132,7 +133,7 @@ function TranscriptionPage() {
 			const newMatchingIdImg = images?.find(
 				(image) => image.id === selectedImage?.id,
 			);
-			const keysToMatch: (keyof ImageData)[] = [
+			const keysToMatch: (keyof ProjectImageData)[] = [
 				"bookCode",
 				"chapter",
 				"startVerse",
@@ -262,67 +263,113 @@ function TranscriptionPage() {
 						<div className="w-[20vw] h-screen overflow-y-scroll" />
 					)}
 				</div>
-				{/* todo: refactor out. This much logic in template is gross */}
-				{imagesArePending ? (
-					// Show a loading spinner or placeholder while fetching images
-					<div className="grow flex flex-row">
-						{/* <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500" /> */}
-					</div>
-				) : images && images.length > 0 ? (
-					<div className="grow flex flex-row">
-						<Pagination
-							image={selectedImage}
-							currentPage={currentPage}
-							totalImages={images.length}
-							onPageChange={handlePageChange}
-						/>
-						<div className="flex-2 relative p-4 overflow-y-auto">
-							<div className="h-full flex flex-col">
-								{selectedImage ? (
-									<RangeInput
-										key={selectedImage?.id}
-										startVerse={selectedImage?.startVerse}
-										endVerse={selectedImage?.endVerse}
-										onRangeChange={handleVerseRangeChange}
-									/>
-								) : (
-									<></>
-								)}
-								<button
-									onClick={handleResubmitImage}
-									className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2"
-									type="button"
-								>
-									Clear Document and Refresh Transcription
-								</button>
-								<TextEditor
-									// key={textEditorKey()}
-									text={selectedImage?.transcription ?? ""}
-									onChange={(text) => {
-										handleTextChange(text);
-									}}
-								/>
-							</div>
-						</div>
-					</div>
-				) : (
-					// Show EmptyProject only when images are not pending and there's no data
-					<EmptyProject handleFiles={handleFiles} />
-				)}
+				<EditorWrapper
+					currentPage={currentPage}
+					handleFiles={handleFiles}
+					handlePageChange={handlePageChange}
+					handleResubmitImage={handleResubmitImage}
+					handleTextChange={handleTextChange}
+					handleVerseRangeChange={handleVerseRangeChange}
+					images={images}
+					imagesArePending={imagesArePending}
+					selectedImage={selectedImage}
+				/>
 
-				{modalImage ? (
+				<ShowWhen when={!!modalImage}>
 					<MoveImageModal
 						key={modalImage?.id}
-						image={modalImage}
+						// biome-ignore lint/style/noNonNullAssertion: <ShowWhen renderes null or fallback given >
+						image={modalImage!}
 						isOpen={isModalOpen}
 						onClose={handleCloseModal}
 						onSave={handleSaveModal}
 					/>
-				) : (
-					<></>
-				)}
+				</ShowWhen>
 			</div>
 		</div>
+	);
+}
+
+type EditorWrapperProps = {
+	images: ProjectImageData[] | undefined;
+	imagesArePending: boolean;
+	selectedImage: ProjectImageData | null;
+	currentPage: number;
+	handlePageChange: (page: number) => void;
+	handleResubmitImage: () => void;
+	handleTextChange: (text: string) => void;
+	handleFiles: (files: File[]) => Promise<void>;
+	handleVerseRangeChange: (start: number, end: number) => Promise<void>;
+};
+
+function EditorWrapper({
+	images,
+	imagesArePending,
+	selectedImage,
+	currentPage,
+	handlePageChange,
+	handleResubmitImage,
+	handleTextChange,
+	handleVerseRangeChange,
+	handleFiles,
+}: EditorWrapperProps) {
+	//  Or other loading states
+	if (imagesArePending) {
+		return (
+			<div className="absolute inset-0 flex items-center justify-center bg-gray-800 opacity-60 rounded-lg">
+				<div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500" />
+			</div>
+		);
+	}
+
+	if (!images || images.length === 0) {
+		return <EmptyProject handleFiles={handleFiles} />;
+	}
+
+	return (
+		<div className="grow flex flex-row">
+			<Pagination
+				image={selectedImage}
+				currentPage={currentPage}
+				totalImages={images.length}
+				onPageChange={handlePageChange}
+			/>
+			<div className="flex-2 relative p-4 overflow-y-auto">
+				<div className="h-full flex flex-col">
+					<RangeInput
+						key={selectedImage?.id}
+						selectedImage={selectedImage}
+						onRangeChange={handleVerseRangeChange}
+					/>
+					<ClearAndRefreshButton
+						handleResubmitImage={handleResubmitImage}
+					/>
+					<TextEditor
+						// key={textEditorKey()}
+						text={selectedImage?.transcription ?? ""}
+						onChange={(text) => {
+							handleTextChange(text);
+						}}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function ClearAndRefreshButton({
+	handleResubmitImage,
+}: {
+	handleResubmitImage: () => void;
+}) {
+	return (
+		<button
+			onClick={handleResubmitImage}
+			className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2"
+			type="button"
+		>
+			Clear Document and Refresh Transcription
+		</button>
 	);
 }
 

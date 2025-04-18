@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
-import type { ImageData } from "@src/data/ImageData";
+import type { ProjectImageData } from "@src/data/ImageData";
 
 interface FileListItemProps {
 	fileName: string;
@@ -154,7 +154,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 
 interface FileListProps {
 	selectedId: string | undefined;
-	images: ImageData[];
+	images: ProjectImageData[];
 	onImageSelected: (imageNumber: number) => void;
 	onMoveImage: (image: number) => void;
 	onDeleteImage: (image: number) => void;

@@ -4,7 +4,7 @@ import { apiV1 } from "@src/api";
 import { transcribeRoute, updateTranscriptionRoute } from "@src/constants";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ImageData } from "@src/data/ImageData";
+import type { ProjectImageData } from "@src/data/ImageData";
 // import { getTranscription } from "@src/services/TranscriptionApi.ts";
 import type { TranscriptionStore } from "@src/persistence/store/TranscriptionStore";
 
@@ -28,7 +28,7 @@ export const useIndexedDbImages = ({
 
 type useMutateIndexedDbImageArgs = {
 	imageId: string;
-	imageData: ImageData;
+	imageData: ProjectImageData;
 };
 export const useMutateIndexedDbImage = () => {
 	const queryClient = useQueryClient();
@@ -48,9 +48,9 @@ export const useMutateIndexedDbImage = () => {
 			// Optimistically update to the new value
 			queryClient.setQueryData(
 				["getIndexedDbImages"],
-				(old: Array<ImageData>) => {
+				(old: Array<ProjectImageData>) => {
 					if (!old) return [imageData];
-					return old.map((image: ImageData) => {
+					return old.map((image: ProjectImageData) => {
 						if (image.id === imageId) {
 							return { ...image, ...imageData };
 						}
@@ -103,12 +103,12 @@ type sendUpdatedTranscriptionArgs = {
 };
 
 type AddImageArgs = {
-	image: ImageData;
+	image: ProjectImageData;
 	transcriptionRequest: TranscriptionRequest;
 };
 
 type TranscriptionServiceArgs = {
-	image: ImageData;
+	image: ProjectImageData;
 	transcriptionRequest: TranscriptionRequest;
 	mutateImage: ReturnType<typeof useMutateIndexedDbImage>;
 	getTranscription: ReturnType<typeof useMutationGetTranscription>;
@@ -137,7 +137,7 @@ async function addImage({
 	}
 
 	if (transcriptionResult.success) {
-		const updatedImage: ImageData = {
+		const updatedImage: ProjectImageData = {
 			...image,
 			transcription: transcriptionResult.transcription,
 		};
@@ -232,7 +232,7 @@ async function resubmitImgForTranscription({
 		return;
 	}
 	if (transcriptionResult.success) {
-		const updatedImage: ImageData = {
+		const updatedImage: ProjectImageData = {
 			...image,
 			transcription: transcriptionResult.transcription,
 		};
@@ -293,7 +293,10 @@ export async function sendUpdatedTranscription({
 export const getTranscriptionRequestPayload = ({
 	image,
 	store,
-}: { store: TranscriptionStore; image: ImageData }): TranscriptionRequest => {
+}: {
+	store: TranscriptionStore;
+	image: ProjectImageData;
+}): TranscriptionRequest => {
 	return {
 		model: store.model,
 		image: image.data,

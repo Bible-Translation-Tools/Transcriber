@@ -1,12 +1,12 @@
 import { openDB, type IDBPDatabase } from "idb";
-import type { ImageData } from "@src/data/ImageData.tsx";
+import type { ProjectImageData } from "@src/data/ImageData.tsx";
 
 const DB_NAME = "imageDB";
 const DB_VERSION = 1;
 const META_STORE = "image-meta";
 const DATA_STORE = "image-data";
 
-type ImageMetadata = Omit<ImageData, "data">;
+type ImageMetadata = Omit<ProjectImageData, "data">;
 
 class IndexedDBImageRepository {
 	private static instance: IndexedDBImageRepository =
@@ -32,7 +32,10 @@ class IndexedDBImageRepository {
 		return [...this.recentLanguages];
 	}
 
-	async storeImage(imageId: string, image: ImageData): Promise<string> {
+	async storeImage(
+		imageId: string,
+		image: ProjectImageData,
+	): Promise<string> {
 		const db = await this.dbPromise;
 		const { data, ...metadata } = image;
 
@@ -48,7 +51,7 @@ class IndexedDBImageRepository {
 		return imageId;
 	}
 
-	async retrieveImage(imageId: string): Promise<ImageData | null> {
+	async retrieveImage(imageId: string): Promise<ProjectImageData | null> {
 		console.log(`Retrieving ${imageId}`);
 		const db = await this.dbPromise;
 
@@ -58,12 +61,12 @@ class IndexedDBImageRepository {
 		await tx.done;
 
 		if (metadata && data) {
-			return { ...metadata, data } as ImageData;
+			return { ...metadata, data } as ProjectImageData;
 		}
 		return null;
 	}
 
-	async retrieveAllImages(): Promise<ImageData[] | null> {
+	async retrieveAllImages(): Promise<ProjectImageData[] | null> {
 		const db = await this.dbPromise;
 		const tx = db.transaction([META_STORE, DATA_STORE], "readonly");
 
@@ -75,7 +78,7 @@ class IndexedDBImageRepository {
 
 		await tx.done;
 
-		const images: ImageData[] = [];
+		const images: ProjectImageData[] = [];
 		for (let i = 0; i < allMetadata.length; i++) {
 			const metadata = allMetadata[i];
 			// const data = allData[i];
@@ -92,7 +95,7 @@ class IndexedDBImageRepository {
 		languageCode: string,
 		bookCode: string,
 		chapter: number,
-	): Promise<ImageData[]> {
+	): Promise<ProjectImageData[]> {
 		const allImages = await this.retrieveAllImages();
 		return (
 			allImages?.filter(

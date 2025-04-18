@@ -1,8 +1,8 @@
 import ZoomableImage from "./ZoomableImage.tsx";
-import type { ImageData } from "@src/data/ImageData.tsx";
+import type { ProjectImageData } from "@src/data/ImageData.tsx";
 
 interface PaginationProps {
-	image: ImageData | null;
+	image: ProjectImageData | null;
 	currentPage: number;
 	totalImages: number;
 	onPageChange: (page: number) => void;

@@ -1,6 +1,6 @@
 import type { PersistStorage, StorageValue } from "zustand/middleware";
 import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
-import type { ImageData } from "@src/data/ImageData.tsx";
+import type { ProjectImageData } from "@src/data/ImageData.tsx";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
@@ -12,7 +12,7 @@ export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
 		const existingValue = JSON.parse(str);
 
 		let selectedImage = null;
-		let images: ImageData[] | null = null;
+		let images: ProjectImageData[] | null = null;
 		let recentLanguages: string[] = [];
 		if (existingValue.state.selectedImage) {
 			selectedImage = await imageRepo.retrieveImage(

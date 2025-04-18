@@ -1,4 +1,4 @@
-export interface ImageData {
+export interface ProjectImageData {
 	id: string;
 	filename: string;
 	created: EpochTimeStamp;

@@ -4,7 +4,7 @@ import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
 } from "@api/domain/TranscriptionRequest";
-import type { ImageData } from "@src/data/ImageData.tsx";
+import type { ProjectImageData } from "@src/data/ImageData.tsx";
 import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
 import type { TranscriptionActions } from "@src/persistence/store/TranscriptionActions.ts";
 import { transcriptionStateStorage } from "@src/persistence/store/PersistTranscriptionState.tsx";
@@ -46,7 +46,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
 			// 		};
 			// 	});
 			// },
-			setSelectedImage: async (image: ImageData | null) => {
+			setSelectedImage: async (image: ProjectImageData | null) => {
 				if (!image) {
 					set({ selectedImage: null });
 					return;
