@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {LanguageOption} from "@src/data/LanguageOption.tsx";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
@@ -18,6 +19,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 	searchable = true,
 	selectedLabel, // Receive selectedLabel
 }) => {
+	const { t } = useTranslation();
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -175,7 +177,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 					{searchable && (
 						<input
 							type="text"
-							placeholder="Search “English” or “eng”..."
+							placeholder={t('Search Language placeholder')}
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
 							className="w-full p-2 border-b focus:outline-none text-color-on-surface-tertiary text-l italic font-[Noto_Sans] leading-10"
@@ -185,7 +187,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 						{recentOptions && recentOptions.length > 0 && (
 							<div className="p-2">
 								<h3 className="text-sm font-semibold mb-1">
-									Recent Languages
+									{t('Recent Languages')}
 								</h3>
 								{recentOptions.map((option) => (
 									<button
@@ -211,7 +213,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
 						<div className="p-2">
 							<h3 className="text-sm font-semibold mb-1">
-								All Languages
+								{t('All Languages title') /* "All Language" seems to be a restricted key */}
 							</h3>
 							{filteredOptions.map((option) => (
 								<button

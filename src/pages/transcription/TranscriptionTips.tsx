@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const TranscriptionTips: React.FC = () => {
+	const { t } = useTranslation();
+
 	return (
 		<div className="flex-2 bg-white rounded-lg shadow-md p-6 h-full overflow-y-auto">
 			<div className="flex items-center mb-12">
@@ -22,36 +25,44 @@ const TranscriptionTips: React.FC = () => {
 			</div>
 
 			<div className="mb-12">
-				<h3 className="text-2xl font-bold text-gray-700 mb-1">Paper Style and Layout</h3>
+				<h3 className="text-2xl font-bold text-gray-700 mb-1">
+					{t('Paper Style and Layout')}
+				</h3>
 				<p className="text-2xl text-gray-600 mb-1">
-					Use lined paper using a verse-by-verse format, written on one side only.
+					{t('Use Lined Paper message')}
 				</p>
 				<p className="text-2xl text-gray-600">
-					Ensure text is straight, with consistent margins on all sides.
+					{t('Ensure Text Is Staight message')}
 				</p>
 			</div>
 
 			<div className="mb-12">
-				<h3 className="text-2xl font-bold text-gray-700 mb-1">Edits</h3>
+				<h3 className="text-2xl font-bold text-gray-700 mb-1">
+					{t('Edits')}
+				</h3>
 				<p className="text-2xl text-gray-600">
-					Avoid crossing out mistakes. You can fix these once the document is done being transcribed.
+					{t('Avoid Crossing Out message')}
 				</p>
 			</div>
 
 			<div className="mb-12">
-				<h3 className="text-2xl font-bold text-gray-700 mb-1">Text Style</h3>
+				<h3 className="text-2xl font-bold text-gray-700 mb-1">
+					{t('Text Style')}
+				</h3>
 				<p className="text-2xl text-gray-600 mb-1">
-					Write in block letters with even spacing between letters and words.
+					{t('Write In Block message')}
 				</p>
 				<p className="text-2xl text-gray-600">
-					Do not use superscripts or subscripts.
+					{t('Do not use superscripts or subscripts.')}
 				</p>
 			</div>
 
 			<div>
-				<h3 className="text-2xl font-bold text-gray-700 mb-1">Verify Your Results</h3>
+				<h3 className="text-2xl font-bold text-gray-700 mb-1">
+					{t('Verify Your Results')}
+				</h3>
 				<p className="text-2xl text-gray-600">
-					Always check your results for missing content or incorrect words.
+					{t('Always Check message')}
 				</p>
 			</div>
 		</div>

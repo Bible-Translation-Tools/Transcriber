@@ -1,5 +1,6 @@
 import "../../App.css";
 // @ts-ignore
+import { useTranslation } from 'react-i18next';
 import { toast } from "react-toastify";
 import {pdf2image} from "@pardnchiu/pdf2image";
 import {useEffect, useState} from "react";
@@ -21,6 +22,7 @@ import {
 } from "@src/domain/ImageActions.ts";
 
 function TranscriptionPage() {
+    const { t } = useTranslation();
     const store = useTranscriptionStore();
     const {images, selectedImage, setSelectedImage} = store;
 
@@ -143,7 +145,7 @@ function TranscriptionPage() {
                                       fill="white"/>
                             </g>
                         </svg>
-                        Add Images...
+                        {t('Add Images...')}
                         <input
                             type="file"
                             id="imageUpload"
@@ -185,7 +187,7 @@ function TranscriptionPage() {
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2"
                                     type="button"
                                 >
-                                    Clear Document and Refresh Transcription
+                                    {t('Clear Document and Refresh Transcription')}
                                 </button>
                                 <TextEditor
                                     text={selectedImage?.transcription ?? ""}

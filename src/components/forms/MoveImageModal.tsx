@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import BookDropdown from "@components/navigation/BookDropdown.tsx";
 import LanguageDropdown from "@components/navigation/LanguageDropdown.tsx";
@@ -22,7 +23,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
         image
     }
 ) => {
-
+    const { t } = useTranslation();
     const {recentLanguages} = useTranscriptionStore();
     const {languages} = useLanguageContext();
 
@@ -62,7 +63,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
                         <img src={image.data} alt="Image to Move" className="rounded-lg object-contain w-[25vw]"/>
                     </div>
                     <div className="flex flex-col">
-                        <h2 className="text-lg font-semibold mb-4">Move Image</h2>
+                        <h2 className="text-lg font-semibold mb-4">{t('Move Image')}</h2>
                         <div className="mb-4">
                             <LanguageDropdown
                                 languageOptions={languages}
@@ -82,7 +83,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
 
                         <div className="flex mb-4 space-x-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Verse Start</label>
+                                <label className="block text-sm font-medium text-gray-700">{t('Verse Start')}</label>
                                 <input
                                     type="number"
                                     value={startVerse}
@@ -91,7 +92,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Verse End</label>
+                                <label className="block text-sm font-medium text-gray-700">{t('Verse End')}</label>
                                 <input
                                     type="number"
                                     value={endVerse}
@@ -106,13 +107,13 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
                                 onClick={handleSave}
                                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                             >
-                                Save
+                                {t('Save')}
                             </button>
                             <button
                                 onClick={onClose}
                                 className="text-gray-600 hover:text-gray-800 py-2 px-4 rounded"
                             >
-                                Cancel
+                                {t('Cancel')}
                             </button>
                         </div>
                     </div>

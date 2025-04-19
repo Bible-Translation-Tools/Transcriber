@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
@@ -10,8 +11,10 @@ import { toast, ToastContentProps } from 'react-toastify';
 import {
     resubmitImageForTranscription,
 } from "@src/domain/ImageActions.ts";
+import i18n from 'i18next';
 
 const Settings: React.FC = () => {
+	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
     const store = useTranscriptionStore();
 	const {
@@ -23,7 +26,7 @@ const Settings: React.FC = () => {
 		setModel,
 	} = store;
 
-	const [language, setLanguage] = useState("en");
+	const [language, setLanguage] = useState(i18n.language || 'en'); // Default to 'en' if no language is set
 	const [theme, setTheme] = useState("light");
 	const [updatedModel, setUpdatedModel] = useState<TranscriptionModel>(
 		model as TranscriptionModel,
@@ -31,6 +34,11 @@ const Settings: React.FC = () => {
 	const [updatedPrompt, setUpdatedPrompt] = useState(prompt);
 	const [updatedSystemPrompt, setUpdatedSystemPrompt] =
 		useState(systemPrompt);
+
+	const handleLanguageChange = (lang: string) => {
+		setLanguage(lang);
+		i18n.changeLanguage(lang); // 👈 updates i18n language
+	};	
 
 	const handleThemeChange = (selectedTheme: "light" | "dark") => {
 		setTheme(selectedTheme);
@@ -73,10 +81,10 @@ const Settings: React.FC = () => {
 		return (
 		  <div className="flex flex-col w-full">
 			<div className="text-sm text-blue-900">
-			  Your transcription settings have changed.
+			  {t('Your transcription settings have changed.')}
 			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor"
 			  	onClick={transcribeAgain}>
-				Transcribe Again
+				{t('Transcribe Again')}
 			  </button>
 			</div>
 		  </div>
@@ -86,21 +94,23 @@ const Settings: React.FC = () => {
 	return (
 		<div className="h-screen flex flex-col bg-gray-100 mx-auto">
 			<div className="flex justify-between items-center px-8 pt-8">
-				<h1 className="text-4xl font-semibold">Settings</h1>
+				<h1 className="text-4xl font-semibold">
+					{t('Settings')}
+				</h1>
 				<div className="space-x-4">
 					<button
 						type="button"
 						className="text-xl bg-transparent hover:bg-gray-200 py-2 px-4 rounded"
 						onClick={onClose}
 					>
-						Cancel
+						{t('Cancel')}
 					</button>
 					<button
 						type="button"
 						className="text-xl bg-white hover:bg-gray-200 py-2 px-4 rounded"
 						onClick={handleSave}
 					>
-						X Save and Close
+						{t('Save and Close')}
 					</button>
 				</div>
 			</div>
@@ -109,11 +119,10 @@ const Settings: React.FC = () => {
 					<section className="py-4 border-t border-gray-300 grid grid-cols-2">
 						<div>
 							<h2 className="text-2xl font-semibold mb-2">
-								App Language
+								{t('App Language')}
 							</h2>
 							<p className="text-xl text-gray-600">
-								Change the language that the app is displayed
-								in. This will NOT affect your transcriptions.
+								{t('Change Language message')}
 							</p>
 						</div>
 						<div className="flex justify-end">
@@ -121,11 +130,16 @@ const Settings: React.FC = () => {
 								<select
 									value={language}
 									onChange={(e) =>
-										setLanguage(e.target.value)
+										handleLanguageChange(e.target.value)
 									}
 									className="border rounded p-2 w-full max-w-sm"
 								>
 									<option value="en">English</option>
+									<option value="es">Español</option>
+									<option value="fr">Français</option>
+									<option value="de">Deutsch</option>
+									<option value="pt">Português</option>
+									<option value="vi">Tiếng Việt</option>
 									{/* Add more language options here */}
 								</select>
 							</div>
@@ -135,10 +149,10 @@ const Settings: React.FC = () => {
 					<section className="py-4 border-t border-gray-300 grid grid-cols-2">
 						<div>
 							<h2 className="text-2xl font-semibold mb-2">
-								Interface Theme
+								{t('Interface Theme')}
 							</h2>
 							<p className="text-xl text-gray-600">
-								Select how the app is displayed for you.
+								{t('Select how the app is displayed for you.')}
 							</p>
 						</div>
 						<div className="flex justify-start">
@@ -155,7 +169,7 @@ const Settings: React.FC = () => {
 										<div className="absolute top-4 left-2 w-8 h-3 rounded bg-blue-500" />
 										<div className="absolute top-3 right-1 w-5 h-3 rounded bg-gray-700" />
 									</div>
-									<span>Dark</span>
+									<span>{t('Dark')}</span>
 								</button>
 								<button
 									type="button"
@@ -169,7 +183,7 @@ const Settings: React.FC = () => {
 										<div className="absolute top-4 left-2 w-8 h-3 rounded bg-blue-500" />
 										<div className="absolute top-3 right-1 w-5 h-3 rounded bg-gray-200" />
 									</div>
-									<span>Light</span>
+									<span>{t('Light')}</span>
 								</button>
 							</div>
 						</div>
@@ -178,10 +192,10 @@ const Settings: React.FC = () => {
 					<section className="py-4 border-t border-gray-300 grid grid-cols-2">
 						<div>
 							<h2 className="text-2xl font-semibold mb-2">
-								Transcription Settings
+								{t('Transcription Settings')}
 							</h2>
 							<p className="text-xl text-gray-600">
-								Modify how your transcriptions are processed.
+								{t('Modify how your transcriptions are processed.')}
 							</p>
 						</div>
 						<div className="flex flex-col justify-between content-between">
@@ -190,7 +204,7 @@ const Settings: React.FC = () => {
 									htmlFor="modelSelect"
 									className="block text-lg font-light text-gray-700"
 								>
-									Model
+									{t('Model')}
 								</label>
 								<div className="flex justify-start">
 									<select
@@ -222,7 +236,7 @@ const Settings: React.FC = () => {
 									htmlFor="systemPromptArea"
 									className="block text-lg font-light text-gray-700"
 								>
-									System Prompt
+									{t('System Prompt')}
 								</label>
 								<textarea
 									id="systemPromptArea"
@@ -239,7 +253,7 @@ const Settings: React.FC = () => {
 										className="text-xl bg-white hover:bg-gray-200 py-2 px-4 rounded"
 										onClick={resetSystemPrompt}
 									>
-										Reset Default
+										{t('Reset Default')}
 									</button>
 								</div>
 							</div>
@@ -248,7 +262,7 @@ const Settings: React.FC = () => {
 									htmlFor="promptArea"
 									className="block text-lg font-light text-gray-700"
 								>
-									Prompt
+									{t('Prompt')}
 								</label>
 								<textarea
 									id="promptArea"
@@ -265,7 +279,7 @@ const Settings: React.FC = () => {
 										className="text-xl bg-white hover:bg-gray-200 py-2 px-4 rounded"
 										onClick={resetPrompt}
 									>
-										Reset Default
+										{t('Reset Default')}
 									</button>
 								</div>
 							</div>

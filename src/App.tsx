@@ -9,6 +9,7 @@ import Home from "./pages/Home.tsx";
 import Login from "./pages/Login.tsx";
 import TranscriptionPage from "./pages/transcription/TranscriptionPage.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import './i18n'; 
 
 const App = () => {
 
