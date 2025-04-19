@@ -21,6 +21,7 @@ import {
 } from "@src/domain/ImageActions.ts";
 import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
+import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
 
 function TranscriptionPage() {
     const store = useTranscriptionStore();
@@ -86,6 +87,7 @@ function TranscriptionPage() {
 
     const handleResubmitImage = () => {
         if (selectedImage != null) {
+            toast.success(ImageSubmittedToast, {data:"Submitted Image for Transcription."});
             resubmitImageForTranscription(store, selectedImage, handleTranscriptionError);
         }
     };
