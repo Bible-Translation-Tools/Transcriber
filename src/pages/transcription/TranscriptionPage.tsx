@@ -29,19 +29,19 @@ function TranscriptionPage() {
 
     const [currentPage, setCurrentPage] = useState(0);
 
-    const [isModalOpen, setIsModalOpen] = useState(true);
-    const [modalImage, setModalImage] = useState<ImageData | null>(null);
+    const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
+    const [modalImage, setMoveImageModalImage] = useState<ImageData | null>(null);
 
-    const handleOpenModal = (page: number) => {
-        setModalImage(images[page]);
-        setIsModalOpen(true);
+    const handleOpenMoveImageModal = (page: number) => {
+        setMoveImageModalImage(images[page]);
+        setIsMoveImageModalOpen(true);
 
         console.log(page);
     }
 
     const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setModalImage(null);
+        setIsMoveImageModalOpen(false);
+        setMoveImageModalImage(null);
     };
 
     const handleSaveModal = async (
@@ -70,7 +70,7 @@ function TranscriptionPage() {
             true
         );
         store.refreshProject();
-        setModalImage(null);
+        setMoveImageModalImage(null);
     };
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,8 +164,8 @@ function TranscriptionPage() {
                         selectedId={selectedImage?.id}
                         images={images}
                         onImageSelected={handlePageChange}
-                        onMoveImage={handleOpenModal}
-                        onDeleteImage={handleOpenModal}
+                        onMoveImage={handleOpenMoveImageModal}
+                        onDeleteImage={handleOpenMoveImageModal}
                     />
                 </div>
                 {(images?.length > 0) ?
