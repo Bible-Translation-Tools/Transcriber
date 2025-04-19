@@ -16,11 +16,13 @@ export const transcriptionStateStorage : PersistStorage<TranscriptionState> =  {
         let recentLanguages: string[] = [];
         if (existingValue.state.selectedImage) {
             selectedImage = await imageRepo.retrieveImage(existingValue.state.selectedImage)
+            selectedImage = {...selectedImage, loading: false};
         }
 
         const {language, bookCode, chapter} = existingValue.state
         if (language != null) {
             images = await imageRepo.getImages(language.code, bookCode, chapter);
+            images = images.map((image) => ({...image, loading: false }));
             recentLanguages = imageRepo.getRecentLanguages();
         } else {
             await imageRepo.retrieveAllImages();
