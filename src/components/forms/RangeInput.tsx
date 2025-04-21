@@ -32,14 +32,14 @@ const RangeInput: React.FC<RangeInputProps> = ({startVerse, endVerse, onRangeCha
 
     return (
         <div className="flex items-center space-x-4 pb-3">
-            <label className="text-gray-700">{t('Start:')}</label>
+            <label className="text-gray-700">{t('Start')}</label>
             <input
                 type="text"
                 value={start}
                 onChange={handleStartChange}
                 className="border rounded px-3 py-2 w-20 text-center"
             />
-            <label className="text-gray-700">{t('End:')}</label>
+            <label className="text-gray-700">{t('End')}</label>
             <input
                 type="text"
                 value={end}
