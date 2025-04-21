@@ -26,7 +26,7 @@ export default function uploadFiles(
         console.log("Only JPEG, PNG, and PDF files are allowed.");
     }
 
-    validFiles.forEach((file) => {
+    validFiles.forEach((file, index) => {
         if (file.type !== "application/pdf") {
             const reader = new FileReader();
 
@@ -36,7 +36,7 @@ export default function uploadFiles(
                 const image: ImageData = {
                     url: url,
                     filename: file.name,
-                    created: Date.now(),
+                    created: Date.now() + (index + 100),
                     data: base64String,
                     transcription: null,
                 }; // Type the image object
@@ -62,7 +62,7 @@ export default function uploadFiles(
                         await converter.convert();
 
                         const createdTime = Date.now();
-
+                        
                         converter.images.forEach((imageData: any, index: number) => {
                             const url = URL.createObjectURL(file);
                             const pageNumber = index + 1;
@@ -73,7 +73,7 @@ export default function uploadFiles(
                             const image: ImageData = {
                                 url:url,
                                 filename: `${baseName}-${pageNumber}${extension}`,
-                                created: createdTime + index, // pad out a little for the number of pages so they sort correctly
+                                created: createdTime +  (index + 100), // pad out a little for the number of pages so they sort correctly
                                 data: imageData,
                                 transcription: null,
                             }; // Type the image object

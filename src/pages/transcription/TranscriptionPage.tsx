@@ -3,7 +3,7 @@ import "../../App.css";
 import { useTranslation } from 'react-i18next';
 import { toast } from "react-toastify";
 import {pdf2image} from "@pardnchiu/pdf2image";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import NavBar from "@components/navigation/NavBar.tsx";
 import Pagination from "@components/image/Pagination.tsx";
 import TextEditor from "@components/forms/TextEditor.tsx";
@@ -28,6 +28,10 @@ function TranscriptionPage() {
     const { t } = useTranslation();
     const store = useTranscriptionStore();
     const {images, selectedImage, setSelectedImage} = store;
+
+    const sortedImages = useMemo(() => {
+        images.sort((a, b) => {return a.created - b.created})
+    }, [images])
 
     const [currentPage, setCurrentPage] = useState(0);
 
