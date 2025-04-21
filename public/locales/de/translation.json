@@ -28,6 +28,7 @@
     "Search Language placeholder": "Suchen Sie nach \"English\" oder \"eng\"...",
     "Search Book placeholder": "Suchen Sie nach \"Genesis\" oder \"gen\"...",
     "Move Image": "Bild verschieben",
+    "Delete Image": "Bild löschen",
     "Verse Start": "Versanfang",
     "Verse End": "Versende",
     "Start": "Beginn",
@@ -51,5 +52,7 @@
     "Zoom Out -": "Verkleinern -",
     "Reset Zoom": "Zoom zurücksetzen",
     "Retry transcription part 1": "Erneut versuchen",
-    "Retry transcription part 2": "Sie die Transkription, wenn ein Problem auftritt."
+    "Retry transcription part 2": "Sie die Transkription, wenn ein Problem auftritt.",
+    "This Image is Being Processed.": "Dieses Bild wird verarbeitet.",
+    "Please Be Patient message": "Bitte haben Sie etwas Geduld, da dies je nach Internetverbindung einige Minuten dauern kann."
 }

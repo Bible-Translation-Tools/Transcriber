@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-
+import { useTranslation } from 'react-i18next';
 import {ImageData} from "@src/data/ImageData.tsx";
 
 interface FileListItemProps {
@@ -15,6 +15,7 @@ interface FileListItemProps {
 
 const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, isLoading, onImageSelected, onMoveImage, onDeleteImage }) => {
 
+    const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +104,7 @@ const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, 
                                     d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
                                 />
                             </svg>
-                            Move Image...
+                            {t('Move Image')}
                         </button>
                         <button
                             onClick={handleDeleteClick}
@@ -123,7 +124,7 @@ const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, 
                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                                 />
                             </svg>
-                            Delete Image
+                            {t('Delete Image')}
                         </button>
                     </div>
                 </div>

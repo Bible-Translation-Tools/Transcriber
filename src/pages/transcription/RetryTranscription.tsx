@@ -41,11 +41,13 @@ const RetryTranscription: React.FC<Props> = ({onRetryTranscription, debounceDela
 };
 
 const TranscriptionStatus: React.FC<Props> = () => {
+    const { t } = useTranslation();
+    
     return (
         <div className="mt-4 p-4 bg-gray-100 rounded-md shadow-sm">
-            <p className="text-sm font-semibold text-gray-700">This Image is Being Processed.</p>
+            <p className="text-sm font-semibold text-gray-700">{t('This Image is Being Processed.')}</p>
             <p className="text-xs text-gray-500 mt-1">
-                Please be patient as this may take several minutes, depending on internet connection.
+                {t('Please Be Patient message')}
             </p>
         </div>
     );

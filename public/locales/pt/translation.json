@@ -28,6 +28,7 @@
     "Search Language placeholder": "Pesquisar \"English\" ou \"eng\"...",
     "Search Book placeholder": "Pesquisar \"Genesis\" ou \"gen\"...",
     "Move Image": "Mover imagem",
+    "Delete Image": "Excluir imagem",
     "Verse Start": "Início do versículo",
     "Verse End": "Fim do versículo",
     "Start": "Início",
@@ -51,5 +52,7 @@
     "Zoom Out -": "Diminuir zoom -",
     "Reset Zoom": "Redefinir zoom",
     "Retry transcription part 1": "Tentar novamente",
-    "Retry transcription part 2": "a transcrição se houver algum problema."
+    "Retry transcription part 2": "a transcrição se houver algum problema.",
+    "This Image is Being Processed.": "Esta imagem está sendo processada.",
+    "Please Be Patient message": "Por favor, seja paciente. Isso pode levar alguns minutos, dependendo da conexão com a internet."
 }

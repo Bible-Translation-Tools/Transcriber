@@ -28,6 +28,7 @@
     "Search Language placeholder": "Tìm kiếm \"English\" hoặc \"eng\"...",
     "Search Book placeholder": "Tìm kiếm \"Genesis\" hoặc \"gen\"...",
     "Move Image": "Di chuyển hình ảnh",
+    "Delete Image": "Xóa hình ảnh",
     "Verse Start": "Bắt đầu câu",
     "Verse End": "Kết thúc câu",
     "Start": "Bắt đầu",
@@ -51,5 +52,7 @@
     "Zoom Out -": "Thu nhỏ -",
     "Reset Zoom": "Đặt lại thu phóng",
     "Retry transcription part 1": "Thử lại",
-    "Retry transcription part 2": "bản chép nếu có sự cố."
+    "Retry transcription part 2": "bản chép nếu có sự cố.",
+    "This Image is Being Processed.": "Hình ảnh này đang được xử lý.",
+    "Please Be Patient message": "Vui lòng kiên nhẫn vì quá trình này có thể mất vài phút tùy theo kết nối internet."
 }
