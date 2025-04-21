@@ -20,6 +20,9 @@ import {
     updateImage,
     updateTranscription
 } from "@src/domain/ImageActions.ts";
+import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
+import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
+import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
 
 function TranscriptionPage() {
     const { t } = useTranslation();
@@ -28,19 +31,19 @@ function TranscriptionPage() {
 
     const [currentPage, setCurrentPage] = useState(0);
 
-    const [isModalOpen, setIsModalOpen] = useState(true);
-    const [modalImage, setModalImage] = useState<ImageData | null>(null);
+    const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
+    const [modalImage, setMoveImageModalImage] = useState<ImageData | null>(null);
 
-    const handleOpenModal = (page: number) => {
-        setModalImage(images[page]);
-        setIsModalOpen(true);
+    const handleOpenMoveImageModal = (page: number) => {
+        setMoveImageModalImage(images[page]);
+        setIsMoveImageModalOpen(true);
 
         console.log(page);
     }
 
     const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setModalImage(null);
+        setIsMoveImageModalOpen(false);
+        setMoveImageModalImage(null);
     };
 
     const handleSaveModal = async (
@@ -69,7 +72,7 @@ function TranscriptionPage() {
             true
         );
         store.refreshProject();
-        setModalImage(null);
+        setMoveImageModalImage(null);
     };
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,12 +84,13 @@ function TranscriptionPage() {
     };
 
     const handleFiles = (files: File[]) => {
-        uploadFiles(store, files, addImage);
+        uploadFiles(store, files, addImage, handleTranscriptionError);
     };
 
     const handleResubmitImage = () => {
         if (selectedImage != null) {
-            resubmitImageForTranscription(store, selectedImage);
+            toast.success(ImageSubmittedToast, {data:"Submitted Image for Transcription."});
+            resubmitImageForTranscription(store, selectedImage, handleTranscriptionError);
         }
     };
 
@@ -112,6 +116,10 @@ function TranscriptionPage() {
             setCurrentPage(0);
         }
     };
+
+    const handleTranscriptionError = (err: TranscriptionErrorCode, errorMessage: string): void => {
+        toast.error(UploadFileErrorToast, {data: errorMessage})
+    }
 
     const handleVerseRangeChange = (start: number, end: number) => {
         const validVerseRange = validateVerseRange(start, end);
@@ -158,8 +166,8 @@ function TranscriptionPage() {
                         selectedId={selectedImage?.id}
                         images={images}
                         onImageSelected={handlePageChange}
-                        onMoveImage={handleOpenModal}
-                        onDeleteImage={handleOpenModal}
+                        onMoveImage={handleOpenMoveImageModal}
+                        onDeleteImage={handleOpenMoveImageModal}
                     />
                 </div>
                 {(images?.length > 0) ?
@@ -169,6 +177,7 @@ function TranscriptionPage() {
                             currentPage={currentPage}
                             totalImages={images.length}
                             onPageChange={handlePageChange}
+                            onRetryTranscription={handleResubmitImage}
                         />
                         <div className="flex-2 relative p-4 overflow-y-auto">
                             <div className="h-full flex flex-col">
@@ -182,13 +191,6 @@ function TranscriptionPage() {
                                     :
                                     <></>
                                 }
-                                <button
-                                    onClick={handleResubmitImage}
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50 mb-2"
-                                    type="button"
-                                >
-                                    {t('Clear Document and Refresh Transcription')}
-                                </button>
                                 <TextEditor
                                     text={selectedImage?.transcription ?? ""}
                                     onChange={(text) => {
