@@ -46,5 +46,10 @@
     "Drag and Drop Images Here": "Bilder hierher ziehen und ablegen",
     "Upload Image text part 1": "Oder ",
     "Upload Image text part 2": "klicken Sie zum Durchsuchen",
-    "Upload Image text part 3": " stattdessen. Diese App unterstützt die meisten Bildformate, z. B.: PNG, JPG, PDF."
-  }
+    "Upload Image text part 3": " stattdessen. Diese App unterstützt die meisten Bildformate, z. B.: PNG, JPG, PDF.",
+    "Zoom In +": "Vergrößern +",
+    "Zoom Out -": "Verkleinern -",
+    "Reset Zoom": "Zoom zurücksetzen",
+    "Retry transcription part 1": "Erneut versuchen",
+    "Retry transcription part 2": "Sie die Transkription, wenn ein Problem auftritt."
+}

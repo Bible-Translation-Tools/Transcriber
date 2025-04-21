@@ -46,5 +46,10 @@
     "Drag and Drop Images Here": "Drag and Drop Images Here",
     "Upload Image text part 1": "Or ",
     "Upload Image text part 2": "click to browse",
-    "Upload Image text part 3": " instead. This app supports most image formats, such as: PNG, JPG, PDF."
+    "Upload Image text part 3": " instead. This app supports most image formats, such as: PNG, JPG, PDF.",
+    "Zoom In +": "Zoom In +",
+    "Zoom Out -": "Zoom Out -",
+    "Reset Zoom": "Reset Zoom",
+    "Retry transcription part 1": "Retry",
+    "Retry transcription part 2": "your transcription if there is a problem."
 }

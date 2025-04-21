@@ -1,6 +1,7 @@
 import type React from 'react';
 import {useCallback} from 'react';
 import {debounce} from 'lodash'; // Or your preferred debounce implementation
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     onRetryTranscription: () => void;
@@ -8,7 +9,8 @@ interface Props {
 };
 
 const RetryTranscription: React.FC<Props> = ({onRetryTranscription, debounceDelay = 1000}) => {
-
+    
+    const { t } = useTranslation();
     const debouncedRetry = useCallback(
         debounce(() => {
             onRetryTranscription();
@@ -29,9 +31,9 @@ const RetryTranscription: React.FC<Props> = ({onRetryTranscription, debounceDela
                         onClick={debouncedRetry}
                         className="ml-1 pr-1 text-blue-500 hover:underline focus:outline"
                     >
-                        Retry
+                        {t('Retry transcription part 1')}
                     </button>
-                    your transcription if there is a problem.
+                    {t('Retry transcription part 2')}
                 </div>
             )}
         </div>

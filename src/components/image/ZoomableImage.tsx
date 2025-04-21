@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
 	TransformComponent,
@@ -7,6 +8,7 @@ import {
 } from "react-zoom-pan-pinch";
 
 const Controls = () => {
+	const { t } = useTranslation();
 	const { zoomIn, zoomOut, resetTransform } = useControls();
 
 	return (
@@ -16,21 +18,21 @@ const Controls = () => {
 				className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
 				onClick={() => zoomIn()}
 			>
-				Zoom In +
+				{t('Zoom In +')}
 			</button>
 			<button
 				type="button"
 				className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
 				onClick={() => zoomOut()}
 			>
-				Zoom Out -
+				{t('Zoom Out -')}
 			</button>
 			<button
 				type="button"
 				className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
 				onClick={() => resetTransform()}
 			>
-				Reset Zoom
+				{t('Reset Zoom')}
 			</button>
 		</div>
 	);

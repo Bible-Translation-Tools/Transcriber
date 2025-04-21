@@ -46,5 +46,10 @@
     "Drag and Drop Images Here": "Arraste e solte imagens aqui",
     "Upload Image text part 1": "Ou ",
     "Upload Image text part 2": "clique para navegar",
-    "Upload Image text part 3": " em vez disso. Este aplicativo suporta a maioria dos formatos de imagem, como: PNG, JPG, PDF."
-  }
+    "Upload Image text part 3": " em vez disso. Este aplicativo suporta a maioria dos formatos de imagem, como: PNG, JPG, PDF.",
+    "Zoom In +": "Aumentar zoom +",
+    "Zoom Out -": "Diminuir zoom -",
+    "Reset Zoom": "Redefinir zoom",
+    "Retry transcription part 1": "Tentar novamente",
+    "Retry transcription part 2": "a transcrição se houver algum problema."
+}

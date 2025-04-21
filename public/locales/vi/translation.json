@@ -46,5 +46,10 @@
     "Drag and Drop Images Here": "Kéo và thả hình ảnh vào đây",
     "Upload Image text part 1": "Hoặc ",
     "Upload Image text part 2": "nhấp để duyệt",
-    "Upload Image text part 3": " thay vào đó. Ứng dụng này hỗ trợ hầu hết các định dạng hình ảnh, chẳng hạn như: PNG, JPG, PDF."
-  }
+    "Upload Image text part 3": " thay vào đó. Ứng dụng này hỗ trợ hầu hết các định dạng hình ảnh, chẳng hạn như: PNG, JPG, PDF.",
+    "Zoom In +": "Phóng to +",
+    "Zoom Out -": "Thu nhỏ -",
+    "Reset Zoom": "Đặt lại thu phóng",
+    "Retry transcription part 1": "Thử lại",
+    "Retry transcription part 2": "bản chép nếu có sự cố."
+}
