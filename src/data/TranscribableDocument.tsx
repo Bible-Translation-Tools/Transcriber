@@ -1,4 +1,4 @@
-export interface ImageData {
+export interface TranscribableDocument {
     id: string;
     filename: string;
     created: EpochTimeStamp;

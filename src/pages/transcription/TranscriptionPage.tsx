@@ -12,7 +12,7 @@ import FileList from "@components/image/FileList.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import uploadFiles from "@src/domain/UploadFiles.ts";
-import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import {
     addImage,
@@ -34,7 +34,7 @@ function TranscriptionPage() {
     }, [images])
 
     const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
-    const [modalImage, setMoveImageModalImage] = useState<ImageData | null>(null);
+    const [modalImage, setMoveImageModalImage] = useState<TranscribableDocument | null>(null);
 
     const handleOpenMoveImageModal = (page: number) => {
         setMoveImageModalImage(images[page]);
@@ -49,7 +49,7 @@ function TranscriptionPage() {
     };
 
     const handleSaveModal = async (
-        image: ImageData,
+        image: TranscribableDocument,
         language: string,
         book: string,
         chapter: number,

@@ -1,7 +1,7 @@
 import BookDropdown from "@components/navigation/BookDropdown.tsx";
 import LanguageDropdown from "@components/navigation/LanguageDropdown.tsx";
 import {useLanguageContext} from "@src/context/useLanguageContext.tsx";
-import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import type {LanguageOption} from "@src/data/LanguageOption.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type React from 'react';
@@ -12,8 +12,8 @@ import { toast } from 'react-toastify';
 interface MoveImageModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (image: ImageData, languageCode: string, bookCode: string, chapter: number, startVerse: number, endVerse: number) => void;
-    image: ImageData;
+    onSave: (image: TranscribableDocument, languageCode: string, bookCode: string, chapter: number, startVerse: number, endVerse: number) => void;
+    image: TranscribableDocument;
 }
 
 const MoveImageModal: React.FC<MoveImageModalProps> = (

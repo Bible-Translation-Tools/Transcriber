@@ -1,4 +1,4 @@
-import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import type {TranscriptionModel} from "@api/domain/TranscriptionRequest.ts";
 import {LanguageOption} from "@src/data/LanguageOption.tsx";
 
@@ -7,8 +7,8 @@ export interface TranscriptionState {
     recentLanguages: string[];
     bookCode: string;
     chapter: number;
-    images: ImageData[]; // We will manage this manually
-    selectedImage: ImageData | null;
+    images: TranscribableDocument[]; // We will manage this manually
+    selectedImage: TranscribableDocument | null;
     model: TranscriptionModel;
     systemPrompt: string;
     prompt: string;

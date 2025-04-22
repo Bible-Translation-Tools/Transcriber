@@ -1,7 +1,7 @@
 import type React from 'react';
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 
 interface FileListItemProps {
     fileName: string;
@@ -151,7 +151,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 
 interface FileListProps {
     selectedId: string | undefined;
-    images: ImageData[];
+    images: TranscribableDocument[];
     onImageSelected: (imageNumber: number) => void;
     onMoveImage: (image: number) => void;
     onDeleteImage: (image: number) => void;
