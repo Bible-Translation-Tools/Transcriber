@@ -1,9 +1,9 @@
 import "../../App.css";
-// @ts-ignore
 import { useTranslation } from 'react-i18next';
 import { toast } from "react-toastify";
+// @ts-ignore
 import {pdf2image} from "@pardnchiu/pdf2image";
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import NavBar from "@components/navigation/NavBar.tsx";
 import Pagination from "@components/image/Pagination.tsx";
 import TextEditor from "@components/forms/TextEditor.tsx";
@@ -12,7 +12,7 @@ import FileList from "@components/image/FileList.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import uploadFiles from "@src/domain/UploadFiles.ts";
-import {ImageData} from "@src/data/ImageData.tsx";
+import type {ImageData} from "@src/data/ImageData.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import {
     addImage,
@@ -29,11 +29,9 @@ function TranscriptionPage() {
     const store = useTranscriptionStore();
     const {images, selectedImage, setSelectedImage} = store;
 
-    const sortedImages = useMemo(() => {
+    useMemo(() => {
         images.sort((a, b) => {return a.created - b.created})
     }, [images])
-
-    const [currentPage, setCurrentPage] = useState(0);
 
     const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
     const [modalImage, setMoveImageModalImage] = useState<ImageData | null>(null);
@@ -114,14 +112,12 @@ function TranscriptionPage() {
     const handlePageChange = (page: number) => {
         if (page < images.length && page >= 0) {
             setSelectedImage(images[page]);
-            setCurrentPage(page);
         } else {
             setSelectedImage(images[0]);
-            setCurrentPage(0);
         }
     };
 
-    const handleTranscriptionError = (err: TranscriptionErrorCode, errorMessage: string): void => {
+    const handleTranscriptionError = (_: TranscriptionErrorCode, errorMessage: string): void => {
         toast.error(UploadFileErrorToast, {data: errorMessage})
     }
 
@@ -178,9 +174,6 @@ function TranscriptionPage() {
                     <div className="grow flex flex-row">
                         <Pagination
                             image={selectedImage}
-                            currentPage={currentPage}
-                            totalImages={images.length}
-                            onPageChange={handlePageChange}
                             onRetryTranscription={handleResubmitImage}
                         />
                         <div className="flex-2 relative p-4 overflow-y-auto">

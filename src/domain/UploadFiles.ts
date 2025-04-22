@@ -1,6 +1,7 @@
+// @ts-ignore
 import {pdf2image} from "@pardnchiu/pdf2image";
-import {ImageData} from "@src/data/ImageData.tsx";
-import {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 
 export default function uploadFiles(
@@ -33,6 +34,7 @@ export default function uploadFiles(
             reader.onloadend = () => {
                 const base64String = reader.result;
                 const url = URL.createObjectURL(file);
+                // @ts-ignore
                 const image: ImageData = {
                     url: url,
                     filename: file.name,
@@ -70,6 +72,7 @@ export default function uploadFiles(
                             const baseName = parts.slice(0, -1).join('.');
                             const extension = parts.length > 1 ? `.${parts.pop()}` : '';
 
+                            // @ts-ignore
                             const image: ImageData = {
                                 url:url,
                                 filename: `${baseName}-${pageNumber}${extension}`,

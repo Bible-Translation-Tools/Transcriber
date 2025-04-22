@@ -49,7 +49,7 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({ src }) => {
 			initialPositionX={200}
 			initialPositionY={100}
 		>
-			{({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+			{() => (
 				<>
 					<Controls />
 					<div className="cursor-move">

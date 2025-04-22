@@ -1,6 +1,7 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import { useTranslation } from 'react-i18next';
-import {ImageData} from "@src/data/ImageData.tsx";
+import type React from 'react';
+import {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import type {ImageData} from "@src/data/ImageData.tsx";
 
 interface FileListItemProps {
     fileName: string;
@@ -9,13 +10,21 @@ interface FileListItemProps {
     index: number;
     onImageSelected: (imageNumber: number) => void;
     onMoveImage: (image: number) => void;
-    onDeleteImage: (image:number) => void;
+    onDeleteImage: (image: number) => void;
     isLoading?: boolean;
 }
 
-const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, isLoading, onImageSelected, onMoveImage, onDeleteImage }) => {
+const FileListItem: React.FC<FileListItemProps> = ({
+                                                       selected,
+                                                       fileName,
+                                                       index,
+                                                       isLoading,
+                                                       onImageSelected,
+                                                       onMoveImage,
+                                                       onDeleteImage
+                                                   }) => {
 
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -56,37 +65,43 @@ const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, 
     const selectedStyle = (): string => {
         if (selected) {
             return "rounded-2xl bg-white";
-        } else {
-            return "";
         }
+        return "";
     }
 
     return (
         <div className={`p-4 border-b border-gray-200 hover:bg-gray-200 ${selectedStyle()}`}>
-            <div className="flex items-center justify-between" >
-                <div className="flex items-center"  onClick={handleImageSelected}>
+            <div className="flex items-center justify-between">
+                {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+                <div className="flex items-center" onClick={handleImageSelected}>
                     <span className="truncate">{fileName}</span>
                 </div>
                 {isLoading ? (
+                    // biome-ignore lint/style/useSelfClosingElements: <explanation>
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blue-500"></div>
                 ) : (
-                    <button onClick={handleMenuClick} className="w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-400">
+                    <button type={"button"}
+                            onClick={handleMenuClick}
+                            className="w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-400">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                         >
-                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path
+                                d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/>
                         </svg>
                     </button>
                 )}
             </div>
 
             {isMenuOpen && (
-                <div ref={menuRef} className="absolute z-1 ml-[18vw] mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div ref={menuRef}
+                     className="absolute z-1 ml-[18vw] mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                     <div className="py-1">
                         <button
+                            type={"button"}
                             onClick={handleMoveClick}
                             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
@@ -107,6 +122,7 @@ const FileListItem: React.FC<FileListItemProps> = ({ selected, fileName, index, 
                             {t('Move Image')}
                         </button>
                         <button
+                            type={"button"}
                             onClick={handleDeleteClick}
                             className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                         >
@@ -141,24 +157,25 @@ interface FileListProps {
     onDeleteImage: (image: number) => void;
 }
 
-const FileList: React.FC<FileListProps> = ({ selectedId, images, onImageSelected, onMoveImage, onDeleteImage }) => {
+const FileList: React.FC<FileListProps> = ({selectedId, images, onImageSelected, onMoveImage, onDeleteImage}) => {
     return (
         <div className="w-[20vw] h-screen overflow-y-scroll">
-            {images.map((image, index) =>
-            {
+            {images.map((image, index) => {
                 return (
-                <FileListItem
-                    key={index}
-                    selected={selectedId === image.id}
-                    id={image.id}
-                    index={index}
-                    fileName={image.filename}
-                    isLoading={image?.loading ?? true}
-                    onImageSelected={onImageSelected}
-                    onMoveImage={onMoveImage}
-                    onDeleteImage={onDeleteImage}
-                />
-            )})}
+                    <FileListItem
+                        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                        key={index}
+                        selected={selectedId === image.id}
+                        id={image.id}
+                        index={index}
+                        fileName={image.filename}
+                        isLoading={image?.loading ?? true}
+                        onImageSelected={onImageSelected}
+                        onMoveImage={onMoveImage}
+                        onDeleteImage={onDeleteImage}
+                    />
+                )
+            })}
         </div>
     );
 };

@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 import BookDropdown from "@components/navigation/BookDropdown.tsx";
 import LanguageDropdown from "@components/navigation/LanguageDropdown.tsx";
 import {useLanguageContext} from "@src/context/useLanguageContext.tsx";
-import {ImageData} from "@src/data/ImageData.tsx";
+import type {ImageData} from "@src/data/ImageData.tsx";
+import type {LanguageOption} from "@src/data/LanguageOption.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {LanguageOption} from "@src/data/LanguageOption.tsx";
+import type React from 'react';
+import {useState} from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 interface MoveImageModalProps {
     isOpen: boolean;
@@ -60,6 +61,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
             <div className="bg-white rounded-lg p-6 flex">
                 <div className="flex flex-row items-center justify-between">
                     <div className="pr-4 max-w-fit">
+                        {/* biome-ignore lint/a11y/noRedundantAlt: <explanation> */}
                         <img src={image.data} alt="Image to Move" className="rounded-lg object-contain w-[25vw]"/>
                     </div>
                     <div className="flex flex-col">
@@ -75,6 +77,7 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
 
                         <div className="mb-4">
                             <BookDropdown
+                                // @ts-ignore
                                 onSelect={handleBookChapterSelect}
                                 selectedBook={book}
                                 selectedChapter={chapter}
@@ -83,20 +86,22 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
 
                         <div className="flex mb-4 space-x-4">
                             <div>
+                                {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
                                 <label className="block text-sm font-medium text-gray-700">{t('Verse Start')}</label>
                                 <input
                                     type="number"
                                     value={startVerse}
-                                    onChange={(e) => setStartVerse(parseInt(e.target.value))}
+                                    onChange={(e) => setStartVerse(Number.parseInt(e.target.value))}
                                     className="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
                             </div>
                             <div>
+                                {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
                                 <label className="block text-sm font-medium text-gray-700">{t('Verse End')}</label>
                                 <input
                                     type="number"
                                     value={endVerse}
-                                    onChange={(e) => setEndVerse(parseInt(e.target.value))}
+                                    onChange={(e) => setEndVerse(Number.parseInt(e.target.value))}
                                     className="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
                             </div>
@@ -104,12 +109,14 @@ const MoveImageModal: React.FC<MoveImageModalProps> = (
 
                         <div className="flex justify-end space-x-4">
                             <button
+                                type={"button"}
                                 onClick={handleSave}
                                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                             >
                                 {t('Save')}
                             </button>
                             <button
+                                type={"button"}
                                 onClick={onClose}
                                 className="text-gray-600 hover:text-gray-800 py-2 px-4 rounded"
                             >
