@@ -1,4 +1,4 @@
-import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import {getTranscription, sendUpdatedTranscription} from "@src/services/TranscriptionApi.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
@@ -9,7 +9,7 @@ const imageRepo = IndexedDBImageRepository.getInstance()
 
 export const addImage = (
     store: TranscriptionStore,
-    image: ImageData,
+    image: TranscribableDocument,
     onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
 ) => {
     if (store.language == null) {
@@ -24,7 +24,7 @@ export const addImage = (
     const systemPrompt = store.systemPrompt;
     const prompt = store.prompt;
 
-    const imageWithCurrentMetadata: ImageData = {
+    const imageWithCurrentMetadata: TranscribableDocument = {
         ...image,
         id: self.crypto.randomUUID(),
         languageCode: language.code,
@@ -64,7 +64,7 @@ export const addImage = (
                 transcription: transcription.transcription,
                 loading: false,
             }
-            store.setImages((prev: any) => (prev.map((image: ImageData) => {
+            store.setImages((prev: any) => (prev.map((image: TranscribableDocument) => {
                 if (image.id === imageWithCurrentMetadata.id) {
                     return newImage;
                 }
@@ -81,7 +81,7 @@ export const addImage = (
 
 export const updateImage = async (
     store: TranscriptionStore,
-    updatedImage: ImageData,
+    updatedImage: TranscribableDocument,
     reloadOnSuccess = true
 ) => {
     console.log(`Updating image: ${updatedImage.id}.`);
@@ -110,7 +110,7 @@ export const updateImage = async (
         const selectedImageMoved = updatedImage.languageCode !== store.language?.code || updatedImage.bookCode !== store.bookCode || updatedImage.chapter !== store.chapter;
         console.log(`selectedImageMoved: ${selectedImageMoved}`);
 
-        function updatedImagesList(prevImages: ImageData[]) {
+        function updatedImagesList(prevImages: TranscribableDocument[]) {
             const updated = prevImages.map((image) =>
                 image.id === updatedImage.id
                     ? updatedImage
@@ -120,7 +120,7 @@ export const updateImage = async (
                     return image.languageCode === store.language?.code && image.bookCode === store.bookCode && image.chapter === store.chapter;
                 }
             )
-            console.log(updated.map((lang: ImageData) => {
+            console.log(updated.map((lang: TranscribableDocument) => {
                 lang.languageCode
             }))
             return updated;
@@ -144,14 +144,14 @@ export const updateImage = async (
 
 export const updateTranscription = (
     store: TranscriptionStore,
-    imageToUpdate: ImageData
+    imageToUpdate: TranscribableDocument
 ) => {
     updateImage(store, imageToUpdate, false);
 };
 
 export async function resubmitImageForTranscription(
     store: TranscriptionStore,
-    imageToUpdate: ImageData,
+    imageToUpdate: TranscribableDocument,
     onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
 ): Promise<void> {
     updateImage(store, {...imageToUpdate, transcription: null, loading: true});

@@ -1,5 +1,4 @@
-import React from "react";
-import {ToastContentProps} from "react-toastify";
+import type {ToastContentProps} from "react-toastify";
 
 export const UploadFileErrorToast = ({data}: ToastContentProps<string>) => {
     return (

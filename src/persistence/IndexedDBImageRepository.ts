@@ -1,4 +1,4 @@
-import {ImageData} from "@src/data/ImageData.tsx";
+import {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 
 class IndexedDBImageRepository {
     private static instance: IndexedDBImageRepository = new IndexedDBImageRepository();
@@ -35,7 +35,7 @@ class IndexedDBImageRepository {
         return [...this.recentLanguages];
     }
 
-    async storeImage(imageId: string, imageData: ImageData): Promise<string> {
+    async storeImage(imageId: string, imageData: TranscribableDocument): Promise<string> {
         const db = await this.dbPromise;
         const transaction = db.transaction(this.objectStoreName, "readwrite");
         const store = transaction.objectStore(this.objectStoreName);
@@ -56,7 +56,7 @@ class IndexedDBImageRepository {
         });
     }
 
-    async retrieveImage(imageId: string): Promise<ImageData | null> {
+    async retrieveImage(imageId: string): Promise<TranscribableDocument | null> {
         console.log(`Retrieving ${imageId}`);
         const db = await this.dbPromise;
         const transaction = db.transaction(this.objectStoreName, "readonly");
@@ -67,7 +67,7 @@ class IndexedDBImageRepository {
 
 
             request.onsuccess = () => {
-                resolve(request.result as ImageData | null);
+                resolve(request.result as TranscribableDocument | null);
             };
 
             request.onerror = () => {
@@ -76,7 +76,7 @@ class IndexedDBImageRepository {
         });
     }
 
-    async retrieveAllImages(): Promise<ImageData[] | null> {
+    async retrieveAllImages(): Promise<TranscribableDocument[] | null> {
         const db = await this.dbPromise;
         const transaction = db.transaction(this.objectStoreName, "readonly");
         const store = transaction.objectStore(this.objectStoreName);
@@ -87,13 +87,13 @@ class IndexedDBImageRepository {
 
             request.onsuccess = () => {
                 if (request.result != null) {
-                    (request.result.map((imageData: ImageData) => imageData.languageCode)).forEach(
+                    (request.result.map((imageData: TranscribableDocument) => imageData.languageCode)).forEach(
                         (languageCode) => {
                             this.recentLanguages.add(languageCode);
                         }
                     )
                 }
-                resolve(request.result as ImageData[] | null);
+                resolve(request.result as TranscribableDocument[] | null);
             };
 
             request.onerror = () => {
@@ -102,7 +102,7 @@ class IndexedDBImageRepository {
         });
     }
 
-    async getImages(languageCode: string, bookCode: string, chapter: number): Promise<ImageData[]> {
+    async getImages(languageCode: string, bookCode: string, chapter: number): Promise<TranscribableDocument[]> {
         const images = await this.retrieveAllImages();
         return images?.filter((item) => {
             return item.languageCode === languageCode &&

@@ -41,6 +41,7 @@ const NavBar: React.FC = () => {
 					languageOptions={languages}
 					recentLanguages={recentLanguages}
 					onSelect={setLanguage}
+					// @ts-ignore
 					selectedLanguage={language}
 				/>
 				<div className="mx-2" />

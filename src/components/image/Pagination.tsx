@@ -1,9 +1,9 @@
 import ZoomableImage from "./ZoomableImage.tsx";
-import {ImageData} from "@src/data/ImageData.tsx";
+import {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import RetryTranscription from "@src/pages/transcription/RetryTranscription.tsx";
 
 interface PaginationProps {
-	image: ImageData | null;
+	image: TranscribableDocument | null;
 	onRetryTranscription: () => void;
 }
 

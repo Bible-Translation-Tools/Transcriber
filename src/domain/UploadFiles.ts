@@ -1,6 +1,7 @@
+// @ts-ignore
 import {pdf2image} from "@pardnchiu/pdf2image";
-import {ImageData} from "@src/data/ImageData.tsx";
-import {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
+import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 
 export default function uploadFiles(
@@ -8,7 +9,7 @@ export default function uploadFiles(
     files: File[],
     addImage: (
         store: TranscriptionStore,
-        image: ImageData,
+        image: TranscribableDocument,
         onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
     ) => void,
     onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
@@ -33,7 +34,8 @@ export default function uploadFiles(
             reader.onloadend = () => {
                 const base64String = reader.result;
                 const url = URL.createObjectURL(file);
-                const image: ImageData = {
+                // @ts-ignore
+                const image: TranscribableDocument = {
                     url: url,
                     filename: file.name,
                     created: Date.now() + (index + 100),
@@ -70,7 +72,8 @@ export default function uploadFiles(
                             const baseName = parts.slice(0, -1).join('.');
                             const extension = parts.length > 1 ? `.${parts.pop()}` : '';
 
-                            const image: ImageData = {
+                            // @ts-ignore
+                            const image: TranscribableDocument = {
                                 url:url,
                                 filename: `${baseName}-${pageNumber}${extension}`,
                                 created: createdTime +  (index + 100), // pad out a little for the number of pages so they sort correctly

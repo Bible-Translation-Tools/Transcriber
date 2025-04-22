@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 import {DetaultTranscriptionPrompt, TranscriptionModel} from "@api/domain/TranscriptionRequest";
-import type {ImageData} from "@src/data/ImageData.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import {TranscriptionState} from "@src/persistence/store/TranscriptionState.ts";
 import {TranscriptionActions} from "@src/persistence/store/TranscriptionActions.ts";
 import {transcriptionStateStorage} from "@src/persistence/store/PersistTranscriptionState.tsx";
@@ -45,7 +45,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
                     }
                 });
             },
-            setSelectedImage: (image: ImageData | null) => set(() => ({selectedImage: image})),
+            setSelectedImage: (image: TranscribableDocument | null) => set(() => ({selectedImage: image})),
             setModel: (model: TranscriptionModel) => set(() => ({model})),
             setSystemPrompt: (prompt: string) => set(() => ({systemPrompt: prompt})),
             setPrompt: (prompt: string) => set(() => ({prompt})),
@@ -68,7 +68,7 @@ async function updateProject(
     language: LanguageOption | null,
     bookCode: string,
     chapter: number,
-    selectedImage: ImageData | null
+    selectedImage: TranscribableDocument | null
 ) {
     set(
         {
@@ -80,7 +80,7 @@ async function updateProject(
     if (language != null) {
         const images = await imageRepo.getImages(language.code, bookCode, chapter);
         const recentLanguages = imageRepo.getRecentLanguages();
-        const selected: ImageData | undefined = (selectedImage != null && images.includes(selectedImage)) ? selectedImage : images[0]
+        const selected: TranscribableDocument | undefined = (selectedImage != null && images.includes(selectedImage)) ? selectedImage : images[0]
         set(
             {
                 recentLanguages: recentLanguages,

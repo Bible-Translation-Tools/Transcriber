@@ -1,6 +1,6 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
-import {LanguageOption} from "@src/data/LanguageOption.tsx";
+import type {LanguageOption} from "@src/data/LanguageOption.tsx";
 import {Dropdown} from "@components/navigation/Dropdown.tsx";
 
 interface LanguageDropdownProps {

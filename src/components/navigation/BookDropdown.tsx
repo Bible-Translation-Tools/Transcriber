@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
 interface BookDropdownProps {
-	onSelect: (book: string, chapter?: number) => void;
+	onSelect: (book: string, chapter: number) => void;
 	selectedBook: string;
 	selectedChapter?: number | null;
 }

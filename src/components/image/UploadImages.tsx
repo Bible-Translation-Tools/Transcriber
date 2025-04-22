@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 // @ts-ignore
 import { pdf2image } from "@pardnchiu/pdf2image";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import uploadFiles from "@src/domain/UploadFiles.ts";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
@@ -13,8 +13,6 @@ import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
 function UploadImages() {
 	const { t } = useTranslation();
 	const store = useTranscriptionStore();
-
-    const [errorMessage, setErrorMessage] = useState("");
 
     // todo: investigate the error thrown by biome here on more deps than necessary: addImage
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -43,7 +41,7 @@ function UploadImages() {
         }
     };
 
-    const handleUploadFileError = (err: TranscriptionErrorCode, errorMessage: string): void => {
+    const handleUploadFileError = (_: TranscriptionErrorCode, errorMessage: string): void => {
         toast.error(UploadFileErrorToast, {data: errorMessage})
     }
 
@@ -116,7 +114,6 @@ function UploadImages() {
                     </div>
                 </>
             )}
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </div>
     );
 }
