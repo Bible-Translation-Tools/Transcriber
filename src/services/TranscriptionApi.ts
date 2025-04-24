@@ -1,7 +1,7 @@
 import type {
 	TranscriptionSuccess
 } from "@api/ai/TranscriptionResponse.ts";
-import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
+import type {TranscriptionRequest, UpdateTranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
 import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@src/api";
 
 export async function getTranscription(
@@ -33,28 +33,14 @@ export async function getTranscription(
 }
 
 export async function sendUpdatedTranscription(
-	imageId: string,
-	transcription: string,
-	language?: string,
-	book?: string,
-	chapter?: number,
-	startVerse?: number,
-	endVerse?: number,
+	document: UpdateTranscriptionRequest
 ): Promise<void> {
 	const response = await fetch(`${apiV1}${updateTranscriptionRoute}`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({
-			imageId,
-			transcription,
-			language,
-			book,
-			chapter,
-			startVerse,
-			endVerse,
-		}),
+		body: JSON.stringify(document),
 	});
 
 	console.log(response);

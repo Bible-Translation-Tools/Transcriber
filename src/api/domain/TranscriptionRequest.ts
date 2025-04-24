@@ -1,3 +1,5 @@
+import * as v from "valibot";
+
 export type TranscriptionRequest = {
 	model: TranscriptionModel;
 	image: string;
@@ -12,6 +14,11 @@ export type TranscriptionRequest = {
 export type UpdateTranscriptionRequest = {
 	imageId: string;
 	transcription: string;
+	languageCode?: string;
+	bookCode?: string;
+	chapter?: number;
+	startVerse?: number;
+	endVerse?: number;
 };
 
 export enum TranscriptionModel {

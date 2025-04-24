@@ -1,8 +1,7 @@
 import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
-import {getTranscription, sendUpdatedTranscription} from "@src/services/TranscriptionApi.ts";
 import type IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
+import type {TranscriptionRequest, UpdateTranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
 import {type TranscriptionError, TranscriptionErrorCode, type TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
 import {toast} from "react-toastify";
 
@@ -11,14 +10,14 @@ export const prepareImageForUpload = async (
     imageRepo: IndexedDBImageRepository,
     image: Partial<TranscribableDocument>
 ): Promise<[TranscribableDocument, TranscriptionRequest]> => {
-    const updatedImage = await addImageToStore(store, imageRepo, image);
+    const updatedImage = await addMetadataFromLocation(store, image);
+    await addImageToStore(store, imageRepo, updatedImage);
     const request = await constructTranscriptionRequest(store, updatedImage);
     return [updatedImage, request];
 }
 
-const addImageToStore = async (
+const addMetadataFromLocation= async (
     store: TranscriptionStore,
-    imageRepo: IndexedDBImageRepository,
     image: Partial<TranscribableDocument>
 ): Promise<TranscribableDocument> => {
     if (store.language == null) {
@@ -38,8 +37,16 @@ const addImageToStore = async (
         chapter: chapter,
     };
 
-    console.log(`Adding image: ${imageWithCurrentMetadata.id}.`);
-    store.setSelectedImage(imageWithCurrentMetadata);
+    return imageWithCurrentMetadata
+}
+
+export const addImageToStore = async (
+    store: TranscriptionStore,
+    imageRepo: IndexedDBImageRepository,
+    image: TranscribableDocument
+): Promise<void> => {
+    console.log(`Adding image: ${image.id}.`);
+    store.setSelectedImage(image);
 
     console.log(`Images in store: ${store.images.length}`)
 
@@ -47,15 +54,14 @@ const addImageToStore = async (
         console.log(`Updating: images in previous store: ${prev.length}`)
         return [
             ...prev,
-            imageWithCurrentMetadata,
+            image,
         ]
     });
 
-    await imageRepo.storeImage(imageWithCurrentMetadata.id, imageWithCurrentMetadata)
-    return imageWithCurrentMetadata;
+    await imageRepo.storeImage(image.id, image)
 }
 
-const constructTranscriptionRequest = async (
+export const constructTranscriptionRequest = async (
     store: TranscriptionStore,
     image: TranscribableDocument
 ): Promise<TranscriptionRequest> => {
@@ -98,33 +104,36 @@ export const finalizeSuccessfulTranscription = async (
     await imageRepo.storeImage(newImage.id, newImage)
 }
 
+export const constructTranscriptionUpdateRequest = async (
+    image: TranscribableDocument
+): Promise<UpdateTranscriptionRequest> => {
+    return {
+        ...image,
+        imageId: image.id,
+        transcription: image.transcription ?? ""
+    }
+}
 
 export const updateImage = async (
     store: TranscriptionStore,
     imageRepo: IndexedDBImageRepository,
     updatedImage: TranscribableDocument,
-    reloadOnSuccess = true
 ) => {
     console.log(`Updating image: ${updatedImage.id}.`);
     await imageRepo.storeImage(updatedImage.id, updatedImage)
-
-    if (updatedImage?.transcription) {
-        await sendUpdatedTranscription(
-            updatedImage.id,
-            updatedImage.transcription,
-            updatedImage.languageCode,
-            updatedImage.bookCode,
-            updatedImage.chapter,
-            updatedImage?.startVerse,
-            updatedImage?.endVerse,
-        );
-    }
 
     for (let i = 0; i < store.images.length; i++) {
         if (store.images[i].id === updatedImage.id) {
             store.images[i].transcription = updatedImage.transcription;
         }
     }
+}
+
+export const finalizeSuccessfulTranscriptionUpdate = async (
+    store: TranscriptionStore,
+    updatedImage: TranscribableDocument,
+    reloadOnSuccess: boolean
+) => {
 
     if (reloadOnSuccess) {
         console.log(`Reloading on successful transcription: ${updatedImage.id}.`);
@@ -162,40 +171,6 @@ export const updateImage = async (
         }
     }
 };
-
-export const updateTranscription = (
-    store: TranscriptionStore,
-    imageRepo: IndexedDBImageRepository,
-    imageToUpdate: TranscribableDocument
-) => {
-    updateImage(store, imageRepo, imageToUpdate, false);
-};
-
-export async function resubmitImageForTranscription(
-    store: TranscriptionStore,
-    imageRepo: IndexedDBImageRepository,
-    imageToUpdate: TranscribableDocument,
-): Promise<void> {
-    await updateImage(store, imageRepo, {...imageToUpdate, transcription: null, loading: true});
-
-    const request: TranscriptionRequest = {
-        model: store.model,
-        image: imageToUpdate.data,
-        imageId: imageToUpdate.id,
-        languageCode: imageToUpdate.languageCode,
-        bookCode: imageToUpdate.bookCode,
-        chapter: imageToUpdate.chapter,
-        systemPrompt: store.systemPrompt,
-        prompt: store.prompt,
-    };
-    const transcription = await getTranscription(request);
-    if (transcription.success) {
-        imageToUpdate.transcription = transcription.transcription;
-        await updateImage(store, imageRepo, imageToUpdate, true);
-    } else {
-        throw transcription
-    }
-}
 
 export const handleTranscriptionError = (error: TranscriptionError) => {
     switch (error.errorCode) {

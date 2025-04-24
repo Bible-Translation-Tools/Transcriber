@@ -5,8 +5,7 @@ import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import {toast, type ToastContentProps} from 'react-toastify';
-import {resubmitImageForTranscription,} from "@src/domain/ImageActions.ts";
-import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
+import {useRetranscribe} from "@src/hooks/useRetranscribe.ts";
 
 const Settings: React.FC = () => {
     const {t, i18n} = useTranslation();
@@ -20,6 +19,7 @@ const Settings: React.FC = () => {
         model,
         setModel,
     } = store;
+    const retranscribe = useRetranscribe();
 
     const [language, setLanguage] = useState(i18n.language || 'en'); // Default to 'en' if no language is set
     const [theme, setTheme] = useState("light");
@@ -69,9 +69,7 @@ const Settings: React.FC = () => {
             closeToast();
             const selectedImage = store.selectedImage;
             if (selectedImage != null) {
-                resubmitImageForTranscription(store, selectedImage, (_, errorMessage: string) => {
-                    toast.error(UploadFileErrorToast, {data: errorMessage})
-                });
+                retranscribe(selectedImage);
             }
         };
 

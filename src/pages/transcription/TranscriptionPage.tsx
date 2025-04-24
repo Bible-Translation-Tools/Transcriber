@@ -8,19 +8,20 @@ import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import {useUploadImage} from "@src/hooks/useUploadImage.ts";
 import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {resubmitImageForTranscription, updateImage, updateTranscription} from "@src/domain/ImageActions.ts";
-import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
-import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
 import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
 import {ShowWhen} from "@components/utils/ShowWhen.tsx";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
-import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
+import {useRetranscribe} from "@src/hooks/useRetranscribe.ts";
+import {useUpdateImage} from "@src/hooks/useUpdateImage.ts";
 
 function TranscriptionPage() {
     const store = useTranscriptionStore();
 
     const uploadImage = useUploadImage();
+    const updateImage = useUpdateImage();
+    const retranscribe = useRetranscribe();
+
     const {images, selectedImage, setSelectedImage} = store;
 
     useMemo(() => {
@@ -58,7 +59,6 @@ function TranscriptionPage() {
         }
         console.log('Saved:', language, book, chapter, startVerse, endVerse);
         await updateImage(
-            store,
             {
                 ...image,
                 languageCode: language,
@@ -67,7 +67,6 @@ function TranscriptionPage() {
                 startVerse: startVerse,
                 endVerse: endVerse
             },
-            true
         );
         store.refreshProject();
         setMoveImageModalImage(null);
@@ -83,22 +82,19 @@ function TranscriptionPage() {
 
     const handleFiles = (files: File[]) => {
         uploadImage(files)
-        // uploadFiles(store, files, addImage, handleTranscriptionError);
     };
 
     const handleResubmitImage = () => {
         if (selectedImage != null) {
             toast.success(ImageSubmittedToast, {data: "Submitted Image for Transcription."});
-            resubmitImageForTranscription(store, IndexedDBImageRepository.getInstance(), selectedImage);
+            retranscribe(selectedImage);
         }
     };
 
     // change to explicitly be a useCallback?
     const handleTextChange = (newText: string) => {
         if (selectedImage != null) {
-            updateTranscription(
-                store,
-                IndexedDBImageRepository.getInstance(),
+            updateImage(
                 {
                     ...selectedImage,
                     transcription: newText,
@@ -115,16 +111,12 @@ function TranscriptionPage() {
         }
     };
 
-    const handleTranscriptionError = (_: TranscriptionErrorCode, errorMessage: string): void => {
-        toast.error(UploadFileErrorToast, {data: errorMessage})
-    }
-
     const handleVerseRangeChange = (start: number, end: number) => {
         const validVerseRange = validateVerseRange(start, end);
         if (validVerseRange && selectedImage) {
             selectedImage.startVerse = start;
             selectedImage.endVerse = end;
-            updateTranscription(store, IndexedDBImageRepository.getInstance(), selectedImage);
+            updateImage(selectedImage);
         }
     }
 
