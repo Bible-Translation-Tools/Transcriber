@@ -7,7 +7,7 @@ import {
     addImageToStore,
     constructTranscriptionRequest,
     finalizeSuccessfulTranscription,
-    handleTranscriptionError
+    handleTranscriptionError, updateImage
 } from "@src/domain/ImageActions.ts";
 import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
 import type {TranscriptionError, TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
@@ -38,7 +38,7 @@ export function useRetranscribe() {
     })
 
     async function retranscribeDocument(document: TranscribableDocument): Promise<void> {
-        await addImageToStore(store, imageRepo, document);
+        await updateImage(store, imageRepo, document);
         const request = await constructTranscriptionRequest(store, document);
         transcribe.mutate({image: document, request: request});
     }
