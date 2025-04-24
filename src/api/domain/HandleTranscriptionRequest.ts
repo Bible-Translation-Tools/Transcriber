@@ -34,6 +34,7 @@ export async function HandleTranscriptionRequest(
 			if (!apiKey) {
 				return Response.json({
 					success: false,
+					imageId: body.imageId,
 					error: "Error, could not get api key from environment for Pixtral",
 					errorCode: TranscriptionErrorCode.AuthenticationError,
 				});
@@ -44,7 +45,7 @@ export async function HandleTranscriptionRequest(
 				body.systemPrompt,
 				body.prompt,
 			);
-			transcriptionResponse = await model.transcribe(body.image);
+			transcriptionResponse = await model.transcribe(body.imageId, body.image);
 			break;
 		}
 		case TranscriptionModel.PIXTRAL: {
@@ -52,6 +53,7 @@ export async function HandleTranscriptionRequest(
 			if (!apiKey) {
 				return Response.json({
 					success: false,
+					imageId: body.imageId,
 					error: "Error, could not get api key from environment for Pixtral",
 					errorCode: TranscriptionErrorCode.AuthenticationError,
 				});
@@ -62,7 +64,7 @@ export async function HandleTranscriptionRequest(
 				body.systemPrompt,
 				body.prompt,
 			);
-			transcriptionResponse = await model.transcribe(body.image);
+			transcriptionResponse = await model.transcribe(body.imageId, body.image);
 			break;
 		}
 		default: {

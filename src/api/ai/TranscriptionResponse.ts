@@ -10,11 +10,13 @@ enum TranscriptionErrorCode {
 
 interface TranscriptionSuccess {
 	success: true;
+	imageId: string;
 	transcription: string;
 }
 
 interface TranscriptionError {
 	success: false;
+	imageId: string;
 	error: string;
 	errorCode: TranscriptionErrorCode;
 }

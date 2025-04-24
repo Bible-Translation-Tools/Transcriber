@@ -8,7 +8,6 @@ import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.t
 
 const NavBar: React.FC = () => {
 	const { t } = useTranslation();
-
 	const {
 		language,
 		setLanguage,
@@ -18,8 +17,6 @@ const NavBar: React.FC = () => {
 		chapter,
 		setChapter,
 	} = useTranscriptionStore();
-
-	console.log("Nav bar language", language);
 
 	const { languages } = useLanguageContext();
 	const navigate = useNavigate();

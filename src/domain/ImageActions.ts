@@ -1,28 +1,34 @@
 import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import {getTranscription, sendUpdatedTranscription} from "@src/services/TranscriptionApi.ts";
-import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
+import type IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
-import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
+import {type TranscriptionError, TranscriptionErrorCode, type TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
+import {toast} from "react-toastify";
 
-const imageRepo = IndexedDBImageRepository.getInstance()
-
-export const addImage = (
+export const prepareImageForUpload = async (
     store: TranscriptionStore,
-    image: TranscribableDocument,
-    onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
-) => {
+    imageRepo: IndexedDBImageRepository,
+    image: Partial<TranscribableDocument>
+): Promise<[TranscribableDocument, TranscriptionRequest]> => {
+    const updatedImage = await addImageToStore(store, imageRepo, image);
+    const request = await constructTranscriptionRequest(store, updatedImage);
+    return [updatedImage, request];
+}
+
+const addImageToStore = async (
+    store: TranscriptionStore,
+    imageRepo: IndexedDBImageRepository,
+    image: Partial<TranscribableDocument>
+): Promise<TranscribableDocument> => {
     if (store.language == null) {
         console.error("Language is null, cannot add image!");
-        return;
+        throw new Error("Language is null, cannot add image!");
     }
 
     const language = store.language;
     const bookCode = store.bookCode;
     const chapter = store.chapter;
-    const model = store.model;
-    const systemPrompt = store.systemPrompt;
-    const prompt = store.prompt;
 
     const imageWithCurrentMetadata: TranscribableDocument = {
         ...image,
@@ -45,42 +51,57 @@ export const addImage = (
         ]
     });
 
-    (async () => {
-        await imageRepo.storeImage(imageWithCurrentMetadata.id, imageWithCurrentMetadata)
+    await imageRepo.storeImage(imageWithCurrentMetadata.id, imageWithCurrentMetadata)
+    return imageWithCurrentMetadata;
+}
 
-        const transcription = await getTranscription({
-            image: imageWithCurrentMetadata.data,
-            imageId: imageWithCurrentMetadata.id,
-            bookCode: imageWithCurrentMetadata.bookCode,
-            languageCode: imageWithCurrentMetadata.languageCode,
-            chapter: imageWithCurrentMetadata.chapter,
-            model: model,
-            systemPrompt: systemPrompt,
-            prompt: prompt,
-        });
-        if (transcription.success) {
-            const newImage = {
-                ...imageWithCurrentMetadata,
-                transcription: transcription.transcription,
-                loading: false,
-            }
-            store.setImages((prev: any) => (prev.map((image: TranscribableDocument) => {
-                if (image.id === imageWithCurrentMetadata.id) {
-                    return newImage;
-                }
-                return image;
-            })));
+const constructTranscriptionRequest = async (
+    store: TranscriptionStore,
+    image: TranscribableDocument
+): Promise<TranscriptionRequest> => {
+    const model = store.model;
+    const systemPrompt = store.systemPrompt;
+    const prompt = store.prompt;
 
-            store.setSelectedImage(newImage);
-            updateTranscription(store, newImage);
-        } else {
-            onError(transcription.errorCode, transcription.error)
+    return {
+        image: image.data,
+        imageId: image.id,
+        bookCode: image.bookCode,
+        languageCode: image.languageCode,
+        chapter: image.chapter,
+        model: model,
+        systemPrompt: systemPrompt,
+        prompt: prompt,
+    }
+}
+
+export const finalizeSuccessfulTranscription = async (
+    store: TranscriptionStore,
+    imageRepo: IndexedDBImageRepository,
+    image: TranscribableDocument,
+    transcription: TranscriptionSuccess
+): Promise<void> => {
+    console.log("Finalizing transcription for image: ", image.id);
+    const newImage: TranscribableDocument = {
+        ...image,
+        transcription: transcription.transcription,
+        loading: false,
+    }
+    store.setImages((prev: any) => (prev.map((prevImage: TranscribableDocument) => {
+        if (newImage.id === prevImage.id) {
+            return newImage;
         }
-    })();
-};
+        return prevImage;
+    })));
+
+    store.setSelectedImage(newImage);
+    await imageRepo.storeImage(newImage.id, newImage)
+}
+
 
 export const updateImage = async (
     store: TranscriptionStore,
+    imageRepo: IndexedDBImageRepository,
     updatedImage: TranscribableDocument,
     reloadOnSuccess = true
 ) => {
@@ -144,17 +165,18 @@ export const updateImage = async (
 
 export const updateTranscription = (
     store: TranscriptionStore,
+    imageRepo: IndexedDBImageRepository,
     imageToUpdate: TranscribableDocument
 ) => {
-    updateImage(store, imageToUpdate, false);
+    updateImage(store, imageRepo, imageToUpdate, false);
 };
 
 export async function resubmitImageForTranscription(
     store: TranscriptionStore,
+    imageRepo: IndexedDBImageRepository,
     imageToUpdate: TranscribableDocument,
-    onError: (err: TranscriptionErrorCode, errorMessage: string) => void,
 ): Promise<void> {
-    updateImage(store, {...imageToUpdate, transcription: null, loading: true});
+    await updateImage(store, imageRepo, {...imageToUpdate, transcription: null, loading: true});
 
     const request: TranscriptionRequest = {
         model: store.model,
@@ -169,8 +191,25 @@ export async function resubmitImageForTranscription(
     const transcription = await getTranscription(request);
     if (transcription.success) {
         imageToUpdate.transcription = transcription.transcription;
-        updateImage(store, imageToUpdate, true);
+        await updateImage(store, imageRepo, imageToUpdate, true);
     } else {
-        onError(transcription.errorCode, transcription.error)
+        throw transcription
+    }
+}
+
+export const handleTranscriptionError = (error: TranscriptionError) => {
+    switch (error.errorCode) {
+        case TranscriptionErrorCode.AuthenticationError:
+            toast.error("Error: Authentication error");
+            break;
+        case TranscriptionErrorCode.NoUserFound:
+            toast.error("Error: User not found");
+            break;
+        case TranscriptionErrorCode.RateLimitExceeded:
+            toast.error("Error: RateLimit exceeded");
+            break;
+        default:
+            toast.error("Error occurred while uploading image.");
+            break;
     }
 }

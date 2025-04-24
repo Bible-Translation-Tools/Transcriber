@@ -19,19 +19,21 @@ export default class OpenAIModel implements Model {
 		this.prompt = prompt;
 	}
 
-	async transcribe(base64Image: any): Promise<TranscriptionResponse> {
+	async transcribe(imageId: string, base64Image: any): Promise<TranscriptionResponse> {
 		return this.transcribeImpl(
 			new OpenAI({
 				apiKey: this.key,
 				baseURL: this.baseUrl,
 				dangerouslyAllowBrowser: true,
 			}),
+			imageId,
 			base64Image,
 		);
 	}
 
 	async transcribeImpl(
 		client: OpenAI,
+		imageId: string,
 		base64Image: any,
 	): Promise<TranscriptionResponse> {
 		const response = await client.chat.completions.create({
@@ -59,6 +61,7 @@ export default class OpenAIModel implements Model {
 		});
 		return {
 			success: true,
+			imageId: imageId,
 			transcription: response.choices[0].message?.content ?? "",
 		};
 	}

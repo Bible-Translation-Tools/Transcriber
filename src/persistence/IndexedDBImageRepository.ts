@@ -1,4 +1,4 @@
-import {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 
 class IndexedDBImageRepository {
     private static instance: IndexedDBImageRepository = new IndexedDBImageRepository();

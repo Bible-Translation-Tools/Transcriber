@@ -5,19 +5,22 @@ import {pdf2image} from "@pardnchiu/pdf2image";
 import {useMemo, useState} from "react";
 import NavBar from "@components/navigation/NavBar.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
-import uploadFiles from "@src/domain/UploadFiles.ts";
+import {useUploadImage} from "@src/hooks/useUploadImage.ts";
 import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {addImage, resubmitImageForTranscription, updateImage, updateTranscription} from "@src/domain/ImageActions.ts";
+import {resubmitImageForTranscription, updateImage, updateTranscription} from "@src/domain/ImageActions.ts";
 import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
 import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
 import {ShowWhen} from "@components/utils/ShowWhen.tsx";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
+import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 
 function TranscriptionPage() {
     const store = useTranscriptionStore();
+
+    const uploadImage = useUploadImage();
     const {images, selectedImage, setSelectedImage} = store;
 
     useMemo(() => {
@@ -79,13 +82,14 @@ function TranscriptionPage() {
     };
 
     const handleFiles = (files: File[]) => {
-        uploadFiles(store, files, addImage, handleTranscriptionError);
+        uploadImage(files)
+        // uploadFiles(store, files, addImage, handleTranscriptionError);
     };
 
     const handleResubmitImage = () => {
         if (selectedImage != null) {
             toast.success(ImageSubmittedToast, {data: "Submitted Image for Transcription."});
-            resubmitImageForTranscription(store, selectedImage, handleTranscriptionError);
+            resubmitImageForTranscription(store, IndexedDBImageRepository.getInstance(), selectedImage);
         }
     };
 
@@ -94,6 +98,7 @@ function TranscriptionPage() {
         if (selectedImage != null) {
             updateTranscription(
                 store,
+                IndexedDBImageRepository.getInstance(),
                 {
                     ...selectedImage,
                     transcription: newText,
@@ -119,7 +124,7 @@ function TranscriptionPage() {
         if (validVerseRange && selectedImage) {
             selectedImage.startVerse = start;
             selectedImage.endVerse = end;
-            updateTranscription(store, selectedImage);
+            updateTranscription(store, IndexedDBImageRepository.getInstance(), selectedImage);
         }
     }
 

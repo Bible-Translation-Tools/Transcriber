@@ -3,16 +3,14 @@ import { useTranslation } from "react-i18next";
 import { pdf2image } from "@pardnchiu/pdf2image";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import uploadFiles from "@src/domain/UploadFiles.ts";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {addImage} from "@src/domain/ImageActions.ts";
+import {useUploadImage} from "@src/hooks/useUploadImage.ts";
 import type {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
 import {toast} from "react-toastify";
 import {UploadFileErrorToast} from "@src/toasts/UploadFileErrorToast.tsx";
 
 function UploadImages() {
 	const { t } = useTranslation();
-	const store = useTranscriptionStore();
+    const uploadImages = useUploadImage();
 
     // todo: investigate the error thrown by biome here on more deps than necessary: addImage
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -20,7 +18,7 @@ function UploadImages() {
         (acceptedFiles: File[]) => {
             handleFiles(acceptedFiles);
         },
-        [addImage],
+        [uploadImages],
     );
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({
@@ -46,7 +44,8 @@ function UploadImages() {
     }
 
     const handleFiles = (files: File[]) => {
-        uploadFiles(store, files, addImage, handleUploadFileError);
+       // uploadFiles(store, files, addImage, handleUploadFileError);
+        uploadImages(files);
     };
 
     return (
