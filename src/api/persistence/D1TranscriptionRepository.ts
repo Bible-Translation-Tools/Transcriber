@@ -4,8 +4,13 @@ import type {
 	Transcription,
 	TranscriptionImage,
 } from "@api/data/TranscriptionImage.ts";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+
+export type UserImageRecord = {
+	[imgIg: string]: TranscribableDocument;
+};
 
 export class D1TranscriptionRepository {
 	private db: ReturnType<typeof drizzle>;
@@ -59,7 +64,10 @@ export class D1TranscriptionRepository {
 			.values({
 				id: image.id,
 				userId: userId,
-				userDeleted: image.user_deleted ? 1 : 0,
+				userDeleted: image.user_deleted,
+				// TODO: SEND FILE NAME FROM FRONT END
+				filename: image.filename,
+				created: Date.now(),
 				filePath,
 				languageCode: image.language_code,
 				bookCode: image.book_code,
@@ -70,7 +78,7 @@ export class D1TranscriptionRepository {
 			.onConflictDoUpdate({
 				target: schema.transcriptionImages.id,
 				set: {
-					userDeleted: image.user_deleted ? 1 : 0,
+					userDeleted: image.user_deleted,
 					languageCode: image.language_code,
 					bookCode: image.book_code,
 					chapter: image.chapter,
@@ -96,7 +104,7 @@ export class D1TranscriptionRepository {
 				.where(
 					and(
 						eq(schema.transcriptions.imageId, imageId),
-						eq(schema.transcriptions.humanModified, 1),
+						eq(schema.transcriptions.humanModified, true),
 					),
 				);
 
@@ -118,7 +126,7 @@ export class D1TranscriptionRepository {
 				// Insert a new human-modified transcription
 				await this.db.insert(schema.transcriptions).values({
 					imageId: imageId,
-					humanModified: 1,
+					humanModified: true,
 					model: transcription.model,
 					prompt: transcription.prompt,
 					systemPrompt: transcription.system_prompt,
@@ -130,7 +138,7 @@ export class D1TranscriptionRepository {
 			// Insert a new transcription if not human modified.
 			await this.db.insert(schema.transcriptions).values({
 				imageId: imageId,
-				humanModified: 0,
+				humanModified: false,
 				model: transcription.model,
 				prompt: transcription.prompt,
 				systemPrompt: transcription.system_prompt,
@@ -151,7 +159,7 @@ export class D1TranscriptionRepository {
 			.where(
 				and(
 					eq(schema.transcriptions.imageId, imageId),
-					eq(schema.transcriptions.humanModified, 1),
+					eq(schema.transcriptions.humanModified, true),
 				),
 			);
 
@@ -174,7 +182,7 @@ export class D1TranscriptionRepository {
 				.where(
 					and(
 						eq(schema.transcriptions.imageId, imageId),
-						eq(schema.transcriptions.humanModified, 0),
+						eq(schema.transcriptions.humanModified, false),
 					),
 				)
 				.orderBy(desc(schema.transcriptions.date))
@@ -184,7 +192,7 @@ export class D1TranscriptionRepository {
 				// Create a human-modified copy
 				await this.db.insert(schema.transcriptions).values({
 					imageId: imageId,
-					humanModified: 1,
+					humanModified: true,
 					model: recentNonModified[0].model,
 					prompt: recentNonModified[0].prompt,
 					systemPrompt: recentNonModified[0].systemPrompt,
@@ -197,5 +205,110 @@ export class D1TranscriptionRepository {
 				);
 			}
 		}
+	}
+	async getAllImagesForUser({
+		userId,
+		indexedDbImgIds,
+	}: {
+		userId: string;
+		indexedDbImgIds: string[];
+	}): Promise<UserImageRecord> {
+		// userId is from wacs
+		// Need to get transcriptionUsers.id from sqlite; query transcriptionUsers where user like userId given;
+		const userRecord = await this.db
+			.select()
+			.from(schema.transcriptionUsers)
+			.where(eq(schema.transcriptionUsers.user, userId));
+		console.log({ userRecord });
+
+		if (!userRecord || userRecord.length === 0) {
+			return {} as TranscribableDocument;
+		}
+
+		const dbUserId = userRecord[0].id;
+		// subquery to get only the most max unix epoch date
+		const latestTranscriptions = this.db
+			.select({
+				imageId: schema.transcriptions.imageId,
+				maxDate: sql`MAX(${schema.transcriptions.date})`.as("maxDate"),
+				date: schema.transcriptions.date,
+			})
+			.from(schema.transcriptions)
+			.groupBy(schema.transcriptions.imageId)
+			.as("latest_transcriptions");
+		// Given that id, query transcriptionImages where userId = id,
+		//join transcriptions table on imagId, but only take the most recent date
+		const images = await this.db
+			.select({
+				id: schema.transcriptionImages.id,
+				userId: schema.transcriptionImages.userId,
+				userDeleted: schema.transcriptionImages.userDeleted,
+				filePath: schema.transcriptionImages.filePath,
+				fileName: schema.transcriptionImages.filename,
+				languageCode: schema.transcriptionImages.languageCode,
+				bookCode: schema.transcriptionImages.bookCode,
+				chapter: schema.transcriptionImages.chapter,
+				verseStart: schema.transcriptionImages.verseStart,
+				verseEnd: schema.transcriptionImages.verseEnd,
+				transcription: schema.transcriptions.text,
+				created: schema.transcriptions.date,
+			})
+			.from(schema.transcriptionImages)
+			.where(eq(schema.transcriptionImages.userId, dbUserId))
+			// Use latestTranscriptions to filter down to only the latest date.
+			.leftJoin(
+				latestTranscriptions,
+				eq(latestTranscriptions.imageId, schema.transcriptionImages.id),
+			)
+			// Then join back to transcriptions to get the full row that matches both imageId and maxDate.
+			.leftJoin(
+				schema.transcriptions,
+				and(
+					eq(
+						schema.transcriptions.imageId,
+						schema.transcriptionImages.id,
+					),
+					eq(
+						schema.transcriptions.date,
+						sql`latest_transcriptions.maxDate`,
+					),
+				),
+			);
+		// Now for any id on server that is not in indexedDbImgIds, we need to also fetch the data from r2 bucket;
+		const withMissingImgData = await Promise.all(
+			images.map(async (image) => {
+				// todo: upudate schmea to not accept nullable values for some of these
+				const updated: TranscribableDocument = {
+					...image,
+					data: null,
+					filename: image.fileName,
+				};
+				if (indexedDbImgIds.includes(image.id) || !image.filePath) {
+					return updated;
+				}
+				const imgData = await this.imageRepo.retrieveImage(
+					image.filePath,
+				);
+				if (!imgData) {
+					return updated;
+				}
+				const u8 = new Uint8Array(imgData);
+				const decoder = new TextDecoder("utf-8");
+				updated.data = decoder.decode(u8);
+				return updated;
+			}),
+		);
+
+		// return as a record to make easier for client to update their own objects by doing a if localImgs[localId] => updated / else create
+		const asRecord = withMissingImgData.reduce(
+			(record: UserImageRecord, img: TranscribableDocument) => {
+				if (img.id) {
+					record[img.id] = img;
+				}
+				return record;
+			},
+			{},
+		);
+		return asRecord;
 	}
 }

@@ -4,7 +4,6 @@ enum TranscriptionErrorCode {
 	AuthenticationError = "authentication_error",
 	RateLimitExceeded = "rate_limit_exceeded",
 	UnexpectedResponse = "unexpected_response",
-	NoUserFound = "no_user_found",
 	UnknownError = "unknown_error", // A general error for unexpected situations
 }
 
