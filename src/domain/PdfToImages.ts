@@ -1,6 +1,5 @@
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import * as pdfjsLib from "pdfjs-dist";
-import type { PDFDocumentProxy } from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?worker";
 const worker = new pdfjsWorker();
 pdfjsLib.GlobalWorkerOptions.workerPort = worker;
@@ -33,13 +32,11 @@ export async function parsePdfFile(file: File) {
 			}
 			await page.render({ canvasContext: context, viewport }).promise;
 			const base64String = canvas.toDataURL("image/jpeg");
-			const url = URL.createObjectURL(file);
 			const parts = file.name.split(".");
 			const baseName = parts.slice(0, -1).join(".");
 			const extension = parts.length > 1 ? `.${parts.pop()}` : "";
-			// @ts-ignore
-			const image: TranscribableDocument = {
-				url: url,
+
+			const image: Partial<TranscribableDocument> = {
 				filename: `${baseName}-${pageIdx.index}${extension}`,
 				created: createdTime + (pageIdx.index + 100), // pad out a little for the number of pages so they sort correctly
 				data: base64String,

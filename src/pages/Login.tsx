@@ -3,7 +3,7 @@ import { TRANSCRIBE_ROUTE } from "@src/constants";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore";
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {

@@ -19,7 +19,10 @@ export default class OpenAIModel implements Model {
 		this.prompt = prompt;
 	}
 
-	async transcribe(imageId: string, base64Image: any): Promise<TranscriptionResponse> {
+	async transcribe(
+		imageId: string,
+		base64Image: string,
+	): Promise<TranscriptionResponse> {
 		return this.transcribeImpl(
 			new OpenAI({
 				apiKey: this.key,
@@ -34,7 +37,7 @@ export default class OpenAIModel implements Model {
 	async transcribeImpl(
 		client: OpenAI,
 		imageId: string,
-		base64Image: any,
+		base64Image: string,
 	): Promise<TranscriptionResponse> {
 		const response = await client.chat.completions.create({
 			model: "gpt-4o",

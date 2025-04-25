@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import type React from "react";
+import { useTranslation } from "react-i18next";
 
 const TranscriptionTips: React.FC = () => {
 	const { t } = useTranslation();
@@ -26,43 +26,43 @@ const TranscriptionTips: React.FC = () => {
 
 			<div className="mb-12">
 				<h3 className="text-2xl font-bold text-gray-700 mb-1">
-					{t('Paper Style and Layout')}
+					{t("Paper Style and Layout")}
 				</h3>
 				<p className="text-2xl text-gray-600 mb-1">
-					{t('Use Lined Paper message')}
+					{t("Use Lined Paper message")}
 				</p>
 				<p className="text-2xl text-gray-600">
-					{t('Ensure Text Is Staight message')}
+					{t("Ensure Text Is Staight message")}
 				</p>
 			</div>
 
 			<div className="mb-12">
 				<h3 className="text-2xl font-bold text-gray-700 mb-1">
-					{t('Edits')}
+					{t("Edits")}
 				</h3>
 				<p className="text-2xl text-gray-600">
-					{t('Avoid Crossing Out message')}
+					{t("Avoid Crossing Out message")}
 				</p>
 			</div>
 
 			<div className="mb-12">
 				<h3 className="text-2xl font-bold text-gray-700 mb-1">
-					{t('Text Style')}
+					{t("Text Style")}
 				</h3>
 				<p className="text-2xl text-gray-600 mb-1">
-					{t('Write In Block message')}
+					{t("Write In Block message")}
 				</p>
 				<p className="text-2xl text-gray-600">
-					{t('Do not use superscripts or subscripts.')}
+					{t("Do not use superscripts or subscripts.")}
 				</p>
 			</div>
 
 			<div>
 				<h3 className="text-2xl font-bold text-gray-700 mb-1">
-					{t('Verify Your Results')}
+					{t("Verify Your Results")}
 				</h3>
 				<p className="text-2xl text-gray-600">
-					{t('Always Check message')}
+					{t("Always Check message")}
 				</p>
 			</div>
 		</div>

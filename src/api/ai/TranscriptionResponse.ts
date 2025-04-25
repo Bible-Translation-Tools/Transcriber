@@ -5,6 +5,7 @@ enum TranscriptionErrorCode {
 	RateLimitExceeded = "rate_limit_exceeded",
 	UnexpectedResponse = "unexpected_response",
 	UnknownError = "unknown_error", // A general error for unexpected situations
+	NoUserFound = "no_user_found",
 }
 
 interface TranscriptionSuccess {

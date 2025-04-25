@@ -1,7 +1,8 @@
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import ImagePreview from "./ImagePreview.tsx";
 
 interface ImagePreviewListProps {
-	images: any[];
+	images: TranscribableDocument[];
 	currentImage: number;
 	onImageSelected: (imageNumber: number) => void;
 }
@@ -14,9 +15,7 @@ const ImagePreviewList: React.FC<ImagePreviewListProps> = ({
 		<div className="flex flex-col gap-2 overflow-y-auto">
 			{images.map((image, index) => (
 				<ImagePreview
-					// todo: either ignore or provide a uuid or url for key
-					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-					key={index}
+					key={image.id}
 					image={image}
 					index={index}
 					onImageSelected={onImageSelected}

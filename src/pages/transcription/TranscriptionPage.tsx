@@ -1,20 +1,17 @@
 import "../../App.css";
-import { toast } from "react-toastify";
-import { useMemo, useState } from "react";
-import NavBar from "@components/navigation/NavBar.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
-import uploadFiles from "@src/domain/UploadFiles.ts";
-import { useUploadImage } from "@src/hooks/useUploadImage.ts";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument.tsx";
-import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
-import type { TranscriptionErrorCode } from "@api/ai/TranscriptionResponse.ts";
-import { UploadFileErrorToast } from "@src/toasts/UploadFileErrorToast.tsx";
-import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
+import NavBar from "@components/navigation/NavBar.tsx";
 import { ShowWhen } from "@components/utils/ShowWhen.tsx";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { useRetranscribe } from "@src/hooks/useRetranscribe";
+import { useUpdateImage } from "@src/hooks/useUpdateImage";
+import { useUploadImage } from "@src/hooks/useUploadImage.ts";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
-import { useUpdateImage } from "@src/hooks/useUpdateImage";
-import { useRetranscribe } from "@src/hooks/useRetranscribe";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
+import { useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 function TranscriptionPage() {
 	const store = useTranscriptionStore();
@@ -45,40 +42,6 @@ function TranscriptionPage() {
 		setMoveImageModalImage(null);
 	};
 
-	const handleSaveModal = async (
-		image: TranscribableDocument,
-		language: string,
-		book: string,
-		chapter: number,
-		startVerse: number,
-		endVerse: number,
-	) => {
-		if (
-			language == null ||
-			book == null ||
-			chapter == null ||
-			startVerse == null ||
-			endVerse == null
-		) {
-			console.log("Incomplete information for moving image, aborting.");
-			return;
-		}
-		console.log("Saved:", language, book, chapter, startVerse, endVerse);
-		await updateImage(
-			store,
-			{
-				...image,
-				languageCode: language,
-				bookCode: book,
-				chapter: chapter,
-				startVerse: startVerse,
-				endVerse: endVerse,
-			},
-			true,
-		);
-		store.refreshProject();
-		setMoveImageModalImage(null);
-	};
 	const handleSaveModal = async (
 		image: TranscribableDocument,
 		language: string,
@@ -185,7 +148,7 @@ function TranscriptionPage() {
 				<ShowWhen when={!!modalImage}>
 					<MoveImageModal
 						key={modalImage?.id}
-						// biome-ignore lint/style/noNonNullAssertion: <explanation>
+						// biome-ignore lint/style/noNonNullAssertion: <Show Narrows>
 						image={modalImage!}
 						isOpen={isModalOpen}
 						onClose={handleCloseModal}

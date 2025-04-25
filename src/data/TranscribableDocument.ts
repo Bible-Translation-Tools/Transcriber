@@ -1,3 +1,4 @@
+import * as v from "valibot";
 export interface TranscribableDocument {
 	[key: string]:
 		| string
@@ -5,7 +6,8 @@ export interface TranscribableDocument {
 		| undefined
 		| EpochTimeStamp
 		| null
-		| boolean;
+		| boolean
+		| unknown;
 	id: string;
 	filename: string;
 	created: EpochTimeStamp;
@@ -19,3 +21,26 @@ export interface TranscribableDocument {
 	endVerse?: number | undefined;
 	loading?: boolean;
 }
+
+// todo: maybe use
+export const transcribableDocumentSchema = v.object({
+	id: v.string(),
+	filename: v.string(),
+	created: v.number(),
+	data: v.any(),
+	transcription: v.optional(v.string()),
+	languageCode: v.string(),
+	bookCode: v.string(),
+	chapter: v.number(),
+	startVerse: v.optional(v.number()),
+	endVerse: v.optional(v.number()),
+	loading: v.optional(v.boolean()),
+});
+
+const safeParseTranscribableDocument = (input: unknown) => {
+	const { issues, output, success, typed } = v.safeParse(
+		transcribableDocumentSchema,
+		input,
+	);
+	return { issues, output, isWellFormed: success, typed };
+};

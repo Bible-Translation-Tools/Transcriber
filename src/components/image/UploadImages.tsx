@@ -1,23 +1,18 @@
-import { useTranslation } from "react-i18next";
+import type { TranscriptionErrorCode } from "@api/ai/TranscriptionResponse.ts";
+import { useUploadImage } from "@src/hooks/useUploadImage.ts";
+import { UploadFileErrorToast } from "@src/toasts/UploadFileErrorToast.tsx";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { useUploadImage } from "@src/hooks/useUploadImage.ts";
-import type { TranscriptionErrorCode } from "@api/ai/TranscriptionResponse.ts";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import { UploadFileErrorToast } from "@src/toasts/UploadFileErrorToast.tsx";
 
 function UploadImages() {
 	const { t } = useTranslation();
 	const uploadImages = useUploadImage();
 
-	// todo: investigate the error thrown by biome here on more deps than necessary: addImage
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	const onDrop = useCallback(
-		(acceptedFiles: File[]) => {
-			handleFiles(acceptedFiles);
-		},
-		[uploadImages],
-	);
+	const onDrop = useCallback((acceptedFiles: File[]) => {
+		handleFiles(acceptedFiles);
+	}, []);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,

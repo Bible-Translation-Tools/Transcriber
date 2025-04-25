@@ -1,7 +1,8 @@
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import type React from "react";
 
 interface ImagePreviewProps {
-	image: any;
+	image: TranscribableDocument;
 	index: number;
 	onImageSelected: (imageNumber: number) => void;
 }

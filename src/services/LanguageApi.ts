@@ -1,4 +1,4 @@
-import {LanguageOption} from "@src/data/LanguageOption.tsx";
+import type { LanguageOption } from "@src/data/LanguageOption.tsx";
 const query = `
 query MyQuery {
   language {

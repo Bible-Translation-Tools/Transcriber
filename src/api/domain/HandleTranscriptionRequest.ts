@@ -6,9 +6,9 @@ import {
 	type TranscriptionResponse,
 	type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse";
+import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
 import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
 import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
-import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
 import * as v from "valibot";
 
 export async function HandleUpdateTranscriptionRequest(
@@ -45,7 +45,10 @@ export async function HandleTranscriptionRequest(
 				body.systemPrompt,
 				body.prompt,
 			);
-			transcriptionResponse = await model.transcribe(body.imageId, body.image);
+			transcriptionResponse = await model.transcribe(
+				body.imageId,
+				body.image,
+			);
 			break;
 		}
 		case TranscriptionModel.PIXTRAL: {
@@ -64,15 +67,19 @@ export async function HandleTranscriptionRequest(
 				body.systemPrompt,
 				body.prompt,
 			);
-			transcriptionResponse = await model.transcribe(body.imageId, body.image);
+			transcriptionResponse = await model.transcribe(
+				body.imageId,
+				body.image,
+			);
 			break;
 		}
 		default: {
 			console.log(`Missing model ${body.model}`);
-			console.log(`Pixtral: ${body.model == TranscriptionModel.PIXTRAL}`);
+			console.log(
+				`Pixtral: ${body.model === TranscriptionModel.PIXTRAL}`,
+			);
 		}
 	}
-
 
 	if (transcriptionResponse != null) {
 		const bookCode = body.bookCode;

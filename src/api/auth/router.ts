@@ -1,12 +1,12 @@
-import { Hono } from "hono";
-import { logout } from "./logout";
-import { getWacsApiTokenAndUser } from "./login";
-import type { HonoBindings } from "./utils";
 import {
 	D1TranscriptionRepository,
 	type UserImageRecord,
 } from "@api/persistence/D1TranscriptionRepository";
 import { R2ImageRepository } from "@api/persistence/R2ImageRepository";
+import { Hono } from "hono";
+import { getWacsApiTokenAndUser } from "./login";
+import { logout } from "./logout";
+import type { HonoBindings } from "./utils";
 
 export const authRouter = new Hono<HonoBindings>();
 export const LOGIN_PATH = "/api/v1/auth/login";

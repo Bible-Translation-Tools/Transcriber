@@ -13,5 +13,4 @@ export default defineConfig({
 			(a, b) => (b.stats?.ctimeMs ?? 0) - (a.stats?.ctimeMs ?? 0),
 		)[0].path,
 	},
-	// dbCredentials: {}, //null cause using wrangler to migrate.  I don't think you can drizzle kit push to local db
 });

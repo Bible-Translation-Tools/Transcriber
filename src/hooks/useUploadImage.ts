@@ -1,49 +1,67 @@
-import type {TranscribableDocument} from "@src/data/TranscribableDocument.tsx";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {useMutation} from "@tanstack/react-query";
-import {getTranscription} from "@src/services/TranscriptionApi.ts";
-import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
+import type {
+	TranscriptionError,
+	TranscriptionSuccess,
+} from "@api/ai/TranscriptionResponse.ts";
+import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import {
-    finalizeSuccessfulTranscription,
-    handleTranscriptionError,
-    prepareImageForUpload
+	finalizeSuccessfulTranscription,
+	handleTranscriptionError,
+	prepareImageForUpload,
 } from "@src/domain/ImageActions.ts";
-import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
-import {processFiles} from "@src/domain/ProcessFiles.tsx";
-import type {TranscriptionError, TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
+import { processFiles } from "@src/domain/ProcessFiles.tsx";
+import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { getTranscription } from "@src/services/TranscriptionApi.ts";
+import { useMutation } from "@tanstack/react-query";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
 
 export function useUploadImage() {
-    const store = useTranscriptionStore();
+	const store = useTranscriptionStore();
 
-    async function executeTranscription(
-        image: TranscribableDocument,
-        request: TranscriptionRequest
-    ): Promise<[TranscribableDocument, TranscriptionSuccess]> {
-        const response = await getTranscription(request)
-        return [image, response];
-    }
+	async function executeTranscription(
+		image: TranscribableDocument,
+		request: TranscriptionRequest,
+	): Promise<[TranscribableDocument, TranscriptionSuccess]> {
+		const response = await getTranscription(request);
+		return [image, response];
+	}
 
-    const transcribe = useMutation({
-        mutationFn: ({ image, request }: { image: TranscribableDocument; request: TranscriptionRequest })  => {
-            return executeTranscription(image, request)
-        },
-        onSuccess: async ([image, transcription]: [TranscribableDocument, TranscriptionSuccess]) => {
-            await finalizeSuccessfulTranscription(store, imageRepo, image, transcription);
-        },
-        onError: async (error: TranscriptionError) => {
-            handleTranscriptionError(error);
-        }
-    })
+	const transcribe = useMutation({
+		mutationFn: ({
+			image,
+			request,
+		}: { image: TranscribableDocument; request: TranscriptionRequest }) => {
+			return executeTranscription(image, request);
+		},
+		onSuccess: async ([image, transcription]: [
+			TranscribableDocument,
+			TranscriptionSuccess,
+		]) => {
+			await finalizeSuccessfulTranscription(
+				store,
+				imageRepo,
+				image,
+				transcription,
+			);
+		},
+		onError: async (error: TranscriptionError) => {
+			handleTranscriptionError(error);
+		},
+	});
 
-    async function uploadImage(files: File[]): Promise<void> {
-        const images = await processFiles(files);
-        images.map(async (image) => {
-            const [updatedImage, request] = await prepareImageForUpload(store, imageRepo, image);
-            transcribe.mutate({image: updatedImage, request: request});
-        });
-    }
+	async function uploadImage(files: File[]): Promise<void> {
+		const images = await processFiles(files);
+		images.map(async (image) => {
+			const [updatedImage, request] = await prepareImageForUpload(
+				store,
+				imageRepo,
+				image,
+			);
+			transcribe.mutate({ image: updatedImage, request: request });
+		});
+	}
 
-    return uploadImage;
+	return uploadImage;
 }

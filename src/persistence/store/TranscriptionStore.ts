@@ -1,15 +1,15 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
 } from "@api/domain/TranscriptionRequest";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument.tsx";
-import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
-import type { TranscriptionActions } from "@src/persistence/store/TranscriptionActions.ts";
-import { transcriptionStateStorage } from "@src/persistence/store/PersistTranscriptionState.tsx";
-import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type { LanguageOption } from "@src/data/LanguageOption.tsx";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
+import { transcriptionStateStorage } from "@src/persistence/store/PersistTranscriptionState.tsx";
+import type { TranscriptionActions } from "@src/persistence/store/TranscriptionActions.ts";
+import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type TranscriptionStore = TranscriptionState & TranscriptionActions;
 
@@ -94,8 +94,9 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
 	),
 );
 
+type SetFn = (state: Partial<TranscriptionState> | TranscriptionState) => void;
 async function updateProject(
-	set: any,
+	set: SetFn,
 	language: LanguageOption | null,
 	bookCode: string,
 	chapter: number,

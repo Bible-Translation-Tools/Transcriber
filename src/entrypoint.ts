@@ -1,10 +1,10 @@
 import type { HonoBindings, WacsTokenAndUser } from "@api/auth/utils";
 import { Hono } from "hono";
-import { apiV1Router } from "./api";
 import { except } from "hono/combine";
 import { getCookie } from "hono/cookie";
-import { TRANSCRIBE_ROUTE, WACS_API_TOKEN } from "./constants";
 import { logger } from "hono/logger";
+import { apiV1Router } from "./api";
+import { TRANSCRIBE_ROUTE, WACS_API_TOKEN } from "./constants";
 
 const app = new Hono<HonoBindings>();
 app.use("*", logger());

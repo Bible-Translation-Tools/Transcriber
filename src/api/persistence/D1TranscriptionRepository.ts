@@ -1,12 +1,12 @@
-import type { R2ImageRepository } from "@api/persistence/R2ImageRepository";
-import * as schema from "@api/persistence/schema";
 import type {
 	Transcription,
 	TranscriptionImage,
 } from "@api/data/TranscriptionImage.ts";
+import type { R2ImageRepository } from "@api/persistence/R2ImageRepository";
+import * as schema from "@api/persistence/schema";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 
 export type UserImageRecord = {
 	[imgIg: string]: TranscribableDocument;
