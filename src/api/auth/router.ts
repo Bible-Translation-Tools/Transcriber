@@ -16,6 +16,7 @@ export const LOGOUT_PATH = "/api/v1/auth/logout";
 export type LoginReturnType = {
 	userId: string;
 	syncData: UserImageRecord;
+	error: string;
 };
 authRouter.post("/login", async (ctx) => {
 	const body = await ctx.req.formData();
@@ -24,7 +25,11 @@ authRouter.post("/login", async (ctx) => {
 	const indexedDbImgs = body.get("imgIds")?.toString();
 	const indexedDbImgIds = JSON.parse(indexedDbImgs ?? "[]") as string[];
 	if (!username || !password) {
-		return ctx.redirect("/?error=missing_credentials");
+		return ctx.json({
+			error: "missing_credentials",
+			syncData: null,
+			userId: null,
+		});
 	}
 	// returning the redirect from fxn is just simpler for keeping the error handling logic inside the fxn here, but allows us to continue on with server sync of images when we do have the token
 	const { token, redirectLambda } = await getWacsApiTokenAndUser({
@@ -47,6 +52,7 @@ authRouter.post("/login", async (ctx) => {
 	return ctx.json({
 		userId,
 		syncData,
+		error: null,
 	});
 });
 authRouter.get("/logout", async (ctx) => {

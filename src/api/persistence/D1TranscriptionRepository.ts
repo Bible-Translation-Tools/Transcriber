@@ -65,10 +65,9 @@ export class D1TranscriptionRepository {
 				id: image.id,
 				userId: userId,
 				userDeleted: image.user_deleted,
-				// TODO: SEND FILE NAME FROM FRONT END
 				filename: image.filename,
-				created: Date.now(),
-				filePath,
+				created: image.created,
+				filePath: filePath,
 				languageCode: image.language_code,
 				bookCode: image.book_code,
 				chapter: image.chapter,
@@ -251,10 +250,15 @@ export class D1TranscriptionRepository {
 				verseStart: schema.transcriptionImages.verseStart,
 				verseEnd: schema.transcriptionImages.verseEnd,
 				transcription: schema.transcriptions.text,
-				created: schema.transcriptions.date,
+				created: schema.transcriptionImages.created,
 			})
 			.from(schema.transcriptionImages)
-			.where(eq(schema.transcriptionImages.userId, dbUserId))
+			.where(
+				and(
+					eq(schema.transcriptionImages.userId, dbUserId),
+					eq(schema.transcriptionImages.userDeleted, false),
+				),
+			)
 			// Use latestTranscriptions to filter down to only the latest date.
 			.leftJoin(
 				latestTranscriptions,

@@ -98,6 +98,8 @@ export async function HandleTranscriptionRequest(
 			user_deleted: false,
 			userId: userId,
 			path: `${userId}/${body.imageId}`,
+			filename: body.filename,
+			created: body.created,
 			data: body.image,
 			book_code: bookCode,
 			language_code: languageCode,
@@ -130,6 +132,8 @@ export const transcriptionRequestSchema = v.object({
 	image: v.string(),
 	imageId: v.string(),
 	languageCode: v.string(),
+	filename: v.string(),
+	created: v.number(), //unix timestamp
 	bookCode: v.string(),
 	chapter: v.number(),
 	systemPrompt: v.string(),

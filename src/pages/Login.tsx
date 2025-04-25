@@ -1,19 +1,22 @@
 import { LOGIN_PATH, type LoginReturnType } from "@api/auth/router";
+import { ShowWhen } from "@src/components/utils/ShowWhen";
 import { TRANSCRIBE_ROUTE } from "@src/constants";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore";
 import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Login() {
 	// Going to use programmatic navigation since the server on login will send back updatedMetaData if there is any, and any new images if we don't have the ID for one;
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
-	const { setSelectedImage, setImages } = useTranscriptionStore();
+	const [err, setErr] = useState<string | boolean>(false);
+	const { setSelectedImage, refreshProject } = useTranscriptionStore();
 
 	async function loginAndSendLocalImages(e: FormEvent<HTMLFormElement>) {
-		// debugger;
+		setErr(false);
 		setLoading(true);
 		// prevent Default cause we want the remote images back form server to sync to to idb first instead of just redirecting from server
 		e.preventDefault();
@@ -36,7 +39,15 @@ function Login() {
 				});
 			}
 			const serverData = (await response.json()) as LoginReturnType;
-			const { syncData, userId } = serverData;
+			const { syncData, userId, error } = serverData;
+			if (error) {
+				toast.error(error, {
+					position: "top-right",
+				});
+				setErr(error);
+				setLoading(false);
+				return;
+			}
 			// todo: store userId locally if you want to use or scope idb by it;
 			console.log("userId", userId);
 			const imagesForStateSet = [];
@@ -67,9 +78,10 @@ function Login() {
 					);
 				}
 			}
-			setImages(imagesForStateSet);
 			setSelectedImage(imagesForStateSet[0]);
 			setLoading(false);
+			// refresh idx db
+			refreshProject();
 			navigate(TRANSCRIBE_ROUTE);
 		} catch (e) {
 			console.error(e);
@@ -119,6 +131,9 @@ function Login() {
 					method="POST"
 					onSubmit={loginAndSendLocalImages}
 				>
+					<ShowWhen when={!!err}>
+						<span className="text-red-500 font-bold"> {err}</span>
+					</ShowWhen>
 					<input
 						type="text"
 						placeholder="Username"

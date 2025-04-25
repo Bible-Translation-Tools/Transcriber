@@ -77,8 +77,10 @@ export const constructTranscriptionRequest = async (
 	return {
 		image: image.data,
 		imageId: image.id,
+		created: image.created,
 		bookCode: image.bookCode,
 		languageCode: image.languageCode,
+		filename: image.filename,
 		chapter: image.chapter,
 		model: model,
 		systemPrompt: systemPrompt,

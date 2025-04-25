@@ -19,7 +19,6 @@ function TranscriptionPage() {
 	const updateImage = useUpdateImage();
 	const retranscribe = useRetranscribe();
 	const { images, selectedImage, setSelectedImage } = store;
-
 	useMemo(() => {
 		images.sort((a, b) => {
 			return a.created - b.created;

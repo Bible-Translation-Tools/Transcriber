@@ -1,10 +1,10 @@
-import * as v from "valibot";
-
 export type TranscriptionRequest = {
 	model: TranscriptionModel;
 	image: string;
 	imageId: string;
 	languageCode: string;
+	created: number;
+	filename: string;
 	bookCode: string;
 	chapter: number;
 	systemPrompt: string;

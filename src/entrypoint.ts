@@ -9,19 +9,23 @@ import { TRANSCRIBE_ROUTE, WACS_API_TOKEN } from "./constants";
 const app = new Hono<HonoBindings>();
 app.use("*", logger());
 
+app.get("/login", async (c, next) => {
+	const apiToken = getCookie(c, WACS_API_TOKEN);
+	console.log({ apiToken });
+	if (apiToken) {
+		return c.redirect(TRANSCRIBE_ROUTE);
+	}
+	await next();
+});
 app.use(
 	"*",
 	// no need for user on login or logout
 	except(["/api/v1/auth/*", "/login"], async (c, next) => {
-		const path = c.req.path;
 		const apiToken = getCookie(c, WACS_API_TOKEN);
 		if (!apiToken) {
-			return c.redirect("/");
+			return c.redirect("/login");
 		}
-		if (path === "/login") {
-			// if you're already auth'd just go straight to the app
-			return c.redirect(TRANSCRIBE_ROUTE);
-		}
+
 		try {
 			const parsed = JSON.parse(apiToken) as WacsTokenAndUser;
 			c.set("user", parsed);

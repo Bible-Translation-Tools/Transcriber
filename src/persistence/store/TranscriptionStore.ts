@@ -113,6 +113,10 @@ async function updateProject(
 			bookCode,
 			chapter,
 		);
+		// WK note: possible addition. More flexible would be if the img had an "order" property in case someone had a pdf out of order or whatever when uploaded and wanted ot change that order
+		images.sort((a, b) => {
+			return a.created - b.created;
+		});
 		const recentLanguages = imageRepo.getRecentLanguages();
 		const selected: TranscribableDocument | undefined =
 			selectedImage != null && images.includes(selectedImage)

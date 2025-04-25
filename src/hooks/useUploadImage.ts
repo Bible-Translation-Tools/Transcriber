@@ -35,6 +35,7 @@ export function useUploadImage() {
 		}: { image: TranscribableDocument; request: TranscriptionRequest }) => {
 			return executeTranscription(image, request);
 		},
+
 		onSuccess: async ([image, transcription]: [
 			TranscribableDocument,
 			TranscriptionSuccess,

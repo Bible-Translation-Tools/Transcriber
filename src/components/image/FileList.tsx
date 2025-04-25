@@ -185,7 +185,8 @@ const FileList: React.FC<FileListProps> = ({
 						id={image.id}
 						index={index}
 						fileName={image.filename}
-						isLoading={image?.loading ?? true}
+						// todo: wk: we moved away from this, so for now gonna set to false.  This might make more sense if we have lazily image by image the data from idb, but doesn't make sense I don't think with just fetchign all from rq. SEtting to ?? to false for now
+						isLoading={image?.loading ?? false}
 						onImageSelected={onImageSelected}
 						onMoveImage={onMoveImage}
 						onDeleteImage={onDeleteImage}

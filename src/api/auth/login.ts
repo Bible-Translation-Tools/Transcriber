@@ -87,7 +87,12 @@ export async function getWacsApiTokenAndUser({
 		console.error(e);
 		return {
 			token: null,
-			redirectLambda: () => ctx.redirect("/?error=login_failed"),
+			redirectLambda: () =>
+				ctx.json({
+					error: "login_failed",
+					syncData: null,
+					userId: null,
+				}),
 		};
 	}
 }

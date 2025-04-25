@@ -25,6 +25,7 @@ apiV1Router.post(`${TRANSCRIBE_ROUTE}`, async (c) => {
 	const body = await c.req.json();
 	const parsed = v.safeParse(transcriptionRequestSchema, body);
 	if (!parsed.success) {
+		parsed.issues.forEach((issue) => console.log(issue.message));
 		return c.json({ error: "Invalid request format" }, { status: 400 });
 	}
 
@@ -35,7 +36,12 @@ apiV1Router.post(`${TRANSCRIBE_ROUTE}`, async (c) => {
 	);
 	let htrRes: Response;
 	if (import.meta.env.DEV) {
-		htrRes = await mockHandleTranscriptionRequest();
+		htrRes = await mockHandleTranscriptionRequest(
+			String(user.wacsUserId),
+			createApiMap(c.env),
+			parsed.output,
+			repo,
+		);
 	} else {
 		htrRes = await HandleTranscriptionRequest(
 			String(user.wacsUserId),
