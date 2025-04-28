@@ -1,7 +1,8 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import {useEffect, useRef, useState} from "react";
+import {useTranslation} from "react-i18next";
 
 interface FileListItemProps {
 	fileName: string;
@@ -73,7 +74,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 
 	return (
 		<div
-			className={`border-b border-gray-200 hover:bg-gray-200 ${selectedStyle()}`}
+			className={`border-b border-gray-200 hover:bg-gray-200 pr-4 ${selectedStyle()}`}
 		>
 			<div className="flex items-center justify-between">
 				<button
@@ -186,7 +187,9 @@ const FileList: React.FC<FileListProps> = ({
 						index={index}
 						fileName={image.filename}
 						// todo: wk: we moved away from this, so for now gonna set to false.  This might make more sense if we have lazily image by image the data from idb, but doesn't make sense I don't think with just fetchign all from rq. SEtting to ?? to false for now
-						isLoading={image?.loading ?? false}
+						isLoading={
+							TranscriptionStatus.IN_PROGRESS === image?.status
+						}
 						onImageSelected={onImageSelected}
 						onMoveImage={onMoveImage}
 						onDeleteImage={onDeleteImage}

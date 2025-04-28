@@ -1,5 +1,6 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { parsePdfFile } from "@src/domain/PdfToImages.ts";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus";
+import {parsePdfFile} from "@src/domain/PdfToImages.ts";
 
 export async function processFiles(
 	files: File[],
@@ -50,6 +51,7 @@ async function processImage(
 		filename: file.name,
 		created: Date.now() + (fileNumber + 100),
 		data: base64String,
+		status: TranscriptionStatus.IN_PROGRESS,
 	};
 
 	return image;

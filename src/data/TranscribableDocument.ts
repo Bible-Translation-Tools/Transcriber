@@ -1,4 +1,6 @@
+import type {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import * as v from "valibot";
+
 export interface TranscribableDocument {
 	[key: string]:
 		| string
@@ -11,7 +13,6 @@ export interface TranscribableDocument {
 	id: string;
 	filename: string;
 	created: EpochTimeStamp;
-	// todo: delete, not an img url, and not need to keep blob urls around
 	data: any;
 	transcription: string | undefined | null; // Optional transcription
 	languageCode: string;
@@ -19,7 +20,7 @@ export interface TranscribableDocument {
 	chapter: number;
 	startVerse?: number | undefined;
 	endVerse?: number | undefined;
-	loading?: boolean;
+	status: TranscriptionStatus;
 }
 
 // todo: maybe use
@@ -34,7 +35,7 @@ export const transcribableDocumentSchema = v.object({
 	chapter: v.number(),
 	startVerse: v.optional(v.number()),
 	endVerse: v.optional(v.number()),
-	loading: v.optional(v.boolean()),
+	status: v.optional(v.string()),
 });
 
 const safeParseTranscribableDocument = (input: unknown) => {
