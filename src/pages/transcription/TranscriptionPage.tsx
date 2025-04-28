@@ -21,12 +21,12 @@ function TranscriptionPage() {
 	const updateImage = useUpdateImage();
 	const deleteImage = useDeleteImage();
 	const retranscribe = useRetranscribe();
-	const { images, selectedImage, setSelectedImage } = store;
+
 	useMemo(() => {
-		images.sort((a, b) => {
+		store.images.sort((a, b) => {
 			return a.created - b.created;
 		});
-	}, [images]);
+	}, [store.images]);
 
 	const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
 	const [modalImage, setMoveImageModalImage] =
@@ -36,14 +36,14 @@ function TranscriptionPage() {
 		useState<TranscribableDocument | null>(null);
 
 	const handleOpenMoveImageModal = (page: number) => {
-		setMoveImageModalImage(images[page]);
+		setMoveImageModalImage(store.images[page]);
 		setIsMoveImageModalOpen(true);
 
 		console.log(page);
 	};
 
 	const handleOpenDeleteImageDialog = (page: number) => {
-		setImageToDelete(images[page]);
+		setImageToDelete(store.images[page]);
 		setIsDeleteDialogOpen(true);
 
 		console.log(page);
@@ -103,29 +103,29 @@ function TranscriptionPage() {
 	};
 
 	const handleResubmitImage = () => {
-		if (selectedImage != null) {
+		if (store.selectedImage != null) {
 			toast.success(ImageSubmittedToast, {
 				data: "Submitted Image for Transcription.",
 			});
-			retranscribe(selectedImage);
+			retranscribe(store.selectedImage);
 		}
 	};
 
 	// change to explicitly be a useCallback?
 	const handleTextChange = (newText: string) => {
-		if (selectedImage != null) {
+		if (store.selectedImage != null) {
 			updateImage({
-				...selectedImage,
+				...store.selectedImage,
 				transcription: newText,
 			});
 		}
 	};
 
 	const handlePageChange = (page: number) => {
-		if (page < images.length && page >= 0) {
-			setSelectedImage(images[page]);
+		if (page < store.images.length && page >= 0) {
+			store.setSelectedImage(store.images[page]);
 		} else {
-			setSelectedImage(images[0]);
+			store.setSelectedImage(store.images[0]);
 		}
 	};
 
@@ -138,10 +138,10 @@ function TranscriptionPage() {
 
 	const handleVerseRangeChange = (start: number, end: number) => {
 		const validVerseRange = validateVerseRange(start, end);
-		if (validVerseRange && selectedImage) {
-			selectedImage.startVerse = start;
-			selectedImage.endVerse = end;
-			updateImage(selectedImage);
+		if (validVerseRange && store.selectedImage) {
+			store.selectedImage.startVerse = start;
+			store.selectedImage.endVerse = end;
+			updateImage(store.selectedImage);
 		}
 	};
 
@@ -157,16 +157,18 @@ function TranscriptionPage() {
 			<NavBar />
 			<div className="flex overflow-y-auto">
 				<ProjectContents
-					images={images}
-					selectedImage={selectedImage}
+					key={store.images.length}
+					images={store.images}
+					selectedImage={store.selectedImage}
 					handleImageUpload={handleImageUpload}
 					handleOpenMoveImageModal={handleOpenMoveImageModal}
 					handlePageChange={handlePageChange}
 					handleDeleteImage={handleOpenDeleteImageDialog}
 				/>
 				<EditorWrapper
-					images={images}
-					selectedImage={selectedImage}
+					key={Math.random()}
+					images={store.images}
+					selectedImage={store.selectedImage}
 					handleResubmitImage={handleResubmitImage}
 					handleTextChange={handleTextChange}
 					handleVerseRangeChange={handleVerseRangeChange}
