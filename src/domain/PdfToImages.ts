@@ -1,6 +1,8 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?worker";
+
 const worker = new pdfjsWorker();
 pdfjsLib.GlobalWorkerOptions.workerPort = worker;
 
@@ -41,6 +43,7 @@ export async function parsePdfFile(file: File) {
 				created: createdTime + (pageIdx.index + 100), // pad out a little for the number of pages so they sort correctly
 				data: base64String,
 				transcription: null,
+				status: TranscriptionStatus.IN_PROGRESS,
 			};
 			canvas.remove();
 			return image;

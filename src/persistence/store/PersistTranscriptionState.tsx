@@ -1,9 +1,19 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
-import type { PersistStorage, StorageValue } from "zustand/middleware";
+import type {TranscriptionState} from "@src/persistence/store/TranscriptionState.ts";
+import type {PersistStorage, StorageValue} from "zustand/middleware";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
+
+function restoreTranscriptionStatus(
+	image: TranscribableDocument,
+): TranscriptionStatus {
+	if (image.transcription == null) {
+		return TranscriptionStatus.TRANSCRIPTION_ERROR;
+	}
+	return TranscriptionStatus.COMPLETED;
+}
 
 export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
 	getItem: async (name) => {
@@ -28,7 +38,10 @@ export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
 				bookCode,
 				chapter,
 			);
-			images = images.map((image) => ({ ...image, loading: false }));
+			images = images.map((image: TranscribableDocument) => ({
+				...image,
+				status: restoreTranscriptionStatus(image),
+			}));
 			recentLanguages = imageRepo.getRecentLanguages();
 		} else {
 			await imageRepo.retrieveAllImages();

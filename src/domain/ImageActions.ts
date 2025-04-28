@@ -5,6 +5,7 @@ import {
 } from "@api/ai/TranscriptionResponse.ts";
 import type {TranscriptionRequest, UpdateTranscriptionRequest,} from "@api/domain/TranscriptionRequest.ts";
 import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import type IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import {toast} from "react-toastify";
@@ -95,7 +96,7 @@ export const finalizeSuccessfulTranscription = async (
 	const newImage: TranscribableDocument = {
 		...image,
 		transcription: transcription.transcription,
-		loading: false,
+		status: TranscriptionStatus.COMPLETED,
 	};
 	store.setImages((prev) =>
 		prev.map((prevImage: TranscribableDocument) => {
@@ -131,6 +132,7 @@ export const updateImage = async (
 	for (let i = 0; i < store.images.length; i++) {
 		if (store.images[i].id === updatedImage.id) {
 			store.images[i].transcription = updatedImage.transcription;
+			store.images[i].status = updatedImage.status;
 		}
 	}
 };
