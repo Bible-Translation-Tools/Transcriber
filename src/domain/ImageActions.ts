@@ -209,7 +209,7 @@ export const handleTranscriptionError = (error: TranscriptionError) => {
 			toast.error("Error: RateLimit exceeded");
 			break;
 		default:
-			toast.error("Error occurred while uploading image.");
+			toast.error("An error occurred.");
 			break;
 	}
 };
