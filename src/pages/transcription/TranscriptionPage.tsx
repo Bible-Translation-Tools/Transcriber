@@ -1,4 +1,5 @@
 import "../../App.css";
+import DeleteConfirmationDialog from "@components/dialogs/DeleteConfirmationDialog.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import NavBar from "@components/navigation/NavBar.tsx";
 import {ShowWhen} from "@components/utils/ShowWhen.tsx";
@@ -30,6 +31,9 @@ function TranscriptionPage() {
 	const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
 	const [modalImage, setMoveImageModalImage] =
 		useState<TranscribableDocument | null>(null);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [imageToDelete, setImageToDelete] =
+		useState<TranscribableDocument | null>(null);
 
 	const handleOpenMoveImageModal = (page: number) => {
 		setMoveImageModalImage(images[page]);
@@ -38,9 +42,21 @@ function TranscriptionPage() {
 		console.log(page);
 	};
 
+	const handleOpenDeleteImageDialog = (page: number) => {
+		setImageToDelete(images[page]);
+		setIsDeleteDialogOpen(true);
+
+		console.log(page);
+	};
+
 	const handleCloseModal = () => {
 		setIsMoveImageModalOpen(false);
 		setMoveImageModalImage(null);
+	};
+
+	const handleCloseDeleteDialog = () => {
+		setIsDeleteDialogOpen(false);
+		setImageToDelete(null);
 	};
 
 	const handleSaveModal = async (
@@ -113,8 +129,11 @@ function TranscriptionPage() {
 		}
 	};
 
-	const handleDeleteImage = (imageNumber: number) => {
-		deleteImage(images[imageNumber]);
+	const handleDeleteImage = () => {
+		if (imageToDelete != null) {
+			deleteImage(imageToDelete);
+		}
+		setIsDeleteDialogOpen(false);
 	};
 
 	const handleVerseRangeChange = (start: number, end: number) => {
@@ -143,7 +162,7 @@ function TranscriptionPage() {
 					handleImageUpload={handleImageUpload}
 					handleOpenMoveImageModal={handleOpenMoveImageModal}
 					handlePageChange={handlePageChange}
-					handleDeleteImage={handleDeleteImage}
+					handleDeleteImage={handleOpenDeleteImageDialog}
 				/>
 				<EditorWrapper
 					images={images}
@@ -160,6 +179,15 @@ function TranscriptionPage() {
 						isOpen={isModalOpen}
 						onClose={handleCloseModal}
 						onSave={handleSaveModal}
+					/>
+				</ShowWhen>
+				<ShowWhen when={!!imageToDelete}>
+					<DeleteConfirmationDialog
+						key={imageToDelete?.id}
+						imageName={imageToDelete?.filename}
+						isOpen={isDeleteDialogOpen}
+						onClose={handleCloseDeleteDialog}
+						onConfirmDelete={handleDeleteImage}
 					/>
 				</ShowWhen>
 			</div>
