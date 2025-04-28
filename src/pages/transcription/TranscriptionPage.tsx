@@ -1,22 +1,25 @@
 import "../../App.css";
+import DeleteConfirmationDialog from "@components/dialogs/DeleteConfirmationDialog.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import NavBar from "@components/navigation/NavBar.tsx";
-import { ShowWhen } from "@components/utils/ShowWhen.tsx";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { useRetranscribe } from "@src/hooks/useRetranscribe";
-import { useUpdateImage } from "@src/hooks/useUpdateImage";
-import { useUploadImage } from "@src/hooks/useUploadImage.ts";
+import {ShowWhen} from "@components/utils/ShowWhen.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {useDeleteImage} from "@src/hooks/useDeleteImage.ts";
+import {useRetranscribe} from "@src/hooks/useRetranscribe";
+import {useUpdateImage} from "@src/hooks/useUpdateImage";
+import {useUploadImage} from "@src/hooks/useUploadImage.ts";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
-import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
-import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
-import { useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
+import {useMemo, useState} from "react";
+import {toast} from "react-toastify";
 
 function TranscriptionPage() {
 	const store = useTranscriptionStore();
 	const uploadImage = useUploadImage();
 	const updateImage = useUpdateImage();
+	const deleteImage = useDeleteImage();
 	const retranscribe = useRetranscribe();
 	const { images, selectedImage, setSelectedImage } = store;
 	useMemo(() => {
@@ -28,6 +31,9 @@ function TranscriptionPage() {
 	const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
 	const [modalImage, setMoveImageModalImage] =
 		useState<TranscribableDocument | null>(null);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [imageToDelete, setImageToDelete] =
+		useState<TranscribableDocument | null>(null);
 
 	const handleOpenMoveImageModal = (page: number) => {
 		setMoveImageModalImage(images[page]);
@@ -36,9 +42,21 @@ function TranscriptionPage() {
 		console.log(page);
 	};
 
+	const handleOpenDeleteImageDialog = (page: number) => {
+		setImageToDelete(images[page]);
+		setIsDeleteDialogOpen(true);
+
+		console.log(page);
+	};
+
 	const handleCloseModal = () => {
 		setIsMoveImageModalOpen(false);
 		setMoveImageModalImage(null);
+	};
+
+	const handleCloseDeleteDialog = () => {
+		setIsDeleteDialogOpen(false);
+		setImageToDelete(null);
 	};
 
 	const handleSaveModal = async (
@@ -79,6 +97,7 @@ function TranscriptionPage() {
 			handleFiles(fileArray);
 		}
 	};
+
 	const handleFiles = (files: File[]) => {
 		uploadImage(files);
 	};
@@ -110,6 +129,13 @@ function TranscriptionPage() {
 		}
 	};
 
+	const handleDeleteImage = () => {
+		if (imageToDelete != null) {
+			deleteImage(imageToDelete);
+		}
+		setIsDeleteDialogOpen(false);
+	};
+
 	const handleVerseRangeChange = (start: number, end: number) => {
 		const validVerseRange = validateVerseRange(start, end);
 		if (validVerseRange && selectedImage) {
@@ -136,6 +162,7 @@ function TranscriptionPage() {
 					handleImageUpload={handleImageUpload}
 					handleOpenMoveImageModal={handleOpenMoveImageModal}
 					handlePageChange={handlePageChange}
+					handleDeleteImage={handleOpenDeleteImageDialog}
 				/>
 				<EditorWrapper
 					images={images}
@@ -152,6 +179,15 @@ function TranscriptionPage() {
 						isOpen={isModalOpen}
 						onClose={handleCloseModal}
 						onSave={handleSaveModal}
+					/>
+				</ShowWhen>
+				<ShowWhen when={!!imageToDelete}>
+					<DeleteConfirmationDialog
+						key={imageToDelete?.id}
+						imageName={imageToDelete?.filename}
+						isOpen={isDeleteDialogOpen}
+						onClose={handleCloseDeleteDialog}
+						onConfirmDelete={handleDeleteImage}
 					/>
 				</ShowWhen>
 			</div>

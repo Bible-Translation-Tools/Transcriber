@@ -1,19 +1,21 @@
 import {
+	deleteTranscriptionRequestSchema,
+	HandleDeleteTranscriptionRequest,
 	HandleTranscriptionRequest,
 	HandleUpdateTranscriptionRequest,
 	transcriptionRequestSchema,
 	updateTranscriptionRequestSchema,
 } from "@api/domain/HandleTranscriptionRequest";
-import { TranscriptionModel } from "@api/domain/TranscriptionRequest";
-import { Hono } from "hono";
-import { authRouter } from "./auth/router";
+import {TranscriptionModel} from "@api/domain/TranscriptionRequest";
+import {Hono} from "hono";
+import {authRouter} from "./auth/router";
 
-import { TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE } from "@src/constants";
+import {DELETE_TRANSCRIPTION_ROUTE, TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE,} from "@src/constants";
 import * as v from "valibot";
-import type { HonoBindings } from "./auth/utils";
-import { mockHandleTranscriptionRequest } from "./domain/mock";
-import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
-import { R2ImageRepository } from "./persistence/R2ImageRepository";
+import type {HonoBindings} from "./auth/utils";
+import {mockHandleTranscriptionRequest} from "./domain/mock";
+import {D1TranscriptionRepository} from "./persistence/D1TranscriptionRepository";
+import {R2ImageRepository} from "./persistence/R2ImageRepository";
 
 export const apiV1 = "/api/v1";
 const apiV1Router = new Hono<HonoBindings>();
@@ -67,6 +69,23 @@ apiV1Router.post(`${UPDATE_TRANSCRIPTION_ROUTE}`, async (c) => {
 		new R2ImageRepository(bucket),
 	);
 	const htrRes = await HandleUpdateTranscriptionRequest(parsed.output, repo);
+	return htrRes;
+});
+
+apiV1Router.post(`${DELETE_TRANSCRIPTION_ROUTE}`, async (c) => {
+	console.log("Recieved delete request.");
+	const body = await c.req.json();
+	const parsed = v.safeParse(deleteTranscriptionRequestSchema, body);
+	if (!parsed.success) {
+		return c.json({ error: "Invalid request format" }, { status: 400 });
+	}
+
+	const bucket = c.env.HTR_STORAGE;
+	const repo = new D1TranscriptionRepository(
+		c.env.HTR_DATABASE,
+		new R2ImageRepository(bucket),
+	);
+	const htrRes = await HandleDeleteTranscriptionRequest(parsed.output, repo);
 	return htrRes;
 });
 

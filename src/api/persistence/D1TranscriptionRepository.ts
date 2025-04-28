@@ -1,12 +1,9 @@
-import type {
-	Transcription,
-	TranscriptionImage,
-} from "@api/data/TranscriptionImage.ts";
-import type { R2ImageRepository } from "@api/persistence/R2ImageRepository";
+import type {Transcription, TranscriptionImage,} from "@api/data/TranscriptionImage.ts";
+import type {R2ImageRepository} from "@api/persistence/R2ImageRepository";
 import * as schema from "@api/persistence/schema";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { and, desc, eq, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {and, desc, eq, sql} from "drizzle-orm";
+import {drizzle} from "drizzle-orm/d1";
 
 export type UserImageRecord = {
 	[imgIg: string]: TranscribableDocument;
@@ -145,6 +142,15 @@ export class D1TranscriptionRepository {
 				text: transcription.text,
 			});
 		}
+	}
+
+	async markImageAsUserDeleted(imageId: string): Promise<void> {
+		await this.db
+			.update(schema.transcriptionImages)
+			.set({
+				userDeleted: false,
+			})
+			.where(eq(schema.transcriptions.imageId, imageId));
 	}
 
 	async updateTranscriptionText(

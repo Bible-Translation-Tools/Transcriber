@@ -1,14 +1,14 @@
 import OpenAIModel from "@api/ai/OpenAIModel.ts";
 
-import { PixtralAIModel } from "@api/ai/PixtralAIModel.ts";
+import {PixtralAIModel} from "@api/ai/PixtralAIModel.ts";
 import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
 	type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse";
-import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
-import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
-import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
+import type {TranscriptionImage} from "@api/data/TranscriptionImage.ts";
+import {TranscriptionModel} from "@api/domain/TranscriptionRequest.ts";
+import type {D1TranscriptionRepository} from "@api/persistence/D1TranscriptionRepository";
 import * as v from "valibot";
 
 export async function HandleUpdateTranscriptionRequest(
@@ -17,6 +17,24 @@ export async function HandleUpdateTranscriptionRequest(
 ): Promise<Response> {
 	await imageRepo.updateTranscriptionText(body.imageId, body.transcription);
 	return Response.json({});
+}
+
+export async function HandleDeleteTranscriptionRequest(
+	body: DeleteTranscriptionRequest,
+	imageRepo: D1TranscriptionRepository,
+): Promise<Response> {
+	console.log("Removing image: ", body.imageId);
+	try {
+		await imageRepo.markImageAsUserDeleted(body.imageId);
+		return Response.json({});
+	} catch (error) {
+		return Response.json({
+			success: false,
+			imageId: body.imageId,
+			error: "Failed to remove image.",
+			errorCode: TranscriptionErrorCode.UnknownError,
+		});
+	}
 }
 
 export async function HandleTranscriptionRequest(
@@ -154,4 +172,11 @@ export const updateTranscriptionRequestSchema = v.object({
 });
 export type UpdateTranscriptionRequest = v.InferOutput<
 	typeof updateTranscriptionRequestSchema
+>;
+
+export const deleteTranscriptionRequestSchema = v.object({
+	imageId: v.string(),
+});
+export type DeleteTranscriptionRequest = v.InferOutput<
+	typeof deleteTranscriptionRequestSchema
 >;
