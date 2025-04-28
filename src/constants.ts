@@ -7,5 +7,6 @@ export const CACHED_JWKS_KEY = "cached_jwks";
 export const R2_JWKS_SYNC_SECONDS = 60 * 5;
 export const TRANSCRIBE_ROUTE = "/transcriber/";
 export const UPDATE_TRANSCRIPTION_ROUTE = "/updateTranscription/";
+export const DELETE_TRANSCRIPTION_ROUTE = "/deleteTranscription/";
 
 // todo: TEst why firefox didn't load these like I expect?

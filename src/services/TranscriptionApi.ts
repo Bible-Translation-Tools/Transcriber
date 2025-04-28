@@ -1,10 +1,8 @@
-import type { TranscriptionSuccess } from "@api/ai/TranscriptionResponse.ts";
-import type {
-	TranscriptionRequest,
-	UpdateTranscriptionRequest,
-} from "@api/domain/TranscriptionRequest.ts";
-import { apiV1 } from "@src/api";
-import { TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE } from "@src/constants";
+import type {TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
+import type {DeleteTranscriptionRequest} from "@api/domain/HandleTranscriptionRequest.ts";
+import type {TranscriptionRequest, UpdateTranscriptionRequest,} from "@api/domain/TranscriptionRequest.ts";
+import {apiV1} from "@src/api";
+import {DELETE_TRANSCRIPTION_ROUTE, TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE,} from "@src/constants";
 
 export async function getTranscription(
 	request: TranscriptionRequest,
@@ -45,5 +43,18 @@ export async function sendUpdatedTranscription(
 		body: JSON.stringify(document),
 	});
 
+	console.log(response);
+}
+
+export async function sendDeleteTranscription(
+	document: DeleteTranscriptionRequest,
+): Promise<void> {
+	const response = await fetch(`${apiV1}${DELETE_TRANSCRIPTION_ROUTE}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(document),
+	});
 	console.log(response);
 }

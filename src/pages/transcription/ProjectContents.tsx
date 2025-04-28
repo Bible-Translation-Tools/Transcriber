@@ -1,13 +1,14 @@
 import FileList from "@components/image/FileList.tsx";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { useTranslation } from "react-i18next";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {useTranslation} from "react-i18next";
 
-type ProjectContentsPops = {
+type ProjectContentsProps = {
 	images: TranscribableDocument[];
 	selectedImage: TranscribableDocument | null;
 	handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	handlePageChange: (imageNumber: number) => void;
 	handleOpenMoveImageModal: (image: number) => void;
+	handleDeleteImage: (image: number) => void;
 };
 
 export default function ProjectContents({
@@ -16,7 +17,8 @@ export default function ProjectContents({
 	handleImageUpload,
 	handleOpenMoveImageModal,
 	handlePageChange,
-}: ProjectContentsPops) {
+	handleDeleteImage,
+}: ProjectContentsProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -54,7 +56,7 @@ export default function ProjectContents({
 				images={images}
 				onImageSelected={handlePageChange}
 				onMoveImage={handleOpenMoveImageModal}
-				onDeleteImage={handleOpenMoveImageModal}
+				onDeleteImage={handleDeleteImage}
 			/>
 		</div>
 	);

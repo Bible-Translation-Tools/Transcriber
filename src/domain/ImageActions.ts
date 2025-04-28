@@ -3,14 +3,11 @@ import {
 	TranscriptionErrorCode,
 	type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse.ts";
-import type {
-	TranscriptionRequest,
-	UpdateTranscriptionRequest,
-} from "@api/domain/TranscriptionRequest.ts";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import type {TranscriptionRequest, UpdateTranscriptionRequest,} from "@api/domain/TranscriptionRequest.ts";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
 import type IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import type { TranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
-import { toast } from "react-toastify";
+import type {TranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import {toast} from "react-toastify";
 
 export const prepareImageForUpload = async (
 	store: TranscriptionStore,
@@ -136,6 +133,17 @@ export const updateImage = async (
 			store.images[i].transcription = updatedImage.transcription;
 		}
 	}
+};
+
+export const deleteImage = async (
+	store: TranscriptionStore,
+	imageRepo: IndexedDBImageRepository,
+	imageToDelete: TranscribableDocument,
+) => {
+	await imageRepo.deleteImage(imageToDelete.id);
+	store.setImages((prev) =>
+		prev.filter((image) => image.id !== imageToDelete.id),
+	);
 };
 
 export const finalizeSuccessfulTranscriptionUpdate = async (

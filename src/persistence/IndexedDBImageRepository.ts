@@ -1,4 +1,4 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
 
 class IndexedDBImageRepository {
 	private static instance: IndexedDBImageRepository =
@@ -130,6 +130,25 @@ class IndexedDBImageRepository {
 
 	public static getInstance(): IndexedDBImageRepository {
 		return IndexedDBImageRepository.instance;
+	}
+
+	async deleteImage(imageId: string): Promise<void> {
+		console.log(`Deleting ${imageId}`);
+		const db = await this.dbPromise;
+		const transaction = db.transaction(this.objectStoreName, "readwrite");
+		const store = transaction.objectStore(this.objectStoreName);
+
+		return new Promise((resolve, reject) => {
+			const request = store.delete(imageId);
+
+			request.onsuccess = () => {
+				resolve();
+			};
+
+			request.onerror = () => {
+				reject(request.error);
+			};
+		});
 	}
 }
 
