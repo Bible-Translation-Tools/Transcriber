@@ -55,6 +55,7 @@
 	"Retry transcription part 1": "Retry",
 	"Retry transcription part 2": "your transcription if there is a problem.",
 	"This Image is Being Processed.": "This Image is Being Processed.",
+	"Please Be Patient message": "Please be patient as this may take several minutes, depending on internet connection.",
 	"Transcription Errored": "An error occurred.",
 	"Please Retry Message": "Please retry transcribing this document."
 }
