@@ -1,7 +1,7 @@
-import { debounce } from "lodash"; // Or your preferred debounce implementation
+import {debounce} from "lodash"; // Or your preferred debounce implementation
 import type React from "react";
-import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
+import {useCallback} from "react";
+import {useTranslation} from "react-i18next";
 
 interface Props {
 	onRetryTranscription: () => void;
@@ -18,7 +18,7 @@ const RetryTranscription: React.FC<Props> = ({
 			onRetryTranscription();
 		}, debounceDelay),
 		//   ℹ Outer scope values, ie debounceDelay and onRetryTranscription aren't valid dependencies because mutating them doesn't re-render the component.
-		[],
+		[onRetryTranscription, debounceDelay],
 	);
 
 	const isTranscribing = false; // Replace with your actual state
