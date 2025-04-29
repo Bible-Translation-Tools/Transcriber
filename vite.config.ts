@@ -7,5 +7,5 @@ import tsconfigPaths from "vite-tsconfig-paths";
 // https://vite.dev/config/
 export default defineConfig({
 	resolve: {},
-	plugins: [tsconfigPaths(), react(), tailwindcss(), cloudflare()],
+	plugins: [tsconfigPaths(), cloudflare(), react(), tailwindcss()],
 });

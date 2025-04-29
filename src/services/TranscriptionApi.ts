@@ -1,14 +1,13 @@
-import {
-	TranscriptionErrorCode,
-	type TranscriptionResponse,
-} from "@api/ai/TranscriptionResponse.ts";
-import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
-import { apiV1, transcribeRoute, updateTranscriptionRoute } from "@src/api";
+import type {TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
+import type {DeleteTranscriptionRequest} from "@api/domain/HandleTranscriptionRequest.ts";
+import type {TranscriptionRequest, UpdateTranscriptionRequest,} from "@api/domain/TranscriptionRequest.ts";
+import {apiV1} from "@src/api";
+import {DELETE_TRANSCRIPTION_ROUTE, TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE,} from "@src/constants";
 
 export async function getTranscription(
 	request: TranscriptionRequest,
-): Promise<TranscriptionResponse> {
-	const response = await fetch(`${apiV1}${transcribeRoute}`, {
+): Promise<TranscriptionSuccess> {
+	const response = await fetch(`${apiV1}${TRANSCRIBE_ROUTE}`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -21,42 +20,41 @@ export async function getTranscription(
 	try {
 		const json = await response.json();
 		console.log(json);
+		// throw if is TranscriptionError
+		if (Object.keys(json).includes("error")) {
+			throw json;
+		}
 		return json;
 	} catch (e) {
 		console.log(response);
 		console.log(e);
-		return {
-			success: false,
-			error: "Error getting transcription",
-			errorCode: TranscriptionErrorCode.UnknownError,
-		};
+		throw e;
 	}
 }
 
 export async function sendUpdatedTranscription(
-	imageId: string,
-	transcription: string,
-	language?: string,
-	book?: string,
-	chapter?: number,
-	startVerse?: number,
-	endVerse?: number,
+	document: UpdateTranscriptionRequest,
 ): Promise<void> {
-	const response = await fetch(`${apiV1}${updateTranscriptionRoute}`, {
+	const response = await fetch(`${apiV1}${UPDATE_TRANSCRIPTION_ROUTE}`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({
-			imageId,
-			transcription,
-			language,
-			book,
-			chapter,
-			startVerse,
-			endVerse,
-		}),
+		body: JSON.stringify(document),
 	});
 
+	console.log(response);
+}
+
+export async function sendDeleteTranscription(
+	document: DeleteTranscriptionRequest,
+): Promise<void> {
+	const response = await fetch(`${apiV1}${DELETE_TRANSCRIPTION_ROUTE}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(document),
+	});
 	console.log(response);
 }

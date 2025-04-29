@@ -9,6 +9,8 @@ export type TranscriptionImage = {
 	userId: string;
 	path: string;
 	data: string;
+	filename: string;
+	created: number;
 	language_code: string;
 	book_code: string;
 	chapter: number;

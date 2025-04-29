@@ -18,21 +18,21 @@ const Controls = () => {
 				className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
 				onClick={() => zoomIn()}
 			>
-				{t('Zoom In +')}
+				{t("Zoom In +")}
 			</button>
 			<button
 				type="button"
 				className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
 				onClick={() => zoomOut()}
 			>
-				{t('Zoom Out -')}
+				{t("Zoom Out -")}
 			</button>
 			<button
 				type="button"
 				className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
 				onClick={() => resetTransform()}
 			>
-				{t('Reset Zoom')}
+				{t("Reset Zoom")}
 			</button>
 		</div>
 	);
@@ -49,7 +49,7 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({ src }) => {
 			initialPositionX={200}
 			initialPositionY={100}
 		>
-			{({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+			{() => (
 				<>
 					<Controls />
 					<div className="cursor-move">

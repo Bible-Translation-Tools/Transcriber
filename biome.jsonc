@@ -21,7 +21,9 @@
 				"noExtraNonNullAssertion": "warn"
 			},
 			"a11y": {
-				"noSvgWithoutTitle": "off"
+				"noSvgWithoutTitle": "off",
+				"noRedundantAlt": "off",
+				"noLabelWithoutControl": "off"
 			},
 			"complexity": {
 				"noForEach": "off"

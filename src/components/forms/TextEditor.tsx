@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 interface TextEditorProps {
 	text: string;
@@ -12,8 +12,11 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 		null,
 	);
 
+	// biome-ignore lint/suspicious/noExplicitAny: <fine for just debouncing to take any args and forward>
 	const debounce = (func: (...args: any[]) => void, delay: number) => {
 		let timer: NodeJS.Timeout;
+
+		// biome-ignore lint/suspicious/noExplicitAny: <same>
 		return (...args: any[]) => {
 			if (typingTimeout) {
 				clearTimeout(typingTimeout);
@@ -39,7 +42,7 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 			value={inputValue}
 			defaultValue={text}
 			onChange={handleChange}
-			className="w-full grow-1 flex-1 border border-gray-300 bg-white p-2 text-lg resize-none"
+			className="h-full w-full grow-1 flex-1 border border-gray-300 bg-white p-2 text-lg resize-none"
 		/>
 	);
 };

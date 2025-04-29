@@ -1,6 +1,7 @@
+import type { LanguageOption } from "@src/data/LanguageOption.tsx";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {LanguageOption} from "@src/data/LanguageOption.tsx";
-import React, {useCallback, useEffect, useRef, useState} from "react";
 
 interface DropdownProps {
 	options: LanguageOption[];
@@ -177,7 +178,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 					{searchable && (
 						<input
 							type="text"
-							placeholder={t('Search Language placeholder')}
+							placeholder={t("Search Language placeholder")}
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
 							className="w-full p-2 border-b focus:outline-none text-color-on-surface-tertiary text-l italic font-[Noto_Sans] leading-10"
@@ -187,7 +188,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 						{recentOptions && recentOptions.length > 0 && (
 							<div className="p-2">
 								<h3 className="text-sm font-semibold mb-1">
-									{t('Recent Languages')}
+									{t("Recent Languages")}
 								</h3>
 								{recentOptions.map((option) => (
 									<button
@@ -213,7 +214,11 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
 						<div className="p-2">
 							<h3 className="text-sm font-semibold mb-1">
-								{t('All Languages title') /* "All Language" seems to be a restricted key */}
+								{
+									t(
+										"All Languages title",
+									) /* "All Language" seems to be a restricted key */
+								}
 							</h3>
 							{filteredOptions.map((option) => (
 								<button

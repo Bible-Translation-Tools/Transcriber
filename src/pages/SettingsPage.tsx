@@ -1,22 +1,21 @@
-import { useTranslation } from "react-i18next";
+import { LOGOUT_PATH } from "@api/auth/router";
 import {
 	DetaultTranscriptionPrompt,
 	TranscriptionModel,
 } from "@api/domain/TranscriptionRequest.ts";
+import { TRANSCRIBE_ROUTE } from "@src/constants";
+import { useRetranscribe } from "@src/hooks/useRetranscribe.ts";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 import type React from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import { toast, ToastContentProps } from 'react-toastify';
-import {
-    resubmitImageForTranscription,
-} from "@src/domain/ImageActions.ts";
-import i18n from 'i18next';
+import { type ToastContentProps, toast } from "react-toastify";
 
 const Settings: React.FC = () => {
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
-    const store = useTranscriptionStore();
+	const store = useTranscriptionStore();
 	const {
 		systemPrompt,
 		setSystemPrompt,
@@ -25,8 +24,9 @@ const Settings: React.FC = () => {
 		model,
 		setModel,
 	} = store;
+	const retranscribe = useRetranscribe();
 
-	const [language, setLanguage] = useState(i18n.language || 'en'); // Default to 'en' if no language is set
+	const [language, setLanguage] = useState(i18n.language || "en"); // Default to 'en' if no language is set
 	const [theme, setTheme] = useState("light");
 	const [updatedModel, setUpdatedModel] = useState<TranscriptionModel>(
 		model as TranscriptionModel,
@@ -38,25 +38,25 @@ const Settings: React.FC = () => {
 	const handleLanguageChange = (lang: string) => {
 		setLanguage(lang);
 		i18n.changeLanguage(lang); // 👈 updates i18n language
-	};	
+	};
 
 	const handleThemeChange = (selectedTheme: "light" | "dark") => {
 		setTheme(selectedTheme);
 	};
 
 	const onClose = () => {
-		navigate("/transcriber");
+		navigate(TRANSCRIBE_ROUTE);
 	};
 
 	const handleSave = () => {
 		setPrompt(updatedPrompt);
 		setSystemPrompt(updatedSystemPrompt);
 		setModel(updatedModel);
-		toast(SettingsNotificationToast, { 
-			className: 'w-[800px]',
-			position: 'bottom-center', 
-			autoClose: 50000, 
-			hideProgressBar: true 
+		toast(SettingsNotificationToast, {
+			className: "w-[800px]",
+			position: "bottom-center",
+			autoClose: 50000,
+			hideProgressBar: true,
 		});
 		onClose();
 	};
@@ -68,49 +68,50 @@ const Settings: React.FC = () => {
 	const resetSystemPrompt = () => {
 		setUpdatedSystemPrompt(DetaultTranscriptionPrompt.SYSTEM);
 	};
-	
+
 	const SettingsNotificationToast = ({ closeToast }: ToastContentProps) => {
 		const transcribeAgain = () => {
 			closeToast();
 			const selectedImage = store.selectedImage;
 			if (selectedImage != null) {
-				resubmitImageForTranscription(store, selectedImage);
+				retranscribe(selectedImage);
 			}
 		};
 
 		return (
-		  <div className="flex flex-col w-full">
-			<div className="text-sm text-blue-900">
-			  {t('Your transcription settings have changed.')}
-			  <button className="ml-2 text-blue-600 font-medium hover:underline hover:cursor"
-			  	onClick={transcribeAgain}>
-				{t('Transcribe Again')}
-			  </button>
+			<div className="flex flex-col w-full">
+				<div className="text-sm text-blue-900">
+					{t("Your transcription settings have changed.")}
+					<button
+						type={"button"}
+						className="ml-2 text-blue-600 font-medium hover:underline hover:cursor"
+						onClick={transcribeAgain}
+					>
+						{t("Transcribe Again")}
+					</button>
+				</div>
 			</div>
-		  </div>
 		);
 	};
 
 	return (
 		<div className="h-screen flex flex-col bg-gray-100 mx-auto">
 			<div className="flex justify-between items-center px-8 pt-8">
-				<h1 className="text-4xl font-semibold">
-					{t('Settings')}
-				</h1>
+				<h1 className="text-4xl font-semibold">{t("Settings")}</h1>
 				<div className="space-x-4">
 					<button
 						type="button"
 						className="text-xl bg-transparent hover:bg-gray-200 py-2 px-4 rounded"
 						onClick={onClose}
 					>
-						{t('Cancel')}
+						{t("Cancel")}
 					</button>
 					<button
 						type="button"
 						className="text-xl bg-white hover:bg-gray-200 py-2 px-4 rounded"
 						onClick={handleSave}
 					>
-						{t('Save and Close')}
+						{t("Save and Close")}
 					</button>
 				</div>
 			</div>
@@ -119,10 +120,10 @@ const Settings: React.FC = () => {
 					<section className="py-4 border-t border-gray-300 grid grid-cols-2">
 						<div>
 							<h2 className="text-2xl font-semibold mb-2">
-								{t('App Language')}
+								{t("App Language")}
 							</h2>
 							<p className="text-xl text-gray-600">
-								{t('Change Language message')}
+								{t("Change Language message")}
 							</p>
 						</div>
 						<div className="flex justify-end">
@@ -149,10 +150,10 @@ const Settings: React.FC = () => {
 					<section className="py-4 border-t border-gray-300 grid grid-cols-2">
 						<div>
 							<h2 className="text-2xl font-semibold mb-2">
-								{t('Interface Theme')}
+								{t("Interface Theme")}
 							</h2>
 							<p className="text-xl text-gray-600">
-								{t('Select how the app is displayed for you.')}
+								{t("Select how the app is displayed for you.")}
 							</p>
 						</div>
 						<div className="flex justify-start">
@@ -169,7 +170,7 @@ const Settings: React.FC = () => {
 										<div className="absolute top-4 left-2 w-8 h-3 rounded bg-blue-500" />
 										<div className="absolute top-3 right-1 w-5 h-3 rounded bg-gray-700" />
 									</div>
-									<span>{t('Dark')}</span>
+									<span>{t("Dark")}</span>
 								</button>
 								<button
 									type="button"
@@ -183,7 +184,7 @@ const Settings: React.FC = () => {
 										<div className="absolute top-4 left-2 w-8 h-3 rounded bg-blue-500" />
 										<div className="absolute top-3 right-1 w-5 h-3 rounded bg-gray-200" />
 									</div>
-									<span>{t('Light')}</span>
+									<span>{t("Light")}</span>
 								</button>
 							</div>
 						</div>
@@ -192,10 +193,12 @@ const Settings: React.FC = () => {
 					<section className="py-4 border-t border-gray-300 grid grid-cols-2">
 						<div>
 							<h2 className="text-2xl font-semibold mb-2">
-								{t('Transcription Settings')}
+								{t("Transcription Settings")}
 							</h2>
 							<p className="text-xl text-gray-600">
-								{t('Modify how your transcriptions are processed.')}
+								{t(
+									"Modify how your transcriptions are processed.",
+								)}
 							</p>
 						</div>
 						<div className="flex flex-col justify-between content-between">
@@ -204,7 +207,7 @@ const Settings: React.FC = () => {
 									htmlFor="modelSelect"
 									className="block text-lg font-light text-gray-700"
 								>
-									{t('Model')}
+									{t("Model")}
 								</label>
 								<div className="flex justify-start">
 									<select
@@ -236,7 +239,7 @@ const Settings: React.FC = () => {
 									htmlFor="systemPromptArea"
 									className="block text-lg font-light text-gray-700"
 								>
-									{t('System Prompt')}
+									{t("System Prompt")}
 								</label>
 								<textarea
 									id="systemPromptArea"
@@ -253,7 +256,7 @@ const Settings: React.FC = () => {
 										className="text-xl bg-white hover:bg-gray-200 py-2 px-4 rounded"
 										onClick={resetSystemPrompt}
 									>
-										{t('Reset Default')}
+										{t("Reset Default")}
 									</button>
 								</div>
 							</div>
@@ -262,7 +265,7 @@ const Settings: React.FC = () => {
 									htmlFor="promptArea"
 									className="block text-lg font-light text-gray-700"
 								>
-									{t('Prompt')}
+									{t("Prompt")}
 								</label>
 								<textarea
 									id="promptArea"
@@ -279,11 +282,19 @@ const Settings: React.FC = () => {
 										className="text-xl bg-white hover:bg-gray-200 py-2 px-4 rounded"
 										onClick={resetPrompt}
 									>
-										{t('Reset Default')}
+										{t("Reset Default")}
 									</button>
 								</div>
 							</div>
 						</div>
+					</section>
+					<section className="py-4 border-t border-gray-300">
+						<a
+							className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+							href={LOGOUT_PATH}
+						>
+							{t("Logout")}
+						</a>
 					</section>
 				</div>
 			</div>

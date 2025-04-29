@@ -3,6 +3,8 @@ export type TranscriptionRequest = {
 	image: string;
 	imageId: string;
 	languageCode: string;
+	created: number;
+	filename: string;
 	bookCode: string;
 	chapter: number;
 	systemPrompt: string;
@@ -12,6 +14,11 @@ export type TranscriptionRequest = {
 export type UpdateTranscriptionRequest = {
 	imageId: string;
 	transcription: string;
+	languageCode?: string;
+	bookCode?: string;
+	chapter?: number;
+	startVerse?: number;
+	endVerse?: number;
 };
 
 export enum TranscriptionModel {

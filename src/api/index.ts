@@ -1,132 +1,93 @@
-import { authRouter } from "@api/auth/router";
-import { checkOrRefresh, syncR2Keys } from "@api/auth/utils";
 import {
+	deleteTranscriptionRequestSchema,
+	HandleDeleteTranscriptionRequest,
 	HandleTranscriptionRequest,
 	HandleUpdateTranscriptionRequest,
 	transcriptionRequestSchema,
 	updateTranscriptionRequestSchema,
 } from "@api/domain/HandleTranscriptionRequest";
-import { TranscriptionModel } from "@api/domain/TranscriptionRequest";
-import { Hono } from "hono";
-import { except } from "hono/combine";
-import type { JwtVariables } from "hono/jwt";
-import { logger } from "hono/logger";
-import { validator } from "hono/validator";
+import {TranscriptionModel} from "@api/domain/TranscriptionRequest";
+import {Hono} from "hono";
+import {authRouter} from "./auth/router";
+
+import {DELETE_TRANSCRIPTION_ROUTE, TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE,} from "@src/constants";
 import * as v from "valibot";
-import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
-import { R2ImageRepository } from "./persistence/R2ImageRepository";
-import {TranscriptionErrorCode} from "@api/ai/TranscriptionResponse.ts";
+import type {HonoBindings} from "./auth/utils";
+import {mockHandleTranscriptionRequest} from "./domain/mock";
+import {D1TranscriptionRepository} from "./persistence/D1TranscriptionRepository";
+import {R2ImageRepository} from "./persistence/R2ImageRepository";
 
 export const apiV1 = "/api/v1";
-const apiV1Router = new Hono<{
-	Bindings: Env;
-	Variables: JwtVariables;
-}>();
+const apiV1Router = new Hono<HonoBindings>();
 apiV1Router.basePath(apiV1);
 
-export const transcribeRoute = "/transcriber/";
-export const updateTranscriptionRoute = "/updateTranscription/";
+apiV1Router.post(`${TRANSCRIBE_ROUTE}`, async (c) => {
+	console.log("Recieved transcription request");
+	const user = c.get("user");
+	const body = await c.req.json();
+	const parsed = v.safeParse(transcriptionRequestSchema, body);
+	if (!parsed.success) {
+		parsed.issues.forEach((issue) => console.log(issue.message));
+		return c.json({ error: "Invalid request format" }, { status: 400 });
+	}
 
-apiV1Router.use("*", logger());
-apiV1Router.use(
-	"*",
-	except([`${apiV1}/auth/logout`], (c, next) => syncR2Keys(c, next)),
-);
-
-// MIDDLEWARES. no response returned here.
-// This is the only ai route right now and we don't need to register middleware for the auth route itself, but if they had a common prefix, we could group as use (routePrefix, middles)
-// check for access Token first
-apiV1Router.post(transcribeRoute, async (c, next) => {
-	return await checkOrRefresh(c, next);
-});
-
-apiV1Router.get("checkTest", async (c) => {
-	const jwtPayload = c.get("jwtPayload");
-	return c.json({ jwtPayload });
-});
-
-apiV1Router.post(
-	`${transcribeRoute}`,
-	validator("json", (value) => {
-		// throws if invalid
-		const parsed = v.safeParse(transcriptionRequestSchema, value);
-		if (!parsed.success) {
-			console.error("invalid transcription request");
-			console.log(value);
-			return new Response(
-				JSON.stringify({ error: "Invalid request format" }),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
-				},
-			);
-		}
-		return parsed.output;
-	}),
-	async (c) => {
-		console.log("Recieved transcription request");
-		const jwtPayload = c.get("jwtPayload");
-		const body = c.req.valid("json");
-
-		const bucket = c.env.HTR_STORAGE;
-		const repo = new D1TranscriptionRepository(
-			c.env.HTR_DATABASE,
-			new R2ImageRepository(bucket),
-		);
-
-		let user = undefined;
-		try {
-			user = jwtPayload.sub;
-		} catch (e) {
-			console.log(e);
-			return Response.json({
-				success: false,
-				error: "User not found, try logging back in.",
-				errorCode: TranscriptionErrorCode.NoUserFound,
-			});
-		}
-		const htrRes = await HandleTranscriptionRequest(
-			user,
+	const bucket = c.env.HTR_STORAGE;
+	const repo = new D1TranscriptionRepository(
+		c.env.HTR_DATABASE,
+		new R2ImageRepository(bucket),
+	);
+	let htrRes: Response;
+	if (import.meta.env.DEV) {
+		htrRes = await mockHandleTranscriptionRequest(
+			String(user.wacsUserId),
 			createApiMap(c.env),
-			body,
+			parsed.output,
 			repo,
 		);
-		return htrRes;
-	},
-);
-
-apiV1Router.post(
-	`${updateTranscriptionRoute}`,
-	validator("json", (value) => {
-		// throws if invalid
-		const parsed = v.safeParse(updateTranscriptionRequestSchema, value);
-		if (!parsed.success) {
-			console.error("invalid transcription update request");
-			return new Response(
-				JSON.stringify({ error: "Invalid request format" }),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
-				},
-			);
-		}
-		return parsed.output;
-	}),
-	async (c) => {
-		console.log("Recieved update request.");
-		const body = c.req.valid("json");
-
-		const bucket = c.env.HTR_STORAGE;
-		const repo = new D1TranscriptionRepository(
-			c.env.HTR_DATABASE,
-			new R2ImageRepository(bucket),
+	} else {
+		htrRes = await HandleTranscriptionRequest(
+			String(user.wacsUserId),
+			createApiMap(c.env),
+			parsed.output,
+			repo,
 		);
+	}
+	return htrRes;
+});
 
-		console.log(JSON.stringify(body));
-		const htrRes = await HandleUpdateTranscriptionRequest(body, repo);
-		return htrRes;
-	},
-);
+apiV1Router.post(`${UPDATE_TRANSCRIPTION_ROUTE}`, async (c) => {
+	console.log("Recieved update request.");
+	const body = await c.req.json();
+	const parsed = v.safeParse(updateTranscriptionRequestSchema, body);
+	if (!parsed.success) {
+		return c.json({ error: "Invalid request format" }, { status: 400 });
+	}
+
+	const bucket = c.env.HTR_STORAGE;
+	const repo = new D1TranscriptionRepository(
+		c.env.HTR_DATABASE,
+		new R2ImageRepository(bucket),
+	);
+	const htrRes = await HandleUpdateTranscriptionRequest(parsed.output, repo);
+	return htrRes;
+});
+
+apiV1Router.post(`${DELETE_TRANSCRIPTION_ROUTE}`, async (c) => {
+	console.log("Recieved delete request.");
+	const body = await c.req.json();
+	const parsed = v.safeParse(deleteTranscriptionRequestSchema, body);
+	if (!parsed.success) {
+		return c.json({ error: "Invalid request format" }, { status: 400 });
+	}
+
+	const bucket = c.env.HTR_STORAGE;
+	const repo = new D1TranscriptionRepository(
+		c.env.HTR_DATABASE,
+		new R2ImageRepository(bucket),
+	);
+	const htrRes = await HandleDeleteTranscriptionRequest(parsed.output, repo);
+	return htrRes;
+});
 
 apiV1Router.route("/auth", authRouter);
 

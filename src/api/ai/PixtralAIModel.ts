@@ -23,18 +23,23 @@ export class PixtralAIModel implements Model {
 		this.prompt = prompt;
 	}
 
-	async transcribe(base64Image: any): Promise<TranscriptionResponse> {
+	async transcribe(
+		imageId: string,
+		base64Image: string,
+	): Promise<TranscriptionResponse> {
 		return await this.transcribeImpl(
 			new Mistral({
 				apiKey: this.key,
 			}),
+			imageId,
 			base64Image,
 		);
 	}
 
 	async transcribeImpl(
 		client: Mistral,
-		base64Image: any,
+		imageId: string,
+		base64Image: string,
 	): Promise<TranscriptionResponse> {
 		console.log("Sending image to pixtral");
 		const response = await client.chat.complete({
@@ -68,15 +73,16 @@ export class PixtralAIModel implements Model {
 		if (isContentValid) {
 			return {
 				success: isContentValid,
+				imageId: imageId,
 				transcription: transcription,
 			};
-		} else {
-			return {
-				success: false,
-				error: "Error extracting transcription from pixtral response",
-				errorCode: TranscriptionErrorCode.UnknownError,
-			};
 		}
+		return {
+			success: false,
+			imageId: imageId,
+			error: "Error extracting transcription from pixtral response",
+			errorCode: TranscriptionErrorCode.UnknownError,
+		};
 	}
 }
 
@@ -92,9 +98,8 @@ function extractTranscription(
 			.map((chunk) => {
 				if (chunk.type === "text" && chunk.text) {
 					return chunk.text;
-				} else {
-					return "";
 				}
+				return "";
 			})
 			.join("");
 	}

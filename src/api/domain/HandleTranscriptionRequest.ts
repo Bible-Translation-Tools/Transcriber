@@ -1,14 +1,14 @@
 import OpenAIModel from "@api/ai/OpenAIModel.ts";
 
-import { PixtralAIModel } from "@api/ai/PixtralAIModel.ts";
+import {PixtralAIModel} from "@api/ai/PixtralAIModel.ts";
 import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
 	type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse";
-import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
-import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
-import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
+import type {TranscriptionImage} from "@api/data/TranscriptionImage.ts";
+import {TranscriptionModel} from "@api/domain/TranscriptionRequest.ts";
+import type {D1TranscriptionRepository} from "@api/persistence/D1TranscriptionRepository";
 import * as v from "valibot";
 
 export async function HandleUpdateTranscriptionRequest(
@@ -17,6 +17,24 @@ export async function HandleUpdateTranscriptionRequest(
 ): Promise<Response> {
 	await imageRepo.updateTranscriptionText(body.imageId, body.transcription);
 	return Response.json({});
+}
+
+export async function HandleDeleteTranscriptionRequest(
+	body: DeleteTranscriptionRequest,
+	imageRepo: D1TranscriptionRepository,
+): Promise<Response> {
+	console.log("Removing image: ", body.imageId);
+	try {
+		await imageRepo.markImageAsUserDeleted(body.imageId);
+		return Response.json({});
+	} catch (error) {
+		return Response.json({
+			success: false,
+			imageId: body.imageId,
+			error: "Failed to remove image.",
+			errorCode: TranscriptionErrorCode.UnknownError,
+		});
+	}
 }
 
 export async function HandleTranscriptionRequest(
@@ -34,6 +52,7 @@ export async function HandleTranscriptionRequest(
 			if (!apiKey) {
 				return Response.json({
 					success: false,
+					imageId: body.imageId,
 					error: "Error, could not get api key from environment for Pixtral",
 					errorCode: TranscriptionErrorCode.AuthenticationError,
 				});
@@ -44,7 +63,10 @@ export async function HandleTranscriptionRequest(
 				body.systemPrompt,
 				body.prompt,
 			);
-			transcriptionResponse = await model.transcribe(body.image);
+			transcriptionResponse = await model.transcribe(
+				body.imageId,
+				body.image,
+			);
 			break;
 		}
 		case TranscriptionModel.PIXTRAL: {
@@ -52,6 +74,7 @@ export async function HandleTranscriptionRequest(
 			if (!apiKey) {
 				return Response.json({
 					success: false,
+					imageId: body.imageId,
 					error: "Error, could not get api key from environment for Pixtral",
 					errorCode: TranscriptionErrorCode.AuthenticationError,
 				});
@@ -62,15 +85,19 @@ export async function HandleTranscriptionRequest(
 				body.systemPrompt,
 				body.prompt,
 			);
-			transcriptionResponse = await model.transcribe(body.image);
+			transcriptionResponse = await model.transcribe(
+				body.imageId,
+				body.image,
+			);
 			break;
 		}
 		default: {
 			console.log(`Missing model ${body.model}`);
-			console.log(`Pixtral: ${body.model === TranscriptionModel.PIXTRAL}`);
+			console.log(
+				`Pixtral: ${body.model === TranscriptionModel.PIXTRAL}`,
+			);
 		}
 	}
-
 
 	if (transcriptionResponse != null) {
 		const bookCode = body.bookCode;
@@ -89,6 +116,8 @@ export async function HandleTranscriptionRequest(
 			user_deleted: false,
 			userId: userId,
 			path: `${userId}/${body.imageId}`,
+			filename: body.filename,
+			created: body.created,
 			data: body.image,
 			book_code: bookCode,
 			language_code: languageCode,
@@ -121,6 +150,8 @@ export const transcriptionRequestSchema = v.object({
 	image: v.string(),
 	imageId: v.string(),
 	languageCode: v.string(),
+	filename: v.string(),
+	created: v.number(), //unix timestamp
 	bookCode: v.string(),
 	chapter: v.number(),
 	systemPrompt: v.string(),
@@ -141,4 +172,11 @@ export const updateTranscriptionRequestSchema = v.object({
 });
 export type UpdateTranscriptionRequest = v.InferOutput<
 	typeof updateTranscriptionRequestSchema
+>;
+
+export const deleteTranscriptionRequestSchema = v.object({
+	imageId: v.string(),
+});
+export type DeleteTranscriptionRequest = v.InferOutput<
+	typeof deleteTranscriptionRequestSchema
 >;
