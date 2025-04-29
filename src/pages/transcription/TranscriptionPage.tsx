@@ -166,7 +166,6 @@ function TranscriptionPage() {
 					handleDeleteImage={handleOpenDeleteImageDialog}
 				/>
 				<EditorWrapper
-					key={Math.random()}
 					images={store.images}
 					selectedImage={store.selectedImage}
 					handleResubmitImage={handleResubmitImage}
