@@ -34,6 +34,20 @@ export async function getWacsApiTokenAndUser({
 			}),
 		});
 		if (!res.ok) {
+			const resHeadersDbug: Record<string, string> = {};
+			for (const pair of res.headers.entries()) {
+				const key = pair[0];
+				const v = pair[1];
+				if (key.toLowerCase() !== "authorization") {
+					resHeadersDbug[key] = v;
+				}
+			}
+			console.error({
+				status: res.status,
+				statusText: res.statusText,
+				body: await res.text(),
+				headers: JSON.stringify(resHeadersDbug),
+			});
 			throw new Error("failed to get wacs api token");
 		}
 		const token = (await res.json()) as TokenRes;
