@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import {BookItem} from "@components/navigation/BookItem.tsx";
+import {ShowWhen} from "@components/utils/ShowWhen.tsx";
 
 interface BookDropdownProps {
     onSelect: (book: string, chapter: number) => void;
@@ -95,7 +96,6 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
     const [searchTerm, setSearchTerm] = useState("");
     const [openBook, setOpenBook] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
 
     const bookIsInProgress = (bookSlug: string): boolean => {
         try {
@@ -367,9 +367,11 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                     <div className="flex flex-col items start p-2 max-h-[75vh] overflow-y-scroll">
                         {filteredOptions.map((option, index) => (
                             <React.Fragment key={option.value}>
-                                <BookItem key={option.value} option={option} inProgress={bookProgress[index]}
+                                <BookItem key={option.value}
+                                          option={option}
+                                          inProgress={bookProgress[index]}
                                           handleBookClick={handleBookClick}/>
-                                {openBook === option.value && (
+                                <ShowWhen when={openBook === option.value}>
                                     <div
                                         className="self-stretch inline-flex justify-start items-start gap-0.5 flex-wrap content-start">
                                         {chapters.map((chapter) => (
@@ -385,7 +387,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                                             </button>
                                         ))}
                                     </div>
-                                )}
+                                </ShowWhen>
                             </React.Fragment>
                         ))}
                     </div>
