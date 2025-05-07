@@ -354,7 +354,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                 </svg> */}
             </button>
 
-            {isOpen && (
+            <ShowWhen when={isOpen}>
                 <div className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border">
                     <input
                         type="text"
@@ -392,7 +392,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                         ))}
                     </div>
                 </div>
-            )}
+            </ShowWhen>
         </div>
     );
 };
