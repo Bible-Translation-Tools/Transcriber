@@ -1,8 +1,7 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {Chip} from "@mui/material";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {ShowWhen} from "@components/utils/ShowWhen.tsx";
+import {BookItem} from "@components/navigation/BookItem.tsx";
 
 interface BookDropdownProps {
     onSelect: (book: string, chapter: number) => void;
@@ -10,17 +9,18 @@ interface BookDropdownProps {
     selectedChapter?: number | null;
 }
 
+export interface BookOption {
+    label: string;
+    value: string;
+}
+
 const BookDropdown: React.FC<BookDropdownProps> = ({
                                                        onSelect,
                                                        selectedBook,
                                                        selectedChapter,
                                                    }) => {
-    interface Option {
-        label: string;
-        value: string;
-    }
 
-    const bookOptions: Option[] = [
+    const bookOptions: BookOption[] = [
         {label: "Genesis", value: "gen"},
         {label: "Exodus", value: "exo"},
         {label: "Leviticus", value: "lev"},
@@ -95,6 +95,20 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
     const [searchTerm, setSearchTerm] = useState("");
     const [openBook, setOpenBook] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+
+    const bookIsInProgress = (bookSlug: string): boolean => {
+        try {
+            const prog = Object.keys(progress[language!.code][bookSlug]).length;
+            return prog > 0;
+        } catch {
+            return false;
+        }
+    }
+
+    const bookProgress = useMemo(() => {
+        return bookOptions.map((option: BookOption) => bookIsInProgress(option.value))
+    }, [language, progress]);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -351,24 +365,10 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                     />
 
                     <div className="flex flex-col items start p-2 max-h-[75vh] overflow-y-scroll">
-                        {filteredOptions.map((option) => (
+                        {filteredOptions.map((option, index) => (
                             <React.Fragment key={option.value}>
-                                <button
-                                    type="button"
-                                    className="flex-start p-2 hover:bg-gray-100 cursor-pointer text-left"
-                                    onClick={() =>
-                                        handleBookClick(option.value)
-                                    }
-                                >
-                                    <div className="flex justify-between">
-                                        <div>{option.label}</div>
-
-                                        <ShowWhen
-                                            when={progress && language?.code != null && option.value != null && progress[language.code][option.value] && Object.keys(progress[language.code][option.value]).length > 0}>
-                                            <Chip variant={"outlined"} label={"In Progress"}/>
-                                        </ShowWhen>
-                                    </div>
-                                </button>
+                                <BookItem key={option.value} option={option} inProgress={bookProgress[index]}
+                                          handleBookClick={handleBookClick}/>
                                 {openBook === option.value && (
                                     <div
                                         className="self-stretch inline-flex justify-start items-start gap-0.5 flex-wrap content-start">
