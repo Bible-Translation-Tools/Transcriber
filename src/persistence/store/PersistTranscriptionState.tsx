@@ -3,76 +3,81 @@ import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type {TranscriptionState} from "@src/persistence/store/TranscriptionState.ts";
 import type {PersistStorage, StorageValue} from "zustand/middleware";
+import {calculateProgress} from "@src/domain/CalculateProgress.ts";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
 
 function restoreTranscriptionStatus(
-	image: TranscribableDocument,
+    image: TranscribableDocument,
 ): TranscriptionStatus {
-	if (image.transcription == null) {
-		return TranscriptionStatus.TRANSCRIPTION_ERROR;
-	}
-	return TranscriptionStatus.COMPLETED;
+    if (image.transcription == null) {
+        return TranscriptionStatus.TRANSCRIPTION_ERROR;
+    }
+    return TranscriptionStatus.COMPLETED;
 }
 
 export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
-	getItem: async (name) => {
-		const str = localStorage.getItem(name);
-		if (!str) return null;
-		const existingValue = JSON.parse(str);
+    getItem: async (name) => {
+        const str = localStorage.getItem(name);
+        if (!str) return null;
+        const existingValue = JSON.parse(str);
 
-		let selectedImage = null;
-		let images: TranscribableDocument[] | null = null;
-		let recentLanguages: string[] = [];
-		if (existingValue.state.selectedImage) {
-			selectedImage = await imageRepo.retrieveImage(
-				existingValue.state.selectedImage,
-			);
-			selectedImage = { ...selectedImage, loading: false };
-		}
+        let selectedImage = null;
+        let images: TranscribableDocument[] | null = null;
+        let recentLanguages: string[] = [];
+        if (existingValue.state.selectedImage) {
+            selectedImage = await imageRepo.retrieveImage(
+                existingValue.state.selectedImage,
+            );
+            selectedImage = {...selectedImage, loading: false};
+        }
 
-		const { language, bookCode, chapter } = existingValue.state;
-		if (language != null) {
-			images = await imageRepo.getImages(
-				language.code,
-				bookCode,
-				chapter,
-			);
-			images = images.map((image: TranscribableDocument) => ({
-				...image,
-				status: restoreTranscriptionStatus(image),
-			}));
-			recentLanguages = imageRepo.getRecentLanguages();
-		} else {
-			await imageRepo.retrieveAllImages();
-			recentLanguages = imageRepo.getRecentLanguages();
-		}
+        const {language, bookCode, chapter} = existingValue.state;
 
-		const rehydrated = {
-			...existingValue,
-			state: {
-				...existingValue.state,
-				recentLanguages: recentLanguages,
-				selectedImage: selectedImage,
-				images: images ? images : [],
-			},
-		};
+        const allImages = await imageRepo.retrieveAllImages();
+        const progress = calculateProgress(allImages ?? []);
 
-		console.log("Rehydrating store with:", rehydrated);
-		return rehydrated;
-	},
-	setItem: async (name, newValue: StorageValue<TranscriptionState>) => {
-		const str = JSON.stringify({
-			...newValue,
-			state: {
-				...newValue.state,
-				selectedImage: newValue.state.selectedImage
-					? newValue.state.selectedImage.id
-					: null,
-				images: newValue.state.images.map((image) => image.id),
-			},
-		});
-		localStorage.setItem(name, str);
-	},
-	removeItem: async (name) => localStorage.removeItem(name),
+        if (language != null) {
+            images = await imageRepo.getImages(
+                language.code,
+                bookCode,
+                chapter,
+            );
+            images = images.map((image: TranscribableDocument) => ({
+                ...image,
+                status: restoreTranscriptionStatus(image),
+            }));
+            recentLanguages = imageRepo.getRecentLanguages();
+        } else {
+            recentLanguages = imageRepo.getRecentLanguages();
+        }
+
+        const rehydrated = {
+            ...existingValue,
+            state: {
+                ...existingValue.state,
+                recentLanguages: recentLanguages,
+                selectedImage: selectedImage,
+                images: images ? images : [],
+                progress: progress
+            },
+        };
+
+        console.log("Rehydrating store with:", rehydrated);
+        return rehydrated;
+    },
+    setItem: async (name, newValue: StorageValue<TranscriptionState>) => {
+        const str = JSON.stringify({
+            ...newValue,
+            state: {
+                ...newValue.state,
+                selectedImage: newValue.state.selectedImage
+                    ? newValue.state.selectedImage.id
+                    : null,
+                images: newValue.state.images.map((image) => image.id),
+            },
+        });
+        localStorage.setItem(name, str);
+    },
+    removeItem: async (name) => localStorage.removeItem(name),
 };
