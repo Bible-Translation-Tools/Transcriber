@@ -2,7 +2,7 @@ import RangeInput from "@components/forms/RangeInput.tsx";
 import TextEditor from "@components/forms/TextEditor.tsx";
 import Pagination from "@components/image/Pagination.tsx";
 import {ShowWhen} from "@components/utils/ShowWhen.tsx";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument.ts";
 import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import TranscriptionStatusOverlay from "@src/pages/transcription/TranscriptionStatusOverlay.tsx";
@@ -28,6 +28,7 @@ export default function EditorWrapper({
 	if (!images || images.length === 0) {
 		return <EmptyProject />;
 	}
+
 	return (
 		<div className="grow flex flex-row">
 			<Pagination

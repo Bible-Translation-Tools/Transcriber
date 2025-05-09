@@ -1,19 +1,21 @@
-import { LOGIN_PATH, type LoginReturnType } from "@api/auth/router";
-import { ShowWhen } from "@src/components/utils/ShowWhen";
-import { TRANSCRIBE_ROUTE } from "@src/constants";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import {LOGIN_PATH, type LoginReturnType} from "@api/auth/router";
+import {ShowWhen} from "@src/components/utils/ShowWhen";
+import {TRANSCRIBE_ROUTE} from "@src/constants";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {calculateProgress} from "@src/domain/CalculateProgress.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
-import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore";
-import { type FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore";
+import {type FormEvent, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 function Login() {
 	// Going to use programmatic navigation since the server on login will send back updatedMetaData if there is any, and any new images if we don't have the ID for one;
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 	const [err, setErr] = useState<string | boolean>(false);
-	const { setSelectedImage, refreshProject } = useTranscriptionStore();
+	const { setSelectedImage, refreshProject, setProgress } =
+		useTranscriptionStore();
 
 	async function loginAndSendLocalImages(e: FormEvent<HTMLFormElement>) {
 		setErr(false);
@@ -82,6 +84,9 @@ function Login() {
 			setLoading(false);
 			// refresh idx db
 			refreshProject();
+			const imageRepo = IndexedDBImageRepository.getInstance();
+			const documents = await imageRepo.retrieveAllImages();
+			setProgress(calculateProgress(documents ?? []));
 			navigate(TRANSCRIBE_ROUTE);
 		} catch (e) {
 			console.error(e);

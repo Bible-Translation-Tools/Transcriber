@@ -1,5 +1,6 @@
 import type {TranscribableDocument} from "@src/data/TranscribableDocument";
 import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
+import {calculateProgress} from "@src/domain/CalculateProgress.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type {TranscriptionState} from "@src/persistence/store/TranscriptionState.ts";
 import type {PersistStorage, StorageValue} from "zustand/middleware";
@@ -32,6 +33,10 @@ export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
 		}
 
 		const { language, bookCode, chapter } = existingValue.state;
+
+		const allImages = await imageRepo.retrieveAllImages();
+		const progress = calculateProgress(allImages ?? []);
+
 		if (language != null) {
 			images = await imageRepo.getImages(
 				language.code,
@@ -42,9 +47,14 @@ export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
 				...image,
 				status: restoreTranscriptionStatus(image),
 			}));
+			if (selectedImage != null) {
+				selectedImage = {
+					...selectedImage,
+					status: restoreTranscriptionStatus(selectedImage),
+				};
+			}
 			recentLanguages = imageRepo.getRecentLanguages();
 		} else {
-			await imageRepo.retrieveAllImages();
 			recentLanguages = imageRepo.getRecentLanguages();
 		}
 
@@ -55,6 +65,7 @@ export const transcriptionStateStorage: PersistStorage<TranscriptionState> = {
 				recentLanguages: recentLanguages,
 				selectedImage: selectedImage,
 				images: images ? images : [],
+				progress: progress,
 			},
 		};
 
