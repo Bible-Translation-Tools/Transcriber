@@ -2,6 +2,7 @@ import {LOGIN_PATH, type LoginReturnType} from "@api/auth/router";
 import {ShowWhen} from "@src/components/utils/ShowWhen";
 import {TRANSCRIBE_ROUTE} from "@src/constants";
 import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import {calculateProgress} from "@src/domain/CalculateProgress.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
 import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore";
@@ -68,16 +69,20 @@ function Login() {
 					const updated: TranscribableDocument = {
 						...localImg, //spread properites only on idb first
 						...withFalsyValsRemoved, //overwrite with spread from server any common properties Id is the same from server
+						status: TranscriptionStatus.COMPLETED,
 					};
 					imagesForStateSet.push(updated);
 					await idbInstance.storeImage(localImg.id, updated);
 				} else {
 					// else just create new
-					imagesForStateSet.push(withFalsyValsRemoved);
-					await idbInstance.storeImage(
-						withFalsyValsRemoved.id,
-						withFalsyValsRemoved,
-					);
+					imagesForStateSet.push({
+						...withFalsyValsRemoved,
+						status: TranscriptionStatus.COMPLETED,
+					});
+					await idbInstance.storeImage(withFalsyValsRemoved.id, {
+						...withFalsyValsRemoved,
+						status: TranscriptionStatus.COMPLETED,
+					});
 				}
 			}
 			setSelectedImage(imagesForStateSet[0]);
