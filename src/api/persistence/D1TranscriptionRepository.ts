@@ -148,9 +148,9 @@ export class D1TranscriptionRepository {
 		await this.db
 			.update(schema.transcriptionImages)
 			.set({
-				userDeleted: false,
+				userDeleted: true,
 			})
-			.where(eq(schema.transcriptions.imageId, imageId));
+			.where(eq(schema.transcriptionImages.id, imageId));
 	}
 
 	async updateTranscriptionText(
