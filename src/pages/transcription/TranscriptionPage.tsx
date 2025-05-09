@@ -16,17 +16,18 @@ import {useMemo, useState} from "react";
 import {toast} from "react-toastify";
 
 function TranscriptionPage() {
-	const store = useTranscriptionStore();
+	const { images, selectedImage, setSelectedImage, refreshProject } =
+		useTranscriptionStore();
 	const uploadImage = useUploadImage();
 	const updateImage = useUpdateImage();
 	const deleteImage = useDeleteImage();
 	const retranscribe = useRetranscribe();
 
 	useMemo(() => {
-		store.images.sort((a, b) => {
+		images.sort((a, b) => {
 			return a.created - b.created;
 		});
-	}, [store.images]);
+	}, [images]);
 
 	const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
 	const [modalImage, setMoveImageModalImage] =
@@ -36,14 +37,14 @@ function TranscriptionPage() {
 		useState<TranscribableDocument | null>(null);
 
 	const handleOpenMoveImageModal = (page: number) => {
-		setMoveImageModalImage(store.images[page]);
+		setMoveImageModalImage(images[page]);
 		setIsMoveImageModalOpen(true);
 
 		console.log(page);
 	};
 
 	const handleOpenDeleteImageDialog = (page: number) => {
-		setImageToDelete(store.images[page]);
+		setImageToDelete(images[page]);
 		setIsDeleteDialogOpen(true);
 
 		console.log(page);
@@ -86,7 +87,7 @@ function TranscriptionPage() {
 			startVerse: startVerse,
 			endVerse: endVerse,
 		});
-		store.refreshProject();
+		refreshProject();
 		setMoveImageModalImage(null);
 	};
 
@@ -103,29 +104,29 @@ function TranscriptionPage() {
 	};
 
 	const handleResubmitImage = () => {
-		if (store.selectedImage != null) {
+		if (selectedImage != null) {
 			toast.success(ImageSubmittedToast, {
 				data: "Submitted Image for Transcription.",
 			});
-			retranscribe(store.selectedImage);
+			retranscribe(selectedImage);
 		}
 	};
 
 	// change to explicitly be a useCallback?
 	const handleTextChange = (newText: string) => {
-		if (store.selectedImage != null) {
+		if (selectedImage != null) {
 			updateImage({
-				...store.selectedImage,
+				...selectedImage,
 				transcription: newText,
 			});
 		}
 	};
 
 	const handlePageChange = (page: number) => {
-		if (page < store.images.length && page >= 0) {
-			store.setSelectedImage(store.images[page]);
+		if (page < images.length && page >= 0) {
+			setSelectedImage(images[page]);
 		} else {
-			store.setSelectedImage(store.images[0]);
+			setSelectedImage(images[0]);
 		}
 	};
 
@@ -138,10 +139,10 @@ function TranscriptionPage() {
 
 	const handleVerseRangeChange = (start: number, end: number) => {
 		const validVerseRange = validateVerseRange(start, end);
-		if (validVerseRange && store.selectedImage) {
-			store.selectedImage.startVerse = start;
-			store.selectedImage.endVerse = end;
-			updateImage(store.selectedImage);
+		if (validVerseRange && selectedImage) {
+			selectedImage.startVerse = start;
+			selectedImage.endVerse = end;
+			updateImage(selectedImage);
 		}
 	};
 
@@ -157,17 +158,17 @@ function TranscriptionPage() {
 			<NavBar />
 			<div className="flex overflow-y-auto">
 				<ProjectContents
-					key={store.images.length}
-					images={store.images}
-					selectedImage={store.selectedImage}
+					key={images.length}
+					images={images}
+					selectedImage={selectedImage}
 					handleImageUpload={handleImageUpload}
 					handleOpenMoveImageModal={handleOpenMoveImageModal}
 					handlePageChange={handlePageChange}
 					handleDeleteImage={handleOpenDeleteImageDialog}
 				/>
 				<EditorWrapper
-					images={store.images}
-					selectedImage={store.selectedImage}
+					images={images}
+					selectedImage={selectedImage}
 					handleResubmitImage={handleResubmitImage}
 					handleTextChange={handleTextChange}
 					handleVerseRangeChange={handleVerseRangeChange}
