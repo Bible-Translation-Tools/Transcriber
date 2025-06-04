@@ -1,5 +1,5 @@
 import type React from "react";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 interface TextEditorProps {
 	text: string;

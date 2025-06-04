@@ -3,14 +3,13 @@ export type Progress = LanguageBookCounts;
 type ImageCount = number;
 
 interface ChapterImageCounts {
-    [chapterNumber: string]: ImageCount;
+	[chapterNumber: string]: ImageCount;
 }
 
 interface BookChapterCounts {
-    [bookIdentifier: string]: ChapterImageCounts;
+	[bookIdentifier: string]: ChapterImageCounts;
 }
 
 interface LanguageBookCounts {
-    [languageCode: string]: BookChapterCounts;
+	[languageCode: string]: BookChapterCounts;
 }
-

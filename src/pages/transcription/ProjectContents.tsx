@@ -1,6 +1,6 @@
 import FileList from "@components/image/FileList.tsx";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {useTranslation} from "react-i18next";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { useTranslation } from "react-i18next";
 
 type ProjectContentsProps = {
 	images: TranscribableDocument[];

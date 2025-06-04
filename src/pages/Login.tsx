@@ -1,14 +1,14 @@
-import {LOGIN_PATH, type LoginReturnType} from "@api/auth/router";
-import {ShowWhen} from "@src/components/utils/ShowWhen";
-import {TRANSCRIBE_ROUTE} from "@src/constants";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
-import {calculateProgress} from "@src/domain/CalculateProgress.ts";
+import { LOGIN_PATH, type LoginReturnType } from "@api/auth/router";
+import { ShowWhen } from "@src/components/utils/ShowWhen";
+import { TRANSCRIBE_ROUTE } from "@src/constants";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
+import { calculateProgress } from "@src/domain/CalculateProgress.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore";
-import {type FormEvent, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {toast} from "react-toastify";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore";
+import { type FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Login() {
 	// Going to use programmatic navigation since the server on login will send back updatedMetaData if there is any, and any new images if we don't have the ID for one;

@@ -1,6 +1,6 @@
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {TranscriptionStatus} from "@src/data/TranscriptionStatus";
-import {parsePdfFile} from "@src/domain/PdfToImages.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { TranscriptionStatus } from "@src/data/TranscriptionStatus";
+import { parsePdfFile } from "@src/domain/PdfToImages.ts";
 
 export async function processFiles(
 	files: File[],

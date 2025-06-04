@@ -1,184 +1,198 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-	// "files": { "ignoreUnknown": false, "ignore": ["tsconfig.*.json"] },
-	"files": {
-		"ignoreUnknown": false,
-		"ignore": ["tsconfig.*.json", "dist/**/*", "./worker-configuration.d.ts"]
-	},
-	"formatter": { "enabled": true, "indentStyle": "tab" },
-	"organizeImports": { "enabled": true },
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"style": {
-				"useAsConstAssertion": "error",
-				"noParameterAssign": "warn"
-			},
-			"suspicious": {
-				"noExplicitAny": "warn",
-				"noExtraNonNullAssertion": "warn"
-			},
-			"a11y": {
-				"noSvgWithoutTitle": "off",
-				"noRedundantAlt": "off",
-				"noLabelWithoutControl": "off"
-			},
-			"complexity": {
-				"noForEach": "off"
-			}
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double",
-			"indentStyle": "tab",
-			"indentWidth": 4
-		}
-	},
-	"overrides": [
-		{
-			"include": ["**/*.{ts,tsx}"],
-			"linter": {
-				"rules": {
-					"complexity": {
-						"noExtraBooleanCast": "warn"
-					},
-					"correctness": {
-						"useExhaustiveDependencies": "warn",
-						"useHookAtTopLevel": "error"
-					}
-				}
-			},
-			"javascript": {
-				"globals": [
-					"onscrollend",
-					"onpointerleave",
-					"oncontextrestored",
-					"onemptied",
-					"ongamepaddisconnected",
-					"onkeypress",
-					"onloadeddata",
-					"onmouseup",
-					"onvolumechange",
-					"onpaste",
-					"onstorage",
-					"onkeyup",
-					"onabort",
-					"oncut",
-					"ontransitionrun",
-					"onafterprint",
-					"onblur",
-					"ondurationchange",
-					"ontransitionstart",
-					"oncanplaythrough",
-					"onanimationend",
-					"onmouseleave",
-					"ondragleave",
-					"onplay",
-					"onunhandledrejection",
-					"onbeforeprint",
-					"onpointercancel",
-					"onsubmit",
-					"ondragstart",
-					"onmessage",
-					"location",
-					"onoffline",
-					"onappinstalled",
-					"onwheel",
-					"onended",
-					"onkeydown",
-					"onclick",
-					"onfocus",
-					"onscroll",
-					"ongamepadconnected",
-					"oncanplay",
-					"onpointerdown",
-					"ondeviceorientationabsolute",
-					"onauxclick",
-					"ondevicemotion",
-					"onratechange",
-					"ontransitionend",
-					"onscrollsnapchanging",
-					"onchange",
-					"onselect",
-					"onbeforeinstallprompt",
-					"onbeforetoggle",
-					"onmouseout",
-					"ontimeupdate",
-					"ondragover",
-					"oncuechange",
-					"ontransitioncancel",
-					"onprogress",
-					"onbeforeinput",
-					"onpointerenter",
-					"onmouseenter",
-					"oninvalid",
-					"onpointerout",
-					"onpagereveal",
-					"onpause",
-					"onanimationstart",
-					"onwaiting",
-					"onscrollsnapchange",
-					"ondeviceorientation",
-					"onclose",
-					"onbeforeunload",
-					"oncancel",
-					"onseeked",
-					"onpointerover",
-					"ongotpointercapture",
-					"onloadedmetadata",
-					"onpageshow",
-					"onstalled",
-					"oncontextmenu",
-					"onreset",
-					"ondrag",
-					"onbeforematch",
-					"onload",
-					"onlostpointercapture",
-					"onsuspend",
-					"onselectionchange",
-					"onpagehide",
-					"onrejectionhandled",
-					"onunload",
-					"onanimationcancel",
-					"onmousedown",
-					"onpointerup",
-					"onmouseover",
-					"onformdata",
-					"oncontentvisibilityautostatechange",
-					"onresize",
-					"onsearch",
-					"ontoggle",
-					"onpageswap",
-					"onbeforexrselect",
-					"onlanguagechange",
-					"ondragenter",
-					"onerror",
-					"onpointermove",
-					"onmousemove",
-					"ondrop",
-					"onhashchange",
-					"onsecuritypolicyviolation",
-					"onslotchange",
-					"oncopy",
-					"onanimationiteration",
-					"ondblclick",
-					"ondragend",
-					"onpointerrawupdate",
-					"onpopstate",
-					"onplaying",
-					"oncontextlost",
-					"onloadstart",
-					"onseeking",
-					"oninput",
-					"onmessageerror",
-					"onselectstart",
-					"onmousewheel",
-					"ononline"
-				]
-			}
-		}
-	]
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    // "files": { "ignoreUnknown": false, "ignore": ["tsconfig.*.json"] },
+    "files": {
+        "ignoreUnknown": false,
+        "ignore": [
+            "tsconfig.*.json",
+            "dist/**/*",
+            "./worker-configuration.d.ts"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "style": {
+                "useAsConstAssertion": "error",
+                "noParameterAssign": "warn"
+            },
+            "suspicious": {
+                "noExplicitAny": "warn",
+                "noExtraNonNullAssertion": "warn"
+            },
+            "a11y": {
+                "noSvgWithoutTitle": "off",
+                "noRedundantAlt": "off",
+                "noLabelWithoutControl": "off"
+            },
+            "complexity": {
+                "noForEach": "off"
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "double",
+            "indentStyle": "tab",
+            "indentWidth": 4
+        }
+    },
+    "overrides": [
+        {
+            "include": ["**/*.{ts,tsx}"],
+            "linter": {
+                "rules": {
+                    "complexity": {
+                        "noExtraBooleanCast": "warn"
+                    },
+                    "correctness": {
+                        "useExhaustiveDependencies": "warn",
+                        "useHookAtTopLevel": "error"
+                    }
+                }
+            },
+            "javascript": {
+                "globals": [
+                    "onscrollend",
+                    "onpointerleave",
+                    "oncontextrestored",
+                    "onemptied",
+                    "ongamepaddisconnected",
+                    "onkeypress",
+                    "onloadeddata",
+                    "onmouseup",
+                    "onvolumechange",
+                    "onpaste",
+                    "onstorage",
+                    "onkeyup",
+                    "onabort",
+                    "oncut",
+                    "ontransitionrun",
+                    "onafterprint",
+                    "onblur",
+                    "ondurationchange",
+                    "ontransitionstart",
+                    "oncanplaythrough",
+                    "onanimationend",
+                    "onmouseleave",
+                    "ondragleave",
+                    "onplay",
+                    "onunhandledrejection",
+                    "onbeforeprint",
+                    "onpointercancel",
+                    "onsubmit",
+                    "ondragstart",
+                    "onmessage",
+                    "location",
+                    "onoffline",
+                    "onappinstalled",
+                    "onwheel",
+                    "onended",
+                    "onkeydown",
+                    "onclick",
+                    "onfocus",
+                    "onscroll",
+                    "ongamepadconnected",
+                    "oncanplay",
+                    "onpointerdown",
+                    "ondeviceorientationabsolute",
+                    "onauxclick",
+                    "ondevicemotion",
+                    "onratechange",
+                    "ontransitionend",
+                    "onscrollsnapchanging",
+                    "onchange",
+                    "onselect",
+                    "onbeforeinstallprompt",
+                    "onbeforetoggle",
+                    "onmouseout",
+                    "ontimeupdate",
+                    "ondragover",
+                    "oncuechange",
+                    "ontransitioncancel",
+                    "onprogress",
+                    "onbeforeinput",
+                    "onpointerenter",
+                    "onmouseenter",
+                    "oninvalid",
+                    "onpointerout",
+                    "onpagereveal",
+                    "onpause",
+                    "onanimationstart",
+                    "onwaiting",
+                    "onscrollsnapchange",
+                    "ondeviceorientation",
+                    "onclose",
+                    "onbeforeunload",
+                    "oncancel",
+                    "onseeked",
+                    "onpointerover",
+                    "ongotpointercapture",
+                    "onloadedmetadata",
+                    "onpageshow",
+                    "onstalled",
+                    "oncontextmenu",
+                    "onreset",
+                    "ondrag",
+                    "onbeforematch",
+                    "onload",
+                    "onlostpointercapture",
+                    "onsuspend",
+                    "onselectionchange",
+                    "onpagehide",
+                    "onrejectionhandled",
+                    "onunload",
+                    "onanimationcancel",
+                    "onmousedown",
+                    "onpointerup",
+                    "onmouseover",
+                    "onformdata",
+                    "oncontentvisibilityautostatechange",
+                    "onresize",
+                    "onsearch",
+                    "ontoggle",
+                    "onpageswap",
+                    "onbeforexrselect",
+                    "onlanguagechange",
+                    "ondragenter",
+                    "onerror",
+                    "onpointermove",
+                    "onmousemove",
+                    "ondrop",
+                    "onhashchange",
+                    "onsecuritypolicyviolation",
+                    "onslotchange",
+                    "oncopy",
+                    "onanimationiteration",
+                    "ondblclick",
+                    "ondragend",
+                    "onpointerrawupdate",
+                    "onpopstate",
+                    "onplaying",
+                    "oncontextlost",
+                    "onloadstart",
+                    "onseeking",
+                    "oninput",
+                    "onmessageerror",
+                    "onselectstart",
+                    "onmousewheel",
+                    "ononline"
+                ]
+            }
+        }
+    ]
 }

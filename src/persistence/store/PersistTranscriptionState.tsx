@@ -1,9 +1,9 @@
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
-import {calculateProgress} from "@src/domain/CalculateProgress.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
+import { calculateProgress } from "@src/domain/CalculateProgress.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import type {TranscriptionState} from "@src/persistence/store/TranscriptionState.ts";
-import type {PersistStorage, StorageValue} from "zustand/middleware";
+import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
+import type { PersistStorage, StorageValue } from "zustand/middleware";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
 

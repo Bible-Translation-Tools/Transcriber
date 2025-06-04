@@ -1,7 +1,7 @@
-import {debounce} from "lodash"; // Or your preferred debounce implementation
+import { debounce } from "lodash"; // Or your preferred debounce implementation
 import type React from "react";
-import {useCallback} from "react";
-import {useTranslation} from "react-i18next";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
 	onRetryTranscription: () => void;

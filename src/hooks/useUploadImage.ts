@@ -1,18 +1,21 @@
-import type {TranscriptionError, TranscriptionSuccess,} from "@api/ai/TranscriptionResponse.ts";
-import type {TranscriptionRequest} from "@api/domain/TranscriptionRequest.ts";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
+import type {
+	TranscriptionError,
+	TranscriptionSuccess,
+} from "@api/ai/TranscriptionResponse.ts";
+import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import {
 	finalizeSuccessfulTranscription,
 	handleTranscriptionError,
 	prepareImageForUpload,
 	updateImage,
 } from "@src/domain/ImageActions.ts";
-import {processFiles} from "@src/domain/ProcessFiles.tsx";
+import { processFiles } from "@src/domain/ProcessFiles.tsx";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {getTranscription} from "@src/services/TranscriptionApi.ts";
-import {useMutation} from "@tanstack/react-query";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { getTranscription } from "@src/services/TranscriptionApi.ts";
+import { useMutation } from "@tanstack/react-query";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
 

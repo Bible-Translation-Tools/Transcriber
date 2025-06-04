@@ -1,5 +1,5 @@
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?worker";
 

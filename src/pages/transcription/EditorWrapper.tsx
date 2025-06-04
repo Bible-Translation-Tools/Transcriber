@@ -1,12 +1,12 @@
 import RangeInput from "@components/forms/RangeInput.tsx";
 import TextEditor from "@components/forms/TextEditor.tsx";
 import Pagination from "@components/image/Pagination.tsx";
-import {ShowWhen} from "@components/utils/ShowWhen.tsx";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument.ts";
-import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
+import { ShowWhen } from "@components/utils/ShowWhen.tsx";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument.ts";
+import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import TranscriptionStatusOverlay from "@src/pages/transcription/TranscriptionStatusOverlay.tsx";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 type EditorWrapperProps = {
 	images: TranscribableDocument[] | undefined;

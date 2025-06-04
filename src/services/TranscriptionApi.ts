@@ -1,8 +1,15 @@
-import type {TranscriptionSuccess} from "@api/ai/TranscriptionResponse.ts";
-import type {DeleteTranscriptionRequest} from "@api/domain/HandleTranscriptionRequest.ts";
-import type {TranscriptionRequest, UpdateTranscriptionRequest,} from "@api/domain/TranscriptionRequest.ts";
-import {apiV1} from "@src/api";
-import {DELETE_TRANSCRIPTION_ROUTE, TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE,} from "@src/constants";
+import type { TranscriptionSuccess } from "@api/ai/TranscriptionResponse.ts";
+import type { DeleteTranscriptionRequest } from "@api/domain/HandleTranscriptionRequest.ts";
+import type {
+	TranscriptionRequest,
+	UpdateTranscriptionRequest,
+} from "@api/domain/TranscriptionRequest.ts";
+import { apiV1 } from "@src/api";
+import {
+	DELETE_TRANSCRIPTION_ROUTE,
+	TRANSCRIBE_ROUTE,
+	UPDATE_TRANSCRIPTION_ROUTE,
+} from "@src/constants";
 
 export async function getTranscription(
 	request: TranscriptionRequest,
