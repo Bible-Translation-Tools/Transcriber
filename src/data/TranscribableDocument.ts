@@ -1,4 +1,4 @@
-import type {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
+import type { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import * as v from "valibot";
 
 export interface TranscribableDocument {

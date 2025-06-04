@@ -1,11 +1,14 @@
-import type {TranscriptionError} from "@api/ai/TranscriptionResponse.ts";
-import type {DeleteTranscriptionRequest} from "@api/domain/HandleTranscriptionRequest.ts";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {deleteImage, handleTranscriptionError,} from "@src/domain/ImageActions.ts";
+import type { TranscriptionError } from "@api/ai/TranscriptionResponse.ts";
+import type { DeleteTranscriptionRequest } from "@api/domain/HandleTranscriptionRequest.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import {
+	deleteImage,
+	handleTranscriptionError,
+} from "@src/domain/ImageActions.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {sendDeleteTranscription} from "@src/services/TranscriptionApi.ts";
-import {useMutation} from "@tanstack/react-query";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { sendDeleteTranscription } from "@src/services/TranscriptionApi.ts";
+import { useMutation } from "@tanstack/react-query";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
 

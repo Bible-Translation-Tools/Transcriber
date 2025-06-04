@@ -1,5 +1,5 @@
-import type {Progress} from "@src/data/Progress.ts";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument.ts";
+import type { Progress } from "@src/data/Progress.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument.ts";
 
 export function calculateProgress(
 	documents: TranscribableDocument[],

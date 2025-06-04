@@ -1,14 +1,14 @@
 import OpenAIModel from "@api/ai/OpenAIModel.ts";
 
-import {PixtralAIModel} from "@api/ai/PixtralAIModel.ts";
+import { PixtralAIModel } from "@api/ai/PixtralAIModel.ts";
 import {
-    TranscriptionErrorCode,
-    type TranscriptionResponse,
-    type TranscriptionSuccess,
+	TranscriptionErrorCode,
+	type TranscriptionResponse,
+	type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse";
-import type {TranscriptionImage} from "@api/data/TranscriptionImage.ts";
-import {TranscriptionModel} from "@api/domain/TranscriptionRequest.ts";
-import type {D1TranscriptionRepository} from "@api/persistence/D1TranscriptionRepository";
+import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
+import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
+import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
 import * as v from "valibot";
 
 export async function HandleUpdateTranscriptionRequest(

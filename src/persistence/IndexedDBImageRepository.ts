@@ -1,4 +1,4 @@
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 
 class IndexedDBImageRepository {
 	private static instance: IndexedDBImageRepository =
