@@ -2,6 +2,7 @@ import DocumentViewer from "@components/image/Pagination.tsx";
 import type {TranscribableDocument} from "@src/data/TranscribableDocument.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import {TranscriptionWorkspace} from "@src/pages/transcription/TranscriptionWorkspace.tsx";
+import {Panel, PanelGroup, PanelResizeHandle} from "react-resizable-panels";
 
 type EditorWrapperProps = {
 	images: TranscribableDocument[] | undefined;
@@ -23,12 +24,17 @@ export default function EditorWrapper({
 	}
 
 	return (
-		<div className="grow flex flex-row">
-			<DocumentViewer
-				image={selectedImage}
-				onRetryTranscription={handleResubmitImage}
-			/>
-			<div className="flex-2">
+		<PanelGroup direction="horizontal">
+			<Panel minSize={20}>
+				<DocumentViewer
+					image={selectedImage}
+					onRetryTranscription={handleResubmitImage}
+				/>
+			</Panel>
+			<PanelResizeHandle className="w-2 bg-gray-200 flex items-center justify-center">
+				<div className="w-1 h-6 bg-gray-400 rounded-full" />
+			</PanelResizeHandle>
+			<Panel minSize={20}>
 				<TranscriptionWorkspace
 					key={selectedImage?.id}
 					selectedImage={selectedImage}
@@ -39,7 +45,7 @@ export default function EditorWrapper({
 						handleTextChange(text);
 					}}
 				/>
-			</div>
-		</div>
+			</Panel>
+		</PanelGroup>
 	);
 }

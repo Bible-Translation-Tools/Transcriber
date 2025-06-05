@@ -1,8 +1,8 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {TranscriptionStatus} from "@src/data/TranscriptionStatus.ts";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import {useEffect, useRef, useState} from "react";
+import {useTranslation} from "react-i18next";
 
 interface FileListItemProps {
 	fileName: string;
@@ -176,7 +176,7 @@ const FileList: React.FC<FileListProps> = ({
 	onDeleteImage,
 }) => {
 	return (
-		<div className="w-[20vw] h-screen overflow-y-scroll">
+		<div className="h-screen overflow-y-scroll">
 			{images.map((image, index) => {
 				return (
 					<FileListItem
