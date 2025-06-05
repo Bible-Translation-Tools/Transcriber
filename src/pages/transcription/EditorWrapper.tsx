@@ -1,8 +1,8 @@
 import DocumentViewer from "@components/image/Pagination.tsx";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument.ts";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
-import {TranscriptionWorkspace} from "@src/pages/transcription/TranscriptionWorkspace.tsx";
-import {Panel, PanelGroup, PanelResizeHandle} from "react-resizable-panels";
+import { TranscriptionWorkspace } from "@src/pages/transcription/TranscriptionWorkspace.tsx";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 type EditorWrapperProps = {
 	images: TranscribableDocument[] | undefined;

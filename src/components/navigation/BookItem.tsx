@@ -1,7 +1,7 @@
+import type { BookOption } from "@components/navigation/BookDropdown.tsx";
 import { ShowWhen } from "@components/utils/ShowWhen.tsx";
 import { Chip } from "@mui/material";
-import React from "react";
-import { BookOption } from "@components/navigation/BookDropdown.tsx";
+import type React from "react";
 
 interface BookItemProps {
 	handleBookClick: (book: string) => void;

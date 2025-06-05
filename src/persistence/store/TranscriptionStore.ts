@@ -3,6 +3,7 @@ import {
 	TranscriptionModel,
 } from "@api/domain/TranscriptionRequest";
 import type { LanguageOption } from "@src/data/LanguageOption.tsx";
+import type { Progress } from "@src/data/Progress.ts";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import { transcriptionStateStorage } from "@src/persistence/store/PersistTranscriptionState.tsx";
@@ -10,7 +11,6 @@ import type { TranscriptionActions } from "@src/persistence/store/TranscriptionA
 import type { TranscriptionState } from "@src/persistence/store/TranscriptionState.ts";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Progress } from "@src/data/Progress.ts";
 
 export type TranscriptionStore = TranscriptionState & TranscriptionActions;
 

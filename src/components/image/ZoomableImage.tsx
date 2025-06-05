@@ -1,7 +1,11 @@
 import type React from "react";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
-import {TransformComponent, TransformWrapper, useControls,} from "react-zoom-pan-pinch";
+import {
+	TransformComponent,
+	TransformWrapper,
+	useControls,
+} from "react-zoom-pan-pinch";
 
 const Controls = () => {
 	const { t } = useTranslation();
@@ -48,8 +52,11 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({ src }) => {
 			{() => (
 				<>
 					<Controls />
-					<div className="cursor-move">
-						<TransformComponent>
+					<div className="cursor-move h-full">
+						<TransformComponent
+							wrapperClass="h-full!"
+							contentClass="h-full!"
+						>
 							<img
 								className="max-w-full max-h-full object-contain block"
 								src={src}
