@@ -2,18 +2,19 @@ import "../../App.css";
 import DeleteConfirmationDialog from "@components/dialogs/DeleteConfirmationDialog.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import NavBar from "@components/navigation/NavBar.tsx";
-import { ShowWhen } from "@components/utils/ShowWhen.tsx";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { useDeleteImage } from "@src/hooks/useDeleteImage.ts";
-import { useRetranscribe } from "@src/hooks/useRetranscribe";
-import { useUpdateImage } from "@src/hooks/useUpdateImage";
-import { useUploadImage } from "@src/hooks/useUploadImage.ts";
+import {ShowWhen} from "@components/utils/ShowWhen.tsx";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
+import {useDeleteImage} from "@src/hooks/useDeleteImage.ts";
+import {useRetranscribe} from "@src/hooks/useRetranscribe";
+import {useUpdateImage} from "@src/hooks/useUpdateImage";
+import {useUploadImage} from "@src/hooks/useUploadImage.ts";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
-import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
-import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
-import { useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
+import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
+import {useMemo, useState} from "react";
+import {Panel, PanelGroup, PanelResizeHandle} from "react-resizable-panels";
+import {toast} from "react-toastify";
 
 function TranscriptionPage() {
 	const { images, selectedImage, setSelectedImage, refreshProject } =
@@ -156,43 +157,50 @@ function TranscriptionPage() {
 	return (
 		<div className="flex flex-col h-screen bg-gray-100">
 			<NavBar />
-			<div className="flex overflow-y-auto">
-				<ProjectContents
-					key={images.length}
-					images={images}
-					selectedImage={selectedImage}
-					handleImageUpload={handleImageUpload}
-					handleOpenMoveImageModal={handleOpenMoveImageModal}
-					handlePageChange={handlePageChange}
-					handleDeleteImage={handleOpenDeleteImageDialog}
-				/>
-				<EditorWrapper
-					images={images}
-					selectedImage={selectedImage}
-					handleResubmitImage={handleResubmitImage}
-					handleTextChange={handleTextChange}
-					handleVerseRangeChange={handleVerseRangeChange}
-				/>
-				<ShowWhen when={!!modalImage}>
-					<MoveImageModal
-						key={modalImage?.id}
-						// biome-ignore lint/style/noNonNullAssertion: <Show Narrows>
-						image={modalImage!}
-						isOpen={isModalOpen}
-						onClose={handleCloseModal}
-						onSave={handleSaveModal}
+			<PanelGroup direction="horizontal">
+				<Panel defaultSize={25} minSize={20} maxSize={30}>
+					<ProjectContents
+						key={images.length}
+						images={images}
+						selectedImage={selectedImage}
+						handleImageUpload={handleImageUpload}
+						handleOpenMoveImageModal={handleOpenMoveImageModal}
+						handlePageChange={handlePageChange}
+						handleDeleteImage={handleOpenDeleteImageDialog}
 					/>
-				</ShowWhen>
-				<ShowWhen when={!!imageToDelete}>
-					<DeleteConfirmationDialog
-						key={imageToDelete?.id}
-						imageName={imageToDelete?.filename}
-						isOpen={isDeleteDialogOpen}
-						onClose={handleCloseDeleteDialog}
-						onConfirmDelete={handleDeleteImage}
+				</Panel>
+				<PanelResizeHandle className="w-2 bg-gray-200 flex items-center justify-center">
+					<div className="w-1 h-6 bg-gray-400 rounded-full" />
+				</PanelResizeHandle>
+				<Panel defaultSize={75}>
+					<EditorWrapper
+						images={images}
+						selectedImage={selectedImage}
+						handleResubmitImage={handleResubmitImage}
+						handleTextChange={handleTextChange}
+						handleVerseRangeChange={handleVerseRangeChange}
 					/>
-				</ShowWhen>
-			</div>
+				</Panel>
+			</PanelGroup>
+			<ShowWhen when={!!modalImage}>
+				<MoveImageModal
+					key={modalImage?.id}
+					// biome-ignore lint/style/noNonNullAssertion: <Show Narrows>
+					image={modalImage!}
+					isOpen={isModalOpen}
+					onClose={handleCloseModal}
+					onSave={handleSaveModal}
+				/>
+			</ShowWhen>
+			<ShowWhen when={!!imageToDelete}>
+				<DeleteConfirmationDialog
+					key={imageToDelete?.id}
+					imageName={imageToDelete?.filename}
+					isOpen={isDeleteDialogOpen}
+					onClose={handleCloseDeleteDialog}
+					onConfirmDelete={handleDeleteImage}
+				/>
+			</ShowWhen>
 		</div>
 	);
 }
