@@ -1,4 +1,4 @@
-import Pagination from "@components/image/Pagination.tsx";
+import DocumentViewer from "@components/image/Pagination.tsx";
 import type {TranscribableDocument} from "@src/data/TranscribableDocument.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
 import {TranscriptionWorkspace} from "@src/pages/transcription/TranscriptionWorkspace.tsx";
@@ -24,7 +24,7 @@ export default function EditorWrapper({
 
 	return (
 		<div className="grow flex flex-row">
-			<Pagination
+			<DocumentViewer
 				image={selectedImage}
 				onRetryTranscription={handleResubmitImage}
 			/>
