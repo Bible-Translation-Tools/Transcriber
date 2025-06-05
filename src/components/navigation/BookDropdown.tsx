@@ -1,3 +1,6 @@
+import { BookItem } from "@components/navigation/BookItem.tsx";
+import { ShowWhen } from "@components/utils/ShowWhen.tsx";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 import React, {
 	useCallback,
 	useEffect,
@@ -6,9 +9,6 @@ import React, {
 	useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
-import { BookItem } from "@components/navigation/BookItem.tsx";
-import { ShowWhen } from "@components/utils/ShowWhen.tsx";
 
 interface BookDropdownProps {
 	onSelect: (book: string, chapter: number) => void;

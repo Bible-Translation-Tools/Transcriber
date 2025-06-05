@@ -1,8 +1,8 @@
 import type { TranscriptionResponse } from "@api/ai/TranscriptionResponse";
+import type { TranscriptionImage } from "@api/data/TranscriptionImage";
+import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
 import type { TranscriptionRequest } from "./HandleTranscriptionRequest";
 import type { TranscriptionModel } from "./TranscriptionRequest";
-import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
-import type { TranscriptionImage } from "@api/data/TranscriptionImage";
 
 export async function mockHandleTranscriptionRequest(
 	userId: string,

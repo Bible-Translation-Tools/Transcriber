@@ -2,19 +2,19 @@ import "../../App.css";
 import DeleteConfirmationDialog from "@components/dialogs/DeleteConfirmationDialog.tsx";
 import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import NavBar from "@components/navigation/NavBar.tsx";
-import {ShowWhen} from "@components/utils/ShowWhen.tsx";
-import type {TranscribableDocument} from "@src/data/TranscribableDocument";
-import {useDeleteImage} from "@src/hooks/useDeleteImage.ts";
-import {useRetranscribe} from "@src/hooks/useRetranscribe";
-import {useUpdateImage} from "@src/hooks/useUpdateImage";
-import {useUploadImage} from "@src/hooks/useUploadImage.ts";
+import { ShowWhen } from "@components/utils/ShowWhen.tsx";
+import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { useDeleteImage } from "@src/hooks/useDeleteImage.ts";
+import { useRetranscribe } from "@src/hooks/useRetranscribe";
+import { useUpdateImage } from "@src/hooks/useUpdateImage";
+import { useUploadImage } from "@src/hooks/useUploadImage.ts";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
-import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
-import {ImageSubmittedToast} from "@src/toasts/ImageSubmittedToast.tsx";
-import {useMemo, useState} from "react";
-import {Panel, PanelGroup, PanelResizeHandle} from "react-resizable-panels";
-import {toast} from "react-toastify";
+import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
+import { useMemo, useState } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { toast } from "react-toastify";
 
 function TranscriptionPage() {
 	const { images, selectedImage, setSelectedImage, refreshProject } =
@@ -155,9 +155,15 @@ function TranscriptionPage() {
 	};
 
 	return (
-		<div className="flex flex-col h-screen bg-gray-100">
+		<div
+			id="transcriptionPagePanels"
+			className="flex flex-col h-screen bg-gray-100"
+		>
 			<NavBar />
-			<PanelGroup direction="horizontal">
+			<PanelGroup
+				className="h-[calc(100%_-_5rem)]! overflow-visible!"
+				direction="horizontal"
+			>
 				<Panel defaultSize={25} minSize={20} maxSize={30}>
 					<ProjectContents
 						key={images.length}

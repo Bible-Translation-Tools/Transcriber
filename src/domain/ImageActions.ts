@@ -9,10 +9,10 @@ import type {
 } from "@api/domain/TranscriptionRequest.ts";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
+import { calculateProgress } from "@src/domain/CalculateProgress.ts";
 import type IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import type { TranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 import { toast } from "react-toastify";
-import { calculateProgress } from "@src/domain/CalculateProgress.ts";
 
 export const prepareImageForUpload = async (
 	store: TranscriptionStore,
