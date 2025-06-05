@@ -34,7 +34,7 @@ export default function EditorWrapper({
 			<PanelResizeHandle className="w-2 bg-gray-200 flex items-center justify-center">
 				<div className="w-1 h-6 bg-gray-400 rounded-full" />
 			</PanelResizeHandle>
-			<Panel minSize={20}>
+			<Panel defaultSize={40} minSize={30}>
 				<TranscriptionWorkspace
 					key={selectedImage?.id}
 					selectedImage={selectedImage}

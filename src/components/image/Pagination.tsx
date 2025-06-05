@@ -1,4 +1,4 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import type {TranscribableDocument} from "@src/data/TranscribableDocument";
 import RetryTranscription from "@src/pages/transcription/RetryTranscription.tsx";
 import ZoomableImage from "./ZoomableImage.tsx";
 
@@ -12,12 +12,12 @@ const Pagination: React.FC<PaginationProps> = ({
 	onRetryTranscription,
 }) => {
 	return (
-		<div className="relative w-[451px] flex flex-col justify-content items-center p-6">
-			<div className="grow relative flex-start group ">
+		<div className="h-full flex flex-col justify-between items-center">
+			<div className="relative flex-start group flex-1 min-h-0 min-w-0 overflow-hidden">
 				{image ? <ZoomableImage src={image.data} /> : <div />}
 			</div>
 			{image ? (
-				<div className="flex-end flex">
+				<div className="flex-none mt-auto pt-4 pb-4 ">
 					<RetryTranscription
 						onRetryTranscription={onRetryTranscription}
 					/>
