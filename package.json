@@ -32,6 +32,7 @@
         "i18next-browser-languagedetector": "^8.0.5",
         "i18next-http-backend": "^3.0.2",
         "lodash": "^4.17.21",
+        "logrocket": "^10.1.0",
         "openai": "^4.96.0",
         "pdfjs-dist": "^5.1.91",
         "react": "^19.1.0",
