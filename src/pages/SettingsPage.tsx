@@ -1,16 +1,13 @@
-import { LOGOUT_PATH } from "@api/auth/router";
-import {
-	DetaultTranscriptionPrompt,
-	TranscriptionModel,
-} from "@api/domain/TranscriptionRequest.ts";
-import { TRANSCRIBE_ROUTE } from "@src/constants";
-import { useRetranscribe } from "@src/hooks/useRetranscribe.ts";
-import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import {LOGOUT_PATH} from "@api/auth/router";
+import {DetaultTranscriptionPrompt, TranscriptionModel,} from "@api/domain/TranscriptionRequest.ts";
+import {TRANSCRIBE_ROUTE} from "@src/constants";
+import {useRetranscribe} from "@src/hooks/useRetranscribe.ts";
+import {useTranscriptionStore} from "@src/persistence/store/TranscriptionStore.ts";
 import type React from "react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { type ToastContentProps, toast } from "react-toastify";
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
+import {useNavigate} from "react-router-dom";
+import {toast, type ToastContentProps} from "react-toastify";
 
 const Settings: React.FC = () => {
 	const { t, i18n } = useTranslation();
@@ -67,6 +64,12 @@ const Settings: React.FC = () => {
 
 	const resetSystemPrompt = () => {
 		setUpdatedSystemPrompt(DetaultTranscriptionPrompt.SYSTEM);
+	};
+
+	const logout = () => {
+		localStorage.removeItem("userId");
+		localStorage.removeItem("userName");
+		localStorage.removeItem("userEmail");
 	};
 
 	const SettingsNotificationToast = ({ closeToast }: ToastContentProps) => {
@@ -292,6 +295,7 @@ const Settings: React.FC = () => {
 						<a
 							className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
 							href={LOGOUT_PATH}
+							onClick={logout}
 						>
 							{t("Logout")}
 						</a>
