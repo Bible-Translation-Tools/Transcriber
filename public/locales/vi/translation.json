@@ -56,6 +56,6 @@
     "Retry transcription part 2": "bản chép nếu có sự cố.",
     "This Image is Being Processed.": "Hình ảnh này đang được xử lý.",
     "Please Be Patient message": "Vui lòng kiên nhẫn vì quá trình này có thể mất vài phút tùy theo kết nối internet.",
-    "Transcription Errored": "An error occurred.",
-    "Please Retry Message": "Please retry transcribing this document."
+    "Transcription Errored": "Một lỗi đã xảy ra.",
+    "Please Retry Message": "Vui lòng thử lại việc sao chép tài liệu này."
 }
