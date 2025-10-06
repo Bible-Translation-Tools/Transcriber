@@ -23,7 +23,7 @@
     "Model": "Modelo",
     "System Prompt": "Prompt do sistema",
     "Reset Default": "Redefinir padrão",
-    "Prompt": "Prompt",
+    "Prompt": "Imediato",
     "Recent Languages": "Idiomas recentes",
     "All Languages title": "Todos os idiomas",
     "Search Language placeholder": "Pesquisar \"English\" ou \"eng\"...",
@@ -56,6 +56,6 @@
     "Retry transcription part 2": "a transcrição se houver algum problema.",
     "This Image is Being Processed.": "Esta imagem está sendo processada.",
     "Please Be Patient message": "Por favor, seja paciente. Isso pode levar alguns minutos, dependendo da conexão com a internet.",
-    "Transcription Errored": "An error occurred.",
-    "Please Retry Message": "Please retry transcribing this document."
+    "Transcription Errored": "Ocorreu um erro.",
+    "Please Retry Message": "Por favor, tente transcrever este documento."
 }
