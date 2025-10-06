@@ -56,6 +56,6 @@
     "Retry transcription part 2": "Sie die Transkription, wenn ein Problem auftritt.",
     "This Image is Being Processed.": "Dieses Bild wird verarbeitet.",
     "Please Be Patient message": "Bitte haben Sie etwas Geduld, da dies je nach Internetverbindung einige Minuten dauern kann.",
-    "Transcription Errored": "An error occurred.",
-    "Please Retry Message": "Please retry transcribing this document."
+    "Transcription Errored": "Es ist ein Fehler aufgetreten.",
+    "Please Retry Message": "Bitte machen Sie das Transkriptieren dieses Dokuments erneut."
 }
