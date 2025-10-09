@@ -55,5 +55,7 @@
     "Retry transcription part 1": "Reintentar",
     "Retry transcription part 2": "la transcripción si hay algún problema.",
     "This Image is Being Processed.": "Esta imagen está siendo procesada.",
-    "Please Be Patient message": "Por favor, sea paciente; esto puede tardar varios minutos dependiendo de la conexión a internet."
+    "Please Be Patient message": "Por favor, sea paciente; esto puede tardar varios minutos dependiendo de la conexión a internet.",
+    "Transcription Errored": "Ocurrió un error.",
+    "Please Retry Message": "Vuelva a intentar la transcripción de este documento."
 }
