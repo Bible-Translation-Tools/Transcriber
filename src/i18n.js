@@ -7,7 +7,7 @@ i18n.use(Backend)
 	.use(LanguageDetector) // Detect language from browser/localStorage
 	.use(initReactI18next) // Pass i18n instance to react-i18next
 	.init({
-		supportedLngs: ["en", "fr", "es", "de", "pt", "vi"],
+		supportedLngs: ["en", "fr", "es", "de", "pt", "vi", "id"],
 		fallbackLng: "en",
 		detection: {
 			order: ["querystring", "cookie", "localStorage", "navigator"],
