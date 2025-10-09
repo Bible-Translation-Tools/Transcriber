@@ -144,6 +144,7 @@ const Settings: React.FC = () => {
 									<option value="de">Deutsch</option>
 									<option value="pt">Português</option>
 									<option value="vi">Tiếng Việt</option>
+									<option value="id">Bahasa Indonesia</option>
 									{/* Add more language options here */}
 								</select>
 							</div>
