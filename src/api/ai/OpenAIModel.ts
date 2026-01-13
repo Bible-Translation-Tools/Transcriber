@@ -1,7 +1,7 @@
-import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
+import {DetaultTranscriptionPrompt} from "@api/domain/TranscriptionRequest.ts";
 import OpenAI from "openai";
 import type Model from "./Model";
-import type { TranscriptionResponse } from "./TranscriptionResponse";
+import type {TranscriptionResponse} from "./TranscriptionResponse";
 
 export default class OpenAIModel implements Model {
 	systemPrompt: string;
@@ -40,7 +40,7 @@ export default class OpenAIModel implements Model {
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
 		const response = await client.chat.completions.create({
-			model: "gpt-4o",
+			model: "gpt-5.2",
 			messages: [
 				{ role: "system", content: this.systemPrompt },
 				{
