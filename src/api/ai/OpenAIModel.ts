@@ -60,7 +60,7 @@ export default class OpenAIModel implements Model {
 				},
 			],
 			temperature: 0.0,
-			max_tokens: 500,
+			max_completion_tokens: 5000,
 		});
 		return {
 			success: true,
