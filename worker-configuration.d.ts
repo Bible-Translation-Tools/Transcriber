@@ -6,6 +6,7 @@ declare namespace Cloudflare {
 		WACS_URL: "https://content.bibletranslationtools.org";
 		OPENAI_KEY: string;
 		MISTRAL_KEY: string;
+		GEMINI_KEY: string;
 		SSO_CLIENT_SECRET: string;
 		HTR_STORAGE: R2Bucket;
 		HTR_DATABASE: D1Database;

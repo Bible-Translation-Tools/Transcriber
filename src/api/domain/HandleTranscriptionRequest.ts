@@ -1,14 +1,15 @@
 import OpenAIModel from "@api/ai/OpenAIModel.ts";
 
-import { PixtralAIModel } from "@api/ai/PixtralAIModel.ts";
+import GeminiAIModel from "@api/ai/GeminiAIModel.ts";
+import {PixtralAIModel} from "@api/ai/PixtralAIModel.ts";
 import {
-	TranscriptionErrorCode,
-	type TranscriptionResponse,
-	type TranscriptionSuccess,
+    TranscriptionErrorCode,
+    type TranscriptionResponse,
+    type TranscriptionSuccess,
 } from "@api/ai/TranscriptionResponse";
-import type { TranscriptionImage } from "@api/data/TranscriptionImage.ts";
-import { TranscriptionModel } from "@api/domain/TranscriptionRequest.ts";
-import type { D1TranscriptionRepository } from "@api/persistence/D1TranscriptionRepository";
+import type {TranscriptionImage} from "@api/data/TranscriptionImage.ts";
+import {TranscriptionModel} from "@api/domain/TranscriptionRequest.ts";
+import type {D1TranscriptionRepository} from "@api/persistence/D1TranscriptionRepository";
 import * as v from "valibot";
 
 export async function HandleUpdateTranscriptionRequest(
@@ -52,13 +53,35 @@ export async function HandleTranscriptionRequest(
 	let transcriptionResponse: TranscriptionResponse | null = null;
 
 	switch (body.model) {
+		case TranscriptionModel.GEMINI: {
+			const apiKey = apiKeys.get(TranscriptionModel.GEMINI);
+			if (!apiKey) {
+				return Response.json({
+					success: false,
+					imageId: body.imageId,
+					error: "Error, could not get api key from environment for Gemini",
+					errorCode: TranscriptionErrorCode.AuthenticationError,
+				});
+			}
+			console.log("User selection: Gemini");
+			const model = new GeminiAIModel(
+				apiKey,
+				body.systemPrompt,
+				body.prompt,
+			);
+			transcriptionResponse = await model.transcribe(
+				body.imageId,
+				body.image,
+			);
+			break;
+		}
 		case TranscriptionModel.OPENAI: {
 			const apiKey = apiKeys.get(TranscriptionModel.OPENAI);
 			if (!apiKey) {
 				return Response.json({
 					success: false,
 					imageId: body.imageId,
-					error: "Error, could not get api key from environment for Pixtral",
+					error: "Error, could not get api key from environment for OpenAI",
 					errorCode: TranscriptionErrorCode.AuthenticationError,
 				});
 			}

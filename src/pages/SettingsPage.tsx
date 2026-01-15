@@ -231,6 +231,11 @@ const Settings: React.FC = () => {
 											OpenAI
 										</option>
 										<option
+											value={TranscriptionModel.GEMINI}
+										>
+											Gemini
+										</option>
+										<option
 											value={TranscriptionModel.PIXTRAL}
 										>
 											Pixtral

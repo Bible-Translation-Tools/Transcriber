@@ -1,25 +1,21 @@
 import {
-	HandleDeleteTranscriptionRequest,
-	HandleTranscriptionRequest,
-	HandleUpdateTranscriptionRequest,
-	deleteTranscriptionRequestSchema,
-	transcriptionRequestSchema,
-	updateTranscriptionRequestSchema,
+    deleteTranscriptionRequestSchema,
+    HandleDeleteTranscriptionRequest,
+    HandleTranscriptionRequest,
+    HandleUpdateTranscriptionRequest,
+    transcriptionRequestSchema,
+    updateTranscriptionRequestSchema,
 } from "@api/domain/HandleTranscriptionRequest";
-import { TranscriptionModel } from "@api/domain/TranscriptionRequest";
-import { Hono } from "hono";
-import { authRouter } from "./auth/router";
+import {TranscriptionModel} from "@api/domain/TranscriptionRequest";
+import {Hono} from "hono";
+import {authRouter} from "./auth/router";
 
-import {
-	DELETE_TRANSCRIPTION_ROUTE,
-	TRANSCRIBE_ROUTE,
-	UPDATE_TRANSCRIPTION_ROUTE,
-} from "@src/constants";
+import {DELETE_TRANSCRIPTION_ROUTE, TRANSCRIBE_ROUTE, UPDATE_TRANSCRIPTION_ROUTE,} from "@src/constants";
 import * as v from "valibot";
-import type { HonoBindings } from "./auth/utils";
-import { mockHandleTranscriptionRequest } from "./domain/mock";
-import { D1TranscriptionRepository } from "./persistence/D1TranscriptionRepository";
-import { R2ImageRepository } from "./persistence/R2ImageRepository";
+import type {HonoBindings} from "./auth/utils";
+import {mockHandleTranscriptionRequest} from "./domain/mock";
+import {D1TranscriptionRepository} from "./persistence/D1TranscriptionRepository";
+import {R2ImageRepository} from "./persistence/R2ImageRepository";
 
 export const apiV1 = "/api/v1";
 const apiV1Router = new Hono<HonoBindings>();
@@ -97,6 +93,7 @@ apiV1Router.route("/auth", authRouter);
 
 function createApiMap(env: Env): Map<TranscriptionModel, string> {
 	const keys = new Map<TranscriptionModel, string>();
+	keys.set(TranscriptionModel.GEMINI, env.GEMINI_KEY);
 	keys.set(TranscriptionModel.OPENAI, env.OPENAI_KEY);
 	keys.set(TranscriptionModel.PIXTRAL, env.MISTRAL_KEY);
 	return keys;

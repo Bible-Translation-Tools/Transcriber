@@ -24,6 +24,7 @@ export type UpdateTranscriptionRequest = {
 export enum TranscriptionModel {
 	OPENAI = "openai",
 	PIXTRAL = "pixtral",
+	GEMINI = "gemini",
 }
 
 export enum DetaultTranscriptionPrompt {
