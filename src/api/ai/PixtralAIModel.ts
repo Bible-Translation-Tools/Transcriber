@@ -1,6 +1,7 @@
 import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
+	parseJsonResponse,
 } from "@api/ai/TranscriptionResponse.ts";
 import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 import { Mistral } from "@mistralai/mistralai";
@@ -41,7 +42,6 @@ export class PixtralAIModel implements Model {
 		imageId: string,
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
-		console.log("Sending image to pixtral");
 		const response = await client.chat.complete({
 			model: "pixtral-12b",
 			messages: [
@@ -64,23 +64,27 @@ export class PixtralAIModel implements Model {
 			],
 			temperature: 0.0,
 			maxTokens: 500,
+			responseFormat: { type: "json_object" },
 		});
 
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		const messageContent = response.choices![0].message?.content;
-		const isContentValid = !!messageContent;
-		const transcription = extractTranscription(messageContent);
-		if (isContentValid) {
+		const rawText = extractTranscription(messageContent);
+		const parsed = parseJsonResponse(rawText);
+		if (parsed) {
 			return {
-				success: isContentValid,
+				success: true,
 				imageId: imageId,
-				transcription: transcription,
+				transcription: parsed.transcription,
 			};
 		}
 		return {
 			success: false,
 			imageId: imageId,
-			error: "Error extracting transcription from pixtral response",
+			error:
+				rawText?.trim()
+					? "Invalid or missing structured transcription in response"
+					: "Error extracting transcription from pixtral response",
 			errorCode: TranscriptionErrorCode.UnknownError,
 		};
 	}

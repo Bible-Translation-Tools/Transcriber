@@ -1,7 +1,12 @@
-import {DetaultTranscriptionPrompt} from "@api/domain/TranscriptionRequest.ts";
+import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 import OpenAI from "openai";
 import type Model from "./Model";
-import type {TranscriptionResponse} from "./TranscriptionResponse";
+import {
+	parseJsonResponse,
+	TranscriptionErrorCode,
+	TRANSCRIPTION_JSON_SCHEMA,
+	type TranscriptionResponse,
+} from "./TranscriptionResponse";
 
 export default class GeminiAIModel implements Model {
 	systemPrompt: string;
@@ -59,13 +64,43 @@ export default class GeminiAIModel implements Model {
 					],
 				},
 			],
-			// temperature: 0.0, // trying temperature of 1 at the recommendation of the docs
 			max_completion_tokens: 5000,
+			response_format: {
+				type: "json_schema",
+				json_schema: {
+					name: "transcription_output",
+					strict: true,
+					schema: TRANSCRIPTION_JSON_SCHEMA,
+				},
+			},
 		});
+
+		const message = response.choices[0].message;
+		const refusal = message?.refusal;
+		if (refusal) {
+			return {
+				success: false,
+				imageId,
+				error: refusal,
+				errorCode: TranscriptionErrorCode.UnexpectedResponse,
+			};
+		}
+
+		const rawContent = message?.content ?? "";
+		const parsed = parseJsonResponse(rawContent);
+		if (parsed) {
+			return {
+				success: true,
+				imageId,
+				transcription: parsed.transcription,
+			};
+		}
+
 		return {
-			success: true,
-			imageId: imageId,
-			transcription: response.choices[0].message?.content ?? "",
+			success: false,
+			imageId,
+			error: "Invalid or missing structured transcription in response",
+			errorCode: TranscriptionErrorCode.UnexpectedResponse,
 		};
 	}
 }

@@ -28,6 +28,6 @@ export enum TranscriptionModel {
 }
 
 export enum DetaultTranscriptionPrompt {
-	SYSTEM = "You are an expert at transcribing handwritten images of various languages. Respond only with the transcription of the image provided, do not output the transcription in quotes, parentheses, brackets or other such symbols",
+	SYSTEM = "You are an expert at transcribing handwritten images of various languages. Respond with a JSON object that has exactly one key, 'transcription', whose value is the transcribed text from the image. Do not wrap the transcription in quotes, parentheses, brackets or other symbols. Output only valid JSON.",
 	PROMPT = "The image says: ",
 }
