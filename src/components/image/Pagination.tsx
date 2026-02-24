@@ -12,12 +12,12 @@ const Pagination: React.FC<PaginationProps> = ({
 	onRetryTranscription,
 }) => {
 	return (
-		<div className="h-full flex flex-col justify-between items-center">
-			<div className="relative flex-start group h-9/10 min-w-0">
+		<div className="h-full flex flex-col items-center">
+			<div className="relative flex-1 min-h-0 w-full min-w-0 group">
 				{image ? <ZoomableImage src={image.data} /> : <div />}
 			</div>
 			{image ? (
-				<div className="flex-none mt-auto py-4 h-1/10">
+				<div className="flex-none py-4">
 					<RetryTranscription
 						onRetryTranscription={onRetryTranscription}
 					/>

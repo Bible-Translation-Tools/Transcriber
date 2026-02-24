@@ -52,13 +52,15 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({ src }) => {
 			{() => (
 				<>
 					<Controls />
-					<div className="cursor-move h-full">
+					<div className="cursor-move h-full w-full">
 						<TransformComponent
-							wrapperClass="h-full!"
-							contentClass="h-full!"
+							wrapperClass="w-full h-full overflow-hidden"
+							contentClass="w-full h-full flex items-center justify-center"
+							wrapperStyle={{ width: "100%", height: "100%" }}
+							contentStyle={{ width: "100%", height: "100%" }}
 						>
 							<img
-								className="max-w-full max-h-full object-contain block"
+								className="w-full h-full object-contain block"
 								src={src}
 								alt="test"
 							/>
