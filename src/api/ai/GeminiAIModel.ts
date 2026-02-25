@@ -1,5 +1,5 @@
 import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import type Model from "./Model";
 import {
 	parseJsonResponse,
@@ -11,7 +11,8 @@ import {
 export default class GeminiAIModel implements Model {
 	systemPrompt: string;
 	prompt: string;
-	baseUrl = "https://generativelanguage.googleapis.com/v1beta/openai/";
+	// Required by the shared Model interface, but not used by the official Gemini client.
+	baseUrl = "https://generativelanguage.googleapis.com";
 	key: string;
 
 	constructor(
@@ -29,10 +30,8 @@ export default class GeminiAIModel implements Model {
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
 		return this.transcribeImpl(
-			new OpenAI({
+			new GoogleGenAI({
 				apiKey: this.key,
-				baseURL: this.baseUrl,
-				dangerouslyAllowBrowser: true,
 			}),
 			imageId,
 			base64Image,
@@ -40,53 +39,40 @@ export default class GeminiAIModel implements Model {
 	}
 
 	async transcribeImpl(
-		client: OpenAI,
+		client: GoogleGenAI,
 		imageId: string,
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
-		const response = await client.chat.completions.create({
+		// Support both raw base64 strings and data URLs.
+		let mimeType = "image/png";
+		let imageData = base64Image;
+		const dataUrlMatch = base64Image.match(/^data:(.+?);base64,(.*)$/);
+		if (dataUrlMatch) {
+			mimeType = dataUrlMatch[1];
+			imageData = dataUrlMatch[2];
+		}
+
+		const response = await client.models.generateContent({
 			model: "gemini-3-flash-preview",
-			messages: [
-				{ role: "system", content: this.systemPrompt },
+			contents: [
 				{
-					role: "user",
-					content: [
-						{
-							type: "text",
-							text: this.prompt,
-						},
-						{
-							type: "image_url",
-							image_url: {
-								url: `${base64Image}`,
-							},
-						},
-					],
+					inlineData: {
+						mimeType,
+						data: imageData,
+					},
 				},
+				{ text: this.prompt },
 			],
-			max_completion_tokens: 5000,
-			response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "transcription_output",
-					strict: true,
-					schema: TRANSCRIPTION_JSON_SCHEMA,
-				},
+			config: {
+				systemInstruction: this.systemPrompt,
+				responseMimeType: "application/json",
+				responseSchema: TRANSCRIPTION_JSON_SCHEMA,
+				maxOutputTokens: 15000,
+				temperature: 0,
 			},
 		});
 
-		const message = response.choices[0].message;
-		const refusal = message?.refusal;
-		if (refusal) {
-			return {
-				success: false,
-				imageId,
-				error: refusal,
-				errorCode: TranscriptionErrorCode.UnexpectedResponse,
-			};
-		}
-
-		const rawContent = message?.content ?? "";
+		const rawContent = response.text ?? "";
 		const parsed = parseJsonResponse(rawContent);
 		if (parsed) {
 			return {
