@@ -67,7 +67,7 @@ export default class OpenAIModel implements Model {
 				},
 			],
 			temperature: 0.0,
-			max_output_tokens: 5000,
+			max_output_tokens: 10000,
 			text: {
 				format: {
 					type: "json_schema",

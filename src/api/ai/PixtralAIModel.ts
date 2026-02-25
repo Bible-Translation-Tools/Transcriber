@@ -65,7 +65,7 @@ export class PixtralAIModel implements Model {
 				},
 			],
 			temperature: 0.0,
-			maxTokens: 5000,
+			maxTokens: 10000,
 			responseFormat: { type: "json_schema", jsonSchema: { name: "transcription_output", schemaDefinition: TRANSCRIPTION_JSON_SCHEMA, strict: true } },
 		});
 

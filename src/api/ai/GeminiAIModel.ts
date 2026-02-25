@@ -67,7 +67,7 @@ export default class GeminiAIModel implements Model {
 				systemInstruction: this.systemPrompt,
 				responseMimeType: "application/json",
 				responseSchema: TRANSCRIPTION_JSON_SCHEMA,
-				maxOutputTokens: 15000,
+				maxOutputTokens: 10000,
 				temperature: 0,
 			},
 		});
