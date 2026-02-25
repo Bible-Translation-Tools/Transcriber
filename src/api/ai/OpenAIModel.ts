@@ -44,40 +44,41 @@ export default class OpenAIModel implements Model {
 		imageId: string,
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
-		const response = await client.chat.completions.create({
+		const response = await client.responses.create({
 			model: "gpt-5.2",
-			messages: [
-				{ role: "system", content: this.systemPrompt },
+			input: [
+				{
+					role: "system",
+					content: this.systemPrompt,
+				},
 				{
 					role: "user",
 					content: [
 						{
-							type: "text",
+							type: "input_text",
 							text: this.prompt,
 						},
 						{
-							type: "image_url",
-							image_url: {
-								url: `${base64Image}`,
-							},
+							type: "input_image",
+							image_url: base64Image,
+							detail: "high",
 						},
 					],
 				},
 			],
 			temperature: 0.0,
-			max_completion_tokens: 5000,
-			response_format: {
-				type: "json_schema",
-				json_schema: {
+			max_output_tokens: 5000,
+			text: {
+				format: {
+					type: "json_schema",
 					name: "transcription_output",
-					strict: true,
 					schema: TRANSCRIPTION_JSON_SCHEMA,
+					strict: true,
 				},
 			},
 		});
 
-		const message = response.choices[0].message;
-		const refusal = message?.refusal;
+		const refusal = this.getRefusalFromOutput(response.output);
 		if (refusal) {
 			return {
 				success: false,
@@ -87,7 +88,7 @@ export default class OpenAIModel implements Model {
 			};
 		}
 
-		const rawContent = message?.content ?? "";
+		const rawContent = this.getOutputText(response);
 		const parsed = parseJsonResponse(rawContent);
 		if (parsed) {
 			return {
@@ -100,8 +101,30 @@ export default class OpenAIModel implements Model {
 		return {
 			success: false,
 			imageId,
-			error: "Invalid or missing structured transcription in response",
+			error: "OpenAI model returned an unexpected response",
 			errorCode: TranscriptionErrorCode.UnexpectedResponse,
 		};
+	}
+
+	private getRefusalFromOutput(
+		output: OpenAI.Responses.Response["output"],
+	): string | undefined {
+		return output
+			?.flatMap((item) =>
+				item?.type === "message" && Array.isArray(item.content)
+					? item.content
+					: [],
+			)
+			.find((part): part is { type: "refusal"; refusal: string } => part?.type === "refusal")
+			?.refusal;
+	}
+
+	private getOutputText(response: OpenAI.Responses.Response): string {
+		return (
+			response.output_text ??
+			(response.output?.[0] as { content?: Array<{ type?: string; text?: string }> } | undefined)
+				?.content?.find((p) => p?.type === "output_text")?.text ??
+			""
+		);
 	}
 }
