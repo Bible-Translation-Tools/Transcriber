@@ -18,15 +18,15 @@ export interface TranscriptionObject {
  * Used with OpenAI and Gemini response_format.json_schema.
  */
 export const TRANSCRIPTION_JSON_SCHEMA = {
-	type: "object" as const,
+	type: "object",
 	properties: {
 		transcription: {
-			type: "string" as const,
+			type: "string",
 			description:
-				"The transcribed text extracted from the image. Only the raw transcription, no quotes or extra symbols.",
+				"The transcribed text extracted from the image.",
 		},
 	},
-	required: ["transcription"] as const,
+	required: ["transcription"],
 	additionalProperties: false,
 };
 

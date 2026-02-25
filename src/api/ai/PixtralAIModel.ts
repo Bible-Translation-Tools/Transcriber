@@ -7,6 +7,8 @@ import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts"
 import { Mistral } from "@mistralai/mistralai";
 import type { ContentChunk } from "@mistralai/mistralai/models/components";
 import type Model from "./Model";
+import { TRANSCRIPTION_JSON_SCHEMA } from "./TranscriptionResponse";
+
 
 export class PixtralAIModel implements Model {
 	baseUrl = "https://api.mistral.ai/v1/models";
@@ -63,8 +65,8 @@ export class PixtralAIModel implements Model {
 				},
 			],
 			temperature: 0.0,
-			maxTokens: 500,
-			responseFormat: { type: "json_object" },
+			maxTokens: 5000,
+			responseFormat: { type: "json_schema", jsonSchema: { name: "transcription_output", schemaDefinition: TRANSCRIPTION_JSON_SCHEMA, strict: true } },
 		});
 
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
