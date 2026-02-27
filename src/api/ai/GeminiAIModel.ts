@@ -1,12 +1,18 @@
-import {DetaultTranscriptionPrompt} from "@api/domain/TranscriptionRequest.ts";
-import OpenAI from "openai";
+import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
+import { GoogleGenAI } from "@google/genai";
 import type Model from "./Model";
-import type {TranscriptionResponse} from "./TranscriptionResponse";
+import {
+	parseJsonResponse,
+	TranscriptionErrorCode,
+	TRANSCRIPTION_JSON_SCHEMA,
+	type TranscriptionResponse,
+} from "./TranscriptionResponse";
 
 export default class GeminiAIModel implements Model {
 	systemPrompt: string;
 	prompt: string;
-	baseUrl = "https://generativelanguage.googleapis.com/v1beta/openai/";
+	// Required by the shared Model interface, but not used by the official Gemini client.
+	baseUrl = "https://generativelanguage.googleapis.com";
 	key: string;
 
 	constructor(
@@ -24,10 +30,8 @@ export default class GeminiAIModel implements Model {
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
 		return this.transcribeImpl(
-			new OpenAI({
+			new GoogleGenAI({
 				apiKey: this.key,
-				baseURL: this.baseUrl,
-				dangerouslyAllowBrowser: true,
 			}),
 			imageId,
 			base64Image,
@@ -35,37 +39,54 @@ export default class GeminiAIModel implements Model {
 	}
 
 	async transcribeImpl(
-		client: OpenAI,
+		client: GoogleGenAI,
 		imageId: string,
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
-		const response = await client.chat.completions.create({
+		// Support both raw base64 strings and data URLs.
+		let mimeType = "image/png";
+		let imageData = base64Image;
+		const dataUrlMatch = base64Image.match(/^data:(.+?);base64,(.*)$/);
+		if (dataUrlMatch) {
+			mimeType = dataUrlMatch[1];
+			imageData = dataUrlMatch[2];
+		}
+
+		const response = await client.models.generateContent({
 			model: "gemini-3-flash-preview",
-			messages: [
-				{ role: "system", content: this.systemPrompt },
+			contents: [
 				{
-					role: "user",
-					content: [
-						{
-							type: "text",
-							text: this.prompt,
-						},
-						{
-							type: "image_url",
-							image_url: {
-								url: `${base64Image}`,
-							},
-						},
-					],
+					inlineData: {
+						mimeType,
+						data: imageData,
+					},
 				},
+				{ text: this.prompt },
 			],
-			// temperature: 0.0, // trying temperature of 1 at the recommendation of the docs
-			max_completion_tokens: 5000,
+			config: {
+				systemInstruction: this.systemPrompt,
+				responseMimeType: "application/json",
+				responseSchema: TRANSCRIPTION_JSON_SCHEMA,
+				maxOutputTokens: 10000,
+				temperature: 0,
+			},
 		});
+
+		const rawContent = response.text ?? "";
+		const parsed = parseJsonResponse(rawContent);
+		if (parsed) {
+			return {
+				success: true,
+				imageId,
+				transcription: parsed.transcription,
+			};
+		}
+
 		return {
-			success: true,
-			imageId: imageId,
-			transcription: response.choices[0].message?.content ?? "",
+			success: false,
+			imageId,
+			error: "Invalid or missing structured transcription in response",
+			errorCode: TranscriptionErrorCode.UnexpectedResponse,
 		};
 	}
 }

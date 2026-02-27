@@ -1,11 +1,14 @@
 import {
 	TranscriptionErrorCode,
 	type TranscriptionResponse,
+	parseJsonResponse,
 } from "@api/ai/TranscriptionResponse.ts";
 import { DetaultTranscriptionPrompt } from "@api/domain/TranscriptionRequest.ts";
 import { Mistral } from "@mistralai/mistralai";
 import type { ContentChunk } from "@mistralai/mistralai/models/components";
 import type Model from "./Model";
+import { TRANSCRIPTION_JSON_SCHEMA } from "./TranscriptionResponse";
+
 
 export class PixtralAIModel implements Model {
 	baseUrl = "https://api.mistral.ai/v1/models";
@@ -41,7 +44,6 @@ export class PixtralAIModel implements Model {
 		imageId: string,
 		base64Image: string,
 	): Promise<TranscriptionResponse> {
-		console.log("Sending image to pixtral");
 		const response = await client.chat.complete({
 			model: "pixtral-12b",
 			messages: [
@@ -63,24 +65,28 @@ export class PixtralAIModel implements Model {
 				},
 			],
 			temperature: 0.0,
-			maxTokens: 500,
+			maxTokens: 10000,
+			responseFormat: { type: "json_schema", jsonSchema: { name: "transcription_output", schemaDefinition: TRANSCRIPTION_JSON_SCHEMA, strict: true } },
 		});
 
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		const messageContent = response.choices![0].message?.content;
-		const isContentValid = !!messageContent;
-		const transcription = extractTranscription(messageContent);
-		if (isContentValid) {
+		const rawText = extractTranscription(messageContent);
+		const parsed = parseJsonResponse(rawText);
+		if (parsed) {
 			return {
-				success: isContentValid,
+				success: true,
 				imageId: imageId,
-				transcription: transcription,
+				transcription: parsed.transcription,
 			};
 		}
 		return {
 			success: false,
 			imageId: imageId,
-			error: "Error extracting transcription from pixtral response",
+			error:
+				rawText?.trim()
+					? "Invalid or missing structured transcription in response"
+					: "Error extracting transcription from pixtral response",
 			errorCode: TranscriptionErrorCode.UnknownError,
 		};
 	}
