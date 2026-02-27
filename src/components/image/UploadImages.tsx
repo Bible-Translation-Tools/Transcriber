@@ -95,7 +95,6 @@ function UploadImages() {
 							</span>
 							<span
 								className="text-[20px] text-[#0056D1] font-normal underline leading-[40px] font-noto-sans cursor-pointer"
-								onClick={handleBrowseClick}
 								onKeyUp={handleBrowseClick}
 							>
 								{t("Upload Image text part 2")}
