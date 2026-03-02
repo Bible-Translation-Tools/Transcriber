@@ -69,7 +69,13 @@ export function useRetranscribe() {
 			...document,
 			status: TranscriptionStatus.IN_PROGRESS,
 		});
-		const request = await constructTranscriptionRequest(store, document);
+		// Use getState() so the request always uses current settings (e.g. after
+		// changing model in Settings and clicking "Transcribe Again" in the toast).
+		const currentStore = useTranscriptionStore.getState();
+		const request = await constructTranscriptionRequest(
+			currentStore,
+			document,
+		);
 		transcribe.mutate({ image: document, request: request });
 	}
 
