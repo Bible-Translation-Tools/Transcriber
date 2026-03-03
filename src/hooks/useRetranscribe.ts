@@ -65,11 +65,17 @@ export function useRetranscribe() {
 	async function retranscribeDocument(
 		document: TranscribableDocument,
 	): Promise<void> {
-		await updateImage(store, imageRepo, {
+		// Use getState() so we update the live store (status → IN_PROGRESS) and use
+		// current settings; avoids stale closure when "Transcribe Again" is used from the toast.
+		const currentStore = useTranscriptionStore.getState();
+		await updateImage(currentStore, imageRepo, {
 			...document,
 			status: TranscriptionStatus.IN_PROGRESS,
 		});
-		const request = await constructTranscriptionRequest(store, document);
+		const request = await constructTranscriptionRequest(
+			currentStore,
+			document,
+		);
 		transcribe.mutate({ image: document, request: request });
 	}
 

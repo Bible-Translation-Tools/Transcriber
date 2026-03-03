@@ -136,11 +136,16 @@ export const updateImage = async (
 	console.log(`Updating image: ${updatedImage.id}.`);
 	await imageRepo.storeImage(updatedImage.id, updatedImage);
 
-	for (let i = 0; i < store.images.length; i++) {
-		if (store.images[i].id === updatedImage.id) {
-			store.images[i].transcription = updatedImage.transcription;
-			store.images[i].status = updatedImage.status;
-		}
+	store.setImages((prev) =>
+		prev.map((img) =>
+			img.id === updatedImage.id ? updatedImage : img,
+		),
+	);
+	if (
+		store.selectedImage != null &&
+		store.selectedImage.id === updatedImage.id
+	) {
+		store.setSelectedImage(updatedImage);
 	}
 };
 
