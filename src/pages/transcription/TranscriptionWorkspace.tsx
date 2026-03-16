@@ -11,6 +11,7 @@ export function TranscriptionWorkspace(props: {
 	onRangeChange: (start: number, end: number) => void;
 	status: TranscriptionStatus | undefined;
 	transcription: string | undefined | null;
+	isVerticalLayout?: boolean;
 	onChange: (text: string) => void;
 }) {
 	const { t } = useTranslation();
@@ -43,10 +44,14 @@ export function TranscriptionWorkspace(props: {
 					/>
 				</ShowWhen>
 				<ShowWhen when={props.status === TranscriptionStatus.COMPLETED}>
-					<TextEditor
-						text={props.transcription ?? ""}
-						onChange={props.onChange}
-					/>
+					<div className="flex h-full w-full justify-center">
+						<div className={props.isVerticalLayout ? "w-3/5" : "w-full"}>
+							<TextEditor
+								text={props.transcription ?? ""}
+								onChange={props.onChange}
+							/>
+						</div>
+					</div>
 				</ShowWhen>
 			</div>
 		</div>
