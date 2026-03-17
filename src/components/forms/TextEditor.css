@@ -1,0 +1,52 @@
+.textEditorRoot {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  flex: 1 1 auto;
+  border: 1px solid #d1d5db; /* gray-300 */
+  background: #ffffff;
+}
+
+.textEditorMirror {
+  pointer-events: none;
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+
+  /* Match textarea wrapping/text metrics */
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 0.5rem; /* match textarea padding */
+  font-size: 1.125rem; /* match textarea font-size */
+  line-height: 1.625; /* match textarea line-height */
+}
+
+.textEditorActiveLine {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: 2px;
+  background: rgba(254, 249, 195, 0.5); /* highlight color */
+}
+
+.textEditorTextarea {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  width: 100%;
+  resize: none;
+  background: transparent;
+  padding: 0.5rem; /* p-2 */
+  font-size: 1.125rem; /* text-lg */
+  line-height: 1.625; /* leading-relaxed */
+  outline: none;
+  border: 0;
+}
+
