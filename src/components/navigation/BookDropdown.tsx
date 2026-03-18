@@ -101,6 +101,8 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 	const [searchTerm, setSearchTerm] = useState("");
 	const [openBook, setOpenBook] = useState<string | null>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const bookRowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	const bookIsInProgress = (bookSlug: string): boolean => {
 		try {
@@ -118,8 +120,40 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 	}, [language, progress]);
 
 	const toggleDropdown = () => {
-		setIsOpen(!isOpen);
+		setIsOpen((prev) => {
+			const next = !prev;
+			if (!next) setOpenBook(null);
+			return next;
+		});
 	};
+
+	const openDropdownToSelectedBook = useCallback(() => {
+		setIsOpen(true);
+		setOpenBook(selectedBook);
+	}, [selectedBook]);
+
+	useEffect(() => {
+		if (!isOpen || !openBook) return;
+
+		const container = scrollContainerRef.current;
+		const el = bookRowRefs.current[openBook];
+		if (!container || !el) return;
+
+		// Keep enough space below the selected book so the chapter grid is visible.
+		const OFFSET_PX = 140;
+
+		const run = () => {
+			const targetTop = Math.max(0, el.offsetTop - OFFSET_PX);
+			const maxTop = Math.max(0, container.scrollHeight - container.clientHeight);
+			container.scrollTo({
+				top: Math.min(targetTop, maxTop),
+				behavior: "smooth",
+			});
+		};
+
+		// Ensure chapter grid has been laid out (height changes after expand).
+		requestAnimationFrame(() => requestAnimationFrame(run));
+	}, [isOpen, openBook]);
 
 	const handleBookClick = (book: string) => {
 		if (openBook === book) {
@@ -302,13 +336,13 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 
 	return (
 		<div className="relative w-96" ref={dropdownRef}>
-			<button
-				type="button"
-				className="w-96 max-w-96 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-start items-center"
-				onClick={toggleDropdown}
-			>
+			<div className="w-96 max-w-96 max-h-12 bg-gray-100 bg-color-surface-secondary rounded-xl inline-flex justify-start items-center">
 				<div className="w-96 max-w-96 max-h-12 bg-color-surface-secondary rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 inline-flex justify-start items-center">
-					<div className="flex-1 p-4 flex justify-start items-center gap-2">
+					<button
+						type="button"
+						className="flex-1 p-4 flex justify-start items-center gap-2"
+						onClick={toggleDropdown}
+					>
 						<div className="w-6 h-6 relative overflow-hidden">
 							<div className="w-4 h-5 bg-color-on-surface-secondary">
 								<svg
@@ -335,12 +369,16 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 								)?.label
 							}
 						</div>
-					</div>
-					<div className="w-20 p-4 max-h-12 border-l border-neutral-200 flex justify-start items-center gap-2">
+					</button>
+					<button
+						type="button"
+						className="w-20 p-4 max-h-12 border-l border-neutral-200 flex justify-start items-center gap-2"
+						onClick={openDropdownToSelectedBook}
+					>
 						<div className="justify-start text-color-on-surface-primary text-l font-medium font-['Noto_Sans'] leading-normal">
 							{selectedChapter}
 						</div>
-					</div>
+					</button>
 				</div>
 
 				{/* <svg
@@ -355,7 +393,7 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
                         clipRule="evenodd"
                     />
                 </svg> */}
-			</button>
+			</div>
 
 			<ShowWhen when={isOpen}>
 				<div className="absolute z-10 mt-2 w-full bg-white rounded-md shadow-lg border">
@@ -367,15 +405,24 @@ const BookDropdown: React.FC<BookDropdownProps> = ({
 						className="w-full p-2 border-b focus:outline-none text-color-on-surface-tertiary text-l italic font-[Noto_Sans] leading-10"
 					/>
 
-					<div className="flex flex-col items start p-2 max-h-[75vh] overflow-y-scroll">
+					<div
+						ref={scrollContainerRef}
+						className="flex flex-col items start p-2 max-h-[75vh] overflow-y-scroll"
+					>
 						{filteredOptions.map((option, index) => (
 							<React.Fragment key={option.value}>
+								<div
+									ref={(el) => {
+										bookRowRefs.current[option.value] = el;
+									}}
+								>
 								<BookItem
 									key={option.value}
 									option={option}
 									inProgress={bookProgress[index]}
 									handleBookClick={handleBookClick}
 								/>
+								</div>
 								<ShowWhen when={openBook === option.value}>
 									<div className="self-stretch inline-flex justify-start items-start gap-0.5 flex-wrap content-start">
 										{chapters.map((chapter) => (

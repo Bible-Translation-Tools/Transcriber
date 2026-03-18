@@ -164,7 +164,7 @@ function TranscriptionPage() {
 				className="h-[calc(100%_-_5rem)]! overflow-visible!"
 				direction="horizontal"
 			>
-				<Panel defaultSize={25} minSize={20} maxSize={30}>
+				<Panel defaultSize={25} minSize={10} maxSize={30} className="min-w-0">
 					<ProjectContents
 						key={images.length}
 						images={images}
@@ -201,7 +201,7 @@ function TranscriptionPage() {
 			<ShowWhen when={!!imageToDelete}>
 				<DeleteConfirmationDialog
 					key={imageToDelete?.id}
-					imageName={imageToDelete?.filename}
+					imageName={imageToDelete?.filename ?? ""}
 					isOpen={isDeleteDialogOpen}
 					onClose={handleCloseDeleteDialog}
 					onConfirmDelete={handleDeleteImage}

@@ -22,7 +22,7 @@ export default function ProjectContents({
 	const { t } = useTranslation();
 
 	return (
-		<div className="flex flex-col p-4 overflow-y-auto">
+		<div className="flex flex-col p-2 overflow-y-auto">
 			<label
 				htmlFor="imageUpload"
 				className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold mb-4 py-2 px-4 rounded-lg flex items-center justify-center"
