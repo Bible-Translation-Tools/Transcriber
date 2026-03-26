@@ -79,7 +79,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 			<div className="flex items-center justify-between">
 				<button
 					type="button"
-					className="flex items-center p-4 w-full"
+					className="flex flex-1 min-w-0 items-center p-4"
 					onClick={handleImageSelected}
 				>
 					<span className="truncate">{fileName}</span>
@@ -91,7 +91,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 					<button
 						type={"button"}
 						onClick={handleMenuClick}
-						className="w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-400"
+						className="flex-shrink-0 w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-400"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +176,7 @@ const FileList: React.FC<FileListProps> = ({
 	onDeleteImage,
 }) => {
 	return (
-		<div className="h-screen overflow-y-scroll">
+		<div className="flex-1 min-h-0 overflow-y-auto">
 			{images.map((image, index) => {
 				return (
 					<FileListItem
