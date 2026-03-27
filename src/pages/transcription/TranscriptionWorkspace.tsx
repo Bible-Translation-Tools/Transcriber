@@ -17,13 +17,13 @@ export function TranscriptionWorkspace(props: {
 	const { t } = useTranslation();
 
 	return (
-		<div className="h-full flex flex-col p-4">
-			<ShowWhen when={!!props.selectedImage}>
+		<div className="h-full flex flex-col">
+			{/* <ShowWhen when={!!props.selectedImage}>
 				<RangeInput
 					selectedImage={props.selectedImage}
 					onRangeChange={props.onRangeChange}
 				/>
-			</ShowWhen>
+			</ShowWhen> */}
 			<div className="h-full flex-1 flex-col">
 				<ShowWhen
 					when={props.status === TranscriptionStatus.IN_PROGRESS}

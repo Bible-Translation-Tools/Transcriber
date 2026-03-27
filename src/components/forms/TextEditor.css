@@ -43,7 +43,7 @@
   width: 100%;
   resize: none;
   background: transparent;
-  padding: 0.5rem; /* p-2 */
+  padding: 1rem; /* p-2 */
   font-size: 1.125rem; /* text-lg */
   line-height: 1.625; /* leading-relaxed */
   outline: none;
