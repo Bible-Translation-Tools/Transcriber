@@ -73,6 +73,7 @@ export default function EditorWrapper({
 							<DocumentViewer
 								image={selectedImage}
 								onRetryTranscription={handleResubmitImage}
+								isVerticalLayout={isVertical}
 							/>
 						</Panel>
 						<PanelResizeHandle className={resizeHandleClass}>
