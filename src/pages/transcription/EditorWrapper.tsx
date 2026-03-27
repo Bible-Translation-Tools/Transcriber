@@ -1,5 +1,5 @@
 import DocumentViewer from "@components/image/Pagination.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
@@ -14,6 +14,8 @@ type EditorWrapperProps = {
 	handleVerseRangeChange: (start: number, end: number) => void;
 };
 
+const EDITOR_LAYOUT_STORAGE_KEY = "transcriber-editor-layout-direction";
+
 export default function EditorWrapper({
 	images,
 	selectedImage,
@@ -21,7 +23,20 @@ export default function EditorWrapper({
 	handleTextChange,
 	handleVerseRangeChange,
 }: EditorWrapperProps) {
-	const [isVertical, setIsVertical] = useState(true);
+	const [isVertical, setIsVertical] = useState(() => {
+		if (typeof window === "undefined") {
+			return true;
+		}
+
+		return localStorage.getItem(EDITOR_LAYOUT_STORAGE_KEY) !== "horizontal";
+	});
+
+	useEffect(() => {
+		localStorage.setItem(
+			EDITOR_LAYOUT_STORAGE_KEY,
+			isVertical ? "vertical" : "horizontal",
+		);
+	}, [isVertical]);
 
 	if (!images || images.length === 0) {
 		return <EmptyProject />;
