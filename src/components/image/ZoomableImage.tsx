@@ -62,16 +62,21 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({
 		<TransformWrapper
 			ref={transformRef}
 			key={`${src}-${isVerticalLayout ? "vertical" : "horizontal"}`}
-			initialScale={isVerticalLayout ? 3 : 1.5}
+			initialScale={isVerticalLayout ? 2.5 : 1.25}
 			initialPositionX={0}
 			initialPositionY={0}
 			centerOnInit={false}
+			smooth={true}
+			wheel={{
+				step: 0.5,
+				smoothStep: isVerticalLayout ? 0.004 : 0.002, // lower scroll-zoom speed when photo is vertical
+			}}
 			onInit={(ctx) => applyTopCenterTransform(ctx)}
 		>
 			{() => (
 				<div className="relative h-full w-full">
 					<Controls />
-					<div className="cursor-move h-full w-full pb-[60px]">
+					<div className="cursor-move h-full w-full pb-[50px]">
 						<TransformComponent
 							wrapperClass="w-full h-full overflow-hidden"
 							contentClass="w-full h-full flex items-center justify-center"
