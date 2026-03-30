@@ -56,6 +56,7 @@ export default function EditorWrapper({
 				type="button"
 				onClick={() => setIsVertical((prev) => !prev)}
 				className="absolute right-3 top-3 z-99 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm transition-transform transition-shadow hover:scale-105 hover:bg-gray-50 hover:shadow-md"
+				style={{ opacity: 0.85 }}
 				aria-label={
 					isVertical ? "Switch to side-by-side layout" : "Switch to stacked layout"
 				}
