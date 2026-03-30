@@ -67,7 +67,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 
 	const selectedStyle = (): string => {
 		if (selected) {
-			return "rounded-2xl bg-white";
+			return "bg-gray-200 border border-[#E6E6E6]";
 		}
 		return "";
 	};
@@ -176,7 +176,7 @@ const FileList: React.FC<FileListProps> = ({
 	onDeleteImage,
 }) => {
 	return (
-		<div className="flex-1 min-h-0 overflow-y-auto">
+		<div className="flex-1 min-h-0 overflow-y-auto bg-white">
 			{images.map((image, index) => {
 				return (
 					<FileListItem

@@ -162,7 +162,7 @@ function TranscriptionPage() {
 			<NavBar />
 			<div className="flex h-[calc(100%_-_5rem)] overflow-visible">
 				{isProjectContentsVisible && (
-					<div className="w-[240px] shrink-0 border-r border-gray-200 bg-gray-100">
+					<div className="w-[240px] shrink-0 border-r border-gray-200 bg-white flex h-full min-h-0 flex-col">
 						<div className="flex items-center justify-end px-4 pt-4">
 							<button
 								type="button"
@@ -195,7 +195,7 @@ function TranscriptionPage() {
 								</svg>
 							</button>
 						</div>
-						<div className="h-[calc(100%-3rem)]">
+						<div className="flex-1 min-h-0">
 							<ProjectContents
 								key={images.length}
 								images={images}

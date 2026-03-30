@@ -44,7 +44,7 @@ export function TranscriptionWorkspace(props: {
 					/>
 				</ShowWhen>
 				<ShowWhen when={props.status === TranscriptionStatus.COMPLETED}>
-					<div className="flex h-full w-full justify-center">
+					<div className="flex h-full w-full justify-center bg-white">
 						<div className={props.isVerticalLayout ? "w-3/5" : "w-full"}>
 							<TextEditor
 								text={props.transcription ?? ""}

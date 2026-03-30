@@ -74,7 +74,7 @@ const ZoomableImage: React.FC<ZoomableImageProps> = ({
 			onInit={(ctx) => applyTopCenterTransform(ctx)}
 		>
 			{() => (
-				<div className="relative h-full w-full">
+				<div className="relative h-full w-full p-2">
 					<Controls />
 					<div className="cursor-move h-full w-full pb-[50px]">
 						<TransformComponent
