@@ -34,7 +34,7 @@ const NavBar: React.FC = () => {
 	return (
 		<div className="flex items-center justify-between p-4 bg-white h-20 border-b border-gray-200">
 			<div className="flex flex-1 grow items-center">
-				<LanguageDropdown
+				{/* <LanguageDropdown
 					languageOptions={languages}
 					recentLanguages={recentLanguages}
 					onSelect={setLanguage}
@@ -45,7 +45,7 @@ const NavBar: React.FC = () => {
 					onSelect={handleBookChapterSelect}
 					selectedBook={bookCode}
 					selectedChapter={chapter}
-				/>
+				/> */}
 			</div>
 			<div>
 				<button
