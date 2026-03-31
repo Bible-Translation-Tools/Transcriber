@@ -5,6 +5,9 @@
   flex: 1 1 auto;
   border: 1px solid #d1d5db; /* gray-300 */
   background: #ffffff;
+  --editor-padding: 1rem;
+  --editor-font-size: 1.125rem;
+  --editor-line-height: 2;
 }
 
 .textEditorMirror {
@@ -22,9 +25,9 @@
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
-  padding: 0.5rem; /* match textarea padding */
-  font-size: 1.125rem; /* match textarea font-size */
-  line-height: 1.625; /* match textarea line-height */
+  padding: var(--editor-padding);
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
 }
 
 .textEditorActiveLine {
@@ -43,9 +46,9 @@
   width: 100%;
   resize: none;
   background: transparent;
-  padding: 0.5rem; /* p-2 */
-  font-size: 1.125rem; /* text-lg */
-  line-height: 1.625; /* leading-relaxed */
+  padding: var(--editor-padding);
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
   outline: none;
   border: 0;
 }

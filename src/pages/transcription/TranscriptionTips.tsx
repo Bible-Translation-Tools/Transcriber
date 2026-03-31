@@ -5,7 +5,7 @@ const TranscriptionTips: React.FC = () => {
 	const { t } = useTranslation();
 
 	return (
-		<div className="flex-2 bg-white rounded-lg shadow-md p-6 h-full overflow-y-auto">
+		<div className="flex-1 h-full min-h-0 overflow-y-auto bg-white p-10">
 			<div className="flex items-center mb-12">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

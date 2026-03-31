@@ -13,7 +13,6 @@ import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
 import { useMemo, useState } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { toast } from "react-toastify";
 
 function TranscriptionPage() {
@@ -36,6 +35,7 @@ function TranscriptionPage() {
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 	const [imageToDelete, setImageToDelete] =
 		useState<TranscribableDocument | null>(null);
+	const [isProjectContentsVisible, setIsProjectContentsVisible] = useState(true);
 
 	const handleOpenMoveImageModal = (page: number) => {
 		setMoveImageModalImage(images[page]);
@@ -160,25 +160,88 @@ function TranscriptionPage() {
 			className="flex flex-col h-screen bg-gray-100"
 		>
 			<NavBar />
-			<PanelGroup
-				className="h-[calc(100%_-_5rem)]! overflow-visible!"
-				direction="horizontal"
-			>
-				<Panel defaultSize={25} minSize={10} maxSize={30} className="min-w-0">
-					<ProjectContents
-						key={images.length}
-						images={images}
-						selectedImage={selectedImage}
-						handleImageUpload={handleImageUpload}
-						handleOpenMoveImageModal={handleOpenMoveImageModal}
-						handlePageChange={handlePageChange}
-						handleDeleteImage={handleOpenDeleteImageDialog}
-					/>
-				</Panel>
-				<PanelResizeHandle className="w-2 bg-gray-200 flex items-center justify-center">
-					<div className="w-1 h-6 bg-gray-400 rounded-full" />
-				</PanelResizeHandle>
-				<Panel defaultSize={75}>
+			<div className="flex h-[calc(100%_-_5rem)] overflow-visible">
+				{isProjectContentsVisible && (
+					<div className="w-[240px] shrink-0 border-r border-gray-200 bg-white flex h-full min-h-0 flex-col">
+						<div className="flex items-center justify-end px-4 pt-4">
+							<button
+								type="button"
+								onClick={() => setIsProjectContentsVisible(false)}
+								className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-[#0F2F4C] shadow-sm transition-transform transition-shadow hover:scale-105 hover:bg-gray-50 hover:shadow-md"
+								aria-label="Hide project contents panel"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 20 20"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M17 1H3C1.89543 1 1 1.89543 1 3V17C1 18.1046 1.89543 19 3 19H17C18.1046 19 19 18.1046 19 17V3C19 1.89543 18.1046 1 17 1Z"
+										stroke="#0F2F4C"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+									<path
+										d="M7 1V19M14 13L11 10L14 7"
+										stroke="#0F2F4C"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							</button>
+						</div>
+						<div className="flex-1 min-h-0">
+							<ProjectContents
+								key={images.length}
+								images={images}
+								selectedImage={selectedImage}
+								handleImageUpload={handleImageUpload}
+								handleOpenMoveImageModal={handleOpenMoveImageModal}
+								handlePageChange={handlePageChange}
+								handleDeleteImage={handleOpenDeleteImageDialog}
+							/>
+						</div>
+					</div>
+				)}
+				<div className="relative h-full min-w-0 flex-1">
+					{!isProjectContentsVisible && (
+						<button
+							type="button"
+							onClick={() => setIsProjectContentsVisible(true)}
+							className="absolute left-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-[#0F2F4C] shadow-sm transition-transform transition-shadow hover:scale-105 hover:bg-gray-50 hover:shadow-md"
+							aria-label="Show project contents panel"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 20 20"
+								fill="none"
+								className="-scale-x-100"
+								aria-hidden="true"
+							>
+								<path
+									d="M17 1H3C1.89543 1 1 1.89543 1 3V17C1 18.1046 1.89543 19 3 19H17C18.1046 19 19 18.1046 19 17V3C19 1.89543 18.1046 1 17 1Z"
+									stroke="#0F2F4C"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+								<path
+									d="M7 1V19M14 13L11 10L14 7"
+									stroke="#0F2F4C"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+						</button>
+					)}
 					<EditorWrapper
 						images={images}
 						selectedImage={selectedImage}
@@ -186,8 +249,8 @@ function TranscriptionPage() {
 						handleTextChange={handleTextChange}
 						handleVerseRangeChange={handleVerseRangeChange}
 					/>
-				</Panel>
-			</PanelGroup>
+				</div>
+			</div>
 			<ShowWhen when={!!modalImage}>
 				<MoveImageModal
 					key={modalImage?.id}

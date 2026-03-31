@@ -1,5 +1,5 @@
 import DocumentViewer from "@components/image/Pagination.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument.ts";
 import EmptyProject from "@src/pages/transcription/EmptyProject.tsx";
@@ -14,6 +14,8 @@ type EditorWrapperProps = {
 	handleVerseRangeChange: (start: number, end: number) => void;
 };
 
+const EDITOR_LAYOUT_STORAGE_KEY = "transcriber-editor-layout-direction";
+
 export default function EditorWrapper({
 	images,
 	selectedImage,
@@ -21,7 +23,20 @@ export default function EditorWrapper({
 	handleTextChange,
 	handleVerseRangeChange,
 }: EditorWrapperProps) {
-	const [isVertical, setIsVertical] = useState(true);
+	const [isVertical, setIsVertical] = useState(() => {
+		if (typeof window === "undefined") {
+			return true;
+		}
+
+		return localStorage.getItem(EDITOR_LAYOUT_STORAGE_KEY) !== "horizontal";
+	});
+
+	useEffect(() => {
+		localStorage.setItem(
+			EDITOR_LAYOUT_STORAGE_KEY,
+			isVertical ? "vertical" : "horizontal",
+		);
+	}, [isVertical]);
 
 	if (!images || images.length === 0) {
 		return <EmptyProject />;
@@ -40,7 +55,7 @@ export default function EditorWrapper({
 			<button
 				type="button"
 				onClick={() => setIsVertical((prev) => !prev)}
-				className="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm transition-transform transition-shadow hover:scale-105 hover:bg-gray-50 hover:shadow-md"
+				className="absolute right-3 top-3 z-99 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm transition-transform transition-shadow hover:scale-105 hover:bg-gray-50 hover:shadow-md"
 				aria-label={
 					isVertical ? "Switch to side-by-side layout" : "Switch to stacked layout"
 				}
@@ -58,6 +73,7 @@ export default function EditorWrapper({
 							<DocumentViewer
 								image={selectedImage}
 								onRetryTranscription={handleResubmitImage}
+								isVerticalLayout={isVertical}
 							/>
 						</Panel>
 						<PanelResizeHandle className={resizeHandleClass}>

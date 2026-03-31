@@ -28,7 +28,7 @@ const RetryTranscription: React.FC<Props> = ({
 			{isTranscribing ? (
 				<TranscriptionStatus onRetryTranscription={debouncedRetry} />
 			) : (
-				<div className="mt-4 text-sm text-gray-500">
+				<div className="p-2 text-sm text-gray-500">
 					<button
 						type={"button"}
 						onClick={debouncedRetry}
@@ -47,7 +47,7 @@ const TranscriptionStatus: React.FC<Props> = () => {
 	const { t } = useTranslation();
 
 	return (
-		<div className="mt-4 p-4 bg-gray-100 rounded-md shadow-sm">
+		<div className="mt-2 p-3 bg-gray-100 rounded-md shadow-sm">
 			<p className="text-sm font-semibold text-gray-700">
 				{t("This Image is Being Processed.")}
 			</p>
