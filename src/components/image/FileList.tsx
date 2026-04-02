@@ -108,10 +108,10 @@ const FileListItem: React.FC<FileListItemProps> = ({
 			{isMenuOpen && (
 				<div
 					ref={menuRef}
-					className="absolute z-1 ml-[18vw] mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+					className="absolute z-1 ml-[10vw] mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
 				>
 					<div className="py-1">
-						<button
+						{/* <button
 							type={"button"}
 							onClick={handleMoveClick}
 							className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -131,7 +131,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 								/>
 							</svg>
 							{t("Move Image")}
-						</button>
+						</button> */}
 						<button
 							type={"button"}
 							onClick={handleDeleteClick}
