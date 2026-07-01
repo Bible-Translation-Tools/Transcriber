@@ -52,7 +52,7 @@ export async function HandleTranscriptionRequest(
   console.log("Handling Transcription Request");
   let transcriptionResponse: TranscriptionResponse | null = null;
 
-  if (body.processImediately) {
+  if (body.processImmediately) {
     switch (body.model) {
       case TranscriptionModel.GEMINI: {
         const apiKey = apiKeys.get(TranscriptionModel.GEMINI);
@@ -185,7 +185,7 @@ export const transcriptionRequestSchema = v.object({
   chapter: v.number(),
   systemPrompt: v.string(),
   prompt: v.string(),
-  processImediately: v.optional(v.boolean(), true),
+  processImmediately: v.optional(v.boolean(), true),
 });
 export type TranscriptionRequest = v.InferOutput<
   typeof transcriptionRequestSchema
