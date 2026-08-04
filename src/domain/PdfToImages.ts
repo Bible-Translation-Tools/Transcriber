@@ -1,4 +1,3 @@
-import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import type { IncomingImage } from "@src/domain/ImageActions.ts";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?worker";
@@ -50,8 +49,6 @@ export async function parsePdfFile(file: File) {
 				created: createdTime + (pageIdx.index + 100), // pad out a little for the number of pages so they sort correctly
 				data: base64String,
 				blob: blob ?? undefined,
-				transcription: null,
-				status: TranscriptionStatus.IN_PROGRESS,
 			};
 			canvas.remove();
 			return image;

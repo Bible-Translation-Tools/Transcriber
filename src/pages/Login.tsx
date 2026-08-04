@@ -48,9 +48,8 @@ function Login() {
 			// Must land before the first sync: every cache read is scoped by it.
 			connectUserWithAnalytics(userId, userName, userEmail);
 
-			// Pull the user's images. A browser that has never seen this account
-			// starts from cursor 0 and gets everything; a returning one gets only
-			// what changed. Image bytes are fetched lazily, as pages are viewed.
+			// Fetch the user's images and transcriptions. Image bytes are pulled
+			// lazily, as pages are viewed.
 			await syncEngine.sync(String(userId));
 			await store.refreshProject();
 			await refreshProgress(store, String(userId));

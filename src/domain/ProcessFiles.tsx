@@ -1,4 +1,3 @@
-import { TranscriptionStatus } from "@src/data/TranscriptionStatus";
 import type { IncomingImage } from "@src/domain/ImageActions.ts";
 import { parsePdfFile } from "@src/domain/PdfToImages.ts";
 
@@ -50,7 +49,6 @@ async function processImage(
 		created: Date.now() + (fileNumber + 100),
 		data: base64String,
 		blob: file,
-		status: TranscriptionStatus.IN_PROGRESS,
 	};
 
 	return image;
