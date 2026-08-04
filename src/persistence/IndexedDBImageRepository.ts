@@ -1,7 +1,12 @@
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 
 const DB_NAME = "imageDB";
-const DB_VERSION = 5;
+/**
+ * v4 adds the blob, meta, and outbox stores and strips image bytes off the
+ * metadata records. v3 - one `images` store holding base64 data URLs - is the
+ * version this upgrades from.
+ */
+const DB_VERSION = 4;
 
 const IMAGE_STORE = "images";
 const BLOB_STORE = "blobs";
@@ -136,15 +141,8 @@ class IndexedDBImageRepository {
 				if (!db.objectStoreNames.contains(META_STORE)) {
 					db.createObjectStore(META_STORE, { keyPath: "key" });
 				}
-				// v4 keyed the outbox by an autoIncrement seq, which let several
-				// rows pile up for one image. Rekey to imageId so the store holds
-				// exactly the latest unsent text per image.
-				if (db.objectStoreNames.contains(OUTBOX_STORE)) {
-					const existing = tx.objectStore(OUTBOX_STORE);
-					if (existing.keyPath !== "imageId") {
-						db.deleteObjectStore(OUTBOX_STORE);
-					}
-				}
+				// Keyed by imageId, so the store holds exactly the latest unsent
+				// text per image rather than one row per edit.
 				if (!db.objectStoreNames.contains(OUTBOX_STORE)) {
 					const outbox = db.createObjectStore(OUTBOX_STORE, {
 						keyPath: "imageId",
@@ -353,11 +351,10 @@ class IndexedDBImageRepository {
 	 * effect here without tombstones or a cursor to keep straight.
 	 *
 	 * Transcription text comes from `documents` and is never carried over from what
-	 * was already here. That is the whole discipline: with no "keep the old text
-	 * if..." branch there is no version to check and nothing to get stale. Earlier
-	 * versions kept the previous text and compared `updated`, which advances on
-	 * every replace whether or not the text was refetched - so a record could hold
-	 * a current version beside stale text and look valid forever.
+	 * was already here. Do not add a "keep the old text if..." branch: any such
+	 * condition needs a version to compare, and `updated` is not one - it advances
+	 * on every replace whether or not the text came with it, so a record would end
+	 * up holding a current version beside stale text and look valid forever.
 	 *
 	 * Unsent local edits are overlaid afterwards, here and nowhere else, since they
 	 * are the one case where the local copy legitimately beats the server's.

@@ -270,9 +270,9 @@ export class D1TranscriptionRepository {
 
 	/**
 	 * Every image a user currently has, oldest first.
-	 * 
-	 * Returns only metadata and the newest transcription text, if any. The full text of older
 	 *
+	 * Returns only metadata and the newest transcription text, if any. The full text of older
+	 */
 	async getImagesForUser(userId: string): Promise<ImageSummary[]> {
 		const dbUserId = await this.getDbUserId(userId);
 		if (dbUserId == null) {
