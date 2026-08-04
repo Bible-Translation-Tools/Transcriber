@@ -5,7 +5,7 @@ import type { TranscribableDocument } from "@src/data/TranscribableDocument";
  * Orders the file list by where each image belongs: language, then book, then
  * chapter, then upload time.
  */
-export function compareDocuments(
+function compareDocuments(
 	a: TranscribableDocument,
 	b: TranscribableDocument,
 ): number {

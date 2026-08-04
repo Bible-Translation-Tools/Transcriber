@@ -1,7 +1,3 @@
-import {
-	type TranscriptionError,
-	TranscriptionErrorCode,
-} from "@api/ai/TranscriptionResponse.ts";
 import type { TranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
 import {
 	API_V1,
@@ -228,27 +224,10 @@ export const refreshProgress = async (
 	store.setProgress(calculateProgress(all));
 };
 
-export const blobToDataUrl = (blob: Blob): Promise<string> =>
+const blobToDataUrl = (blob: Blob): Promise<string> =>
 	new Promise((resolve, reject) => {
 		const reader = new FileReader();
 		reader.onload = () => resolve(String(reader.result ?? ""));
 		reader.onerror = () => reject(reader.error);
 		reader.readAsDataURL(blob);
 	});
-
-export const handleTranscriptionError = (error: TranscriptionError) => {
-	switch (error.errorCode) {
-		case TranscriptionErrorCode.AuthenticationError:
-			toast.error("Error: Authentication error");
-			break;
-		case TranscriptionErrorCode.NoUserFound:
-			toast.error("Error: User not found");
-			break;
-		case TranscriptionErrorCode.RateLimitExceeded:
-			toast.error("Error: RateLimit exceeded");
-			break;
-		default:
-			toast.error("An error occurred.");
-			break;
-	}
-};

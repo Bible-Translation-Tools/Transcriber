@@ -22,7 +22,7 @@ import type { HonoBindings } from "./auth/utils";
 import { mockHandleTranscriptionRequest } from "./domain/mock";
 import { createRepo } from "./persistence/D1TranscriptionRepository";
 
-export const apiV1 = "/api/v1";
+const apiV1 = "/api/v1";
 const apiV1Router = new Hono<HonoBindings>();
 apiV1Router.basePath(apiV1);
 
@@ -86,7 +86,7 @@ apiV1Router.get(`${IMAGES_ROUTE}`, async (c) => {
 	const user = c.get("user");
 	const repo = createRepo(c.env);
 	const images = await repo.getImagesForUser(String(user.wacsUserId));
-	return c.json({ serverTime: Date.now(), images });
+	return c.json({ images });
 });
 
 apiV1Router.get(`${IMAGE_ROUTE}/:id`, async (c) => {

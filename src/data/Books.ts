@@ -86,10 +86,3 @@ const BOOK_ORDER: Map<string, number> = new Map(
 export function bookOrder(bookCode: string): number {
 	return BOOK_ORDER.get(bookCode) ?? Number.MAX_SAFE_INTEGER;
 }
-
-/** Human-readable book name, falling back to the raw code. */
-export function bookLabel(bookCode: string): string {
-	return (
-		BOOK_OPTIONS.find((book) => book.value === bookCode)?.label ?? bookCode
-	);
-}

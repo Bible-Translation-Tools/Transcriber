@@ -33,7 +33,7 @@ const MIGRATED_V4_KEY = "migratedV4";
  * `fileName` - is dropped on the way in, so the store cannot silently
  * accumulate junk the way it used to.
  */
-export type StoredImage = {
+type StoredImage = {
 	id: string;
 	userId: string;
 	filename: string;
@@ -279,7 +279,7 @@ class IndexedDBImageRepository {
 		return records as unknown as TranscribableDocument[];
 	}
 
-	async getImage(
+	private async getImage(
 		userId: string,
 		imageId: string,
 	): Promise<TranscribableDocument | null> {
