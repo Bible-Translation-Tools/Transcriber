@@ -2,14 +2,26 @@ import type {
 	Transcription,
 	TranscriptionImage,
 } from "@api/data/TranscriptionImage.ts";
-import type { R2ImageRepository } from "@api/persistence/R2ImageRepository";
+import {
+	decodeStoredImage,
+	R2ImageRepository,
+} from "@api/persistence/R2ImageRepository";
 import * as schema from "@api/persistence/schema";
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 
-export type UserImageRecord = {
-	[imgIg: string]: TranscribableDocument;
+export type ImageSummary = {
+	id: string;
+	filename: string;
+	languageCode: string;
+	bookCode: string;
+	chapter: number;
+	verseStart: number;
+	verseEnd: number;
+	created: number | null;
+	updated: number;
+	transcription: string | null;
+	hasTranscription: boolean;
 };
 
 export class D1TranscriptionRepository {
@@ -73,6 +85,7 @@ export class D1TranscriptionRepository {
 				chapter: image.chapter,
 				verseStart: image.verse_start,
 				verseEnd: image.verse_end,
+				updated: Date.now(),
 			})
 			.onConflictDoUpdate({
 				target: schema.transcriptionImages.id,
@@ -83,12 +96,25 @@ export class D1TranscriptionRepository {
 					chapter: image.chapter,
 					verseStart: image.verse_start,
 					verseEnd: image.verse_end,
+					updated: Date.now(),
 				},
 			});
 
 		for (const transcription of image.transcription) {
 			await this.upsertTranscription(image.id, transcription);
 		}
+	}
+
+	/**
+	 * Advances an image's sync watermark. Called by every mutation, including
+	 * transcription writes, so a single cursor is enough for clients to catch up.
+	 * The timestamp is always taken server-side - never from a client clock.
+	 */
+	private async touchImage(imageId: string): Promise<void> {
+		await this.db
+			.update(schema.transcriptionImages)
+			.set({ updated: Date.now() })
+			.where(eq(schema.transcriptionImages.id, imageId));
 	}
 
 	async upsertTranscription(
@@ -145,6 +171,8 @@ export class D1TranscriptionRepository {
 				text: transcription.text,
 			});
 		}
+
+		await this.touchImage(imageId);
 	}
 
 	async markImageAsUserDeleted(imageId: string): Promise<void> {
@@ -152,6 +180,7 @@ export class D1TranscriptionRepository {
 			.update(schema.transcriptionImages)
 			.set({
 				userDeleted: true,
+				updated: Date.now(),
 			})
 			.where(eq(schema.transcriptionImages.id, imageId));
 	}
@@ -209,57 +238,69 @@ export class D1TranscriptionRepository {
 				});
 			} else {
 				console.warn(
-					`No non-human-modified transcriptions found for image ID: ${imageId}`,
+					`No prior transcription for image ID: ${imageId} - storing human-modified text with empty provenance.`,
 				);
+				await this.db.insert(schema.transcriptions).values({
+					imageId: imageId,
+					humanModified: true,
+					model: "",
+					prompt: "",
+					systemPrompt: "",
+					date: Date.now(),
+					text: transcriptionText,
+				});
 			}
 		}
+
+		await this.touchImage(imageId);
 	}
-	async getAllImagesForUser({
-		userId,
-		indexedDbImgIds,
-	}: {
-		userId: string;
-		indexedDbImgIds: string[];
-	}): Promise<UserImageRecord> {
-		// userId is from wacs
-		// Need to get transcriptionUsers.id from sqlite; query transcriptionUsers where user like userId given;
+
+	/** Resolves a WACS user id to the local TranscriptionUsers row id. */
+	private async getDbUserId(wacsUserId: string): Promise<number | null> {
 		const userRecord = await this.db
 			.select()
 			.from(schema.transcriptionUsers)
-			.where(eq(schema.transcriptionUsers.user, userId));
-		console.log({ userRecord });
+			.where(eq(schema.transcriptionUsers.user, wacsUserId));
 
 		if (!userRecord || userRecord.length === 0) {
-			return {} as TranscribableDocument;
+			return null;
+		}
+		return userRecord[0].id;
+	}
+
+	/**
+	 * Every image a user currently has, oldest first.
+	 * 
+	 * Returns only metadata and the newest transcription text, if any. The full text of older
+	 *
+	async getImagesForUser(userId: string): Promise<ImageSummary[]> {
+		const dbUserId = await this.getDbUserId(userId);
+		if (dbUserId == null) {
+			// Unknown user means nothing has ever been stored for them.
+			return [];
 		}
 
-		const dbUserId = userRecord[0].id;
-		// subquery to get only the most max unix epoch date
-		const latestTranscriptions = this.db
+		const latestDates = this.db
 			.select({
 				imageId: schema.transcriptions.imageId,
 				maxDate: sql`MAX(${schema.transcriptions.date})`.as("maxDate"),
-				date: schema.transcriptions.date,
 			})
 			.from(schema.transcriptions)
 			.groupBy(schema.transcriptions.imageId)
 			.as("latest_transcriptions");
-		// Given that id, query transcriptionImages where userId = id,
-		//join transcriptions table on imagId, but only take the most recent date
-		const images = await this.db
+
+		const rows = await this.db
 			.select({
 				id: schema.transcriptionImages.id,
-				userId: schema.transcriptionImages.userId,
-				userDeleted: schema.transcriptionImages.userDeleted,
-				filePath: schema.transcriptionImages.filePath,
-				fileName: schema.transcriptionImages.filename,
+				filename: schema.transcriptionImages.filename,
 				languageCode: schema.transcriptionImages.languageCode,
 				bookCode: schema.transcriptionImages.bookCode,
 				chapter: schema.transcriptionImages.chapter,
 				verseStart: schema.transcriptionImages.verseStart,
 				verseEnd: schema.transcriptionImages.verseEnd,
-				transcription: schema.transcriptions.text,
 				created: schema.transcriptionImages.created,
+				updated: schema.transcriptionImages.updated,
+				transcription: schema.transcriptions.text,
 			})
 			.from(schema.transcriptionImages)
 			.where(
@@ -268,12 +309,10 @@ export class D1TranscriptionRepository {
 					eq(schema.transcriptionImages.userDeleted, false),
 				),
 			)
-			// Use latestTranscriptions to filter down to only the latest date.
 			.leftJoin(
-				latestTranscriptions,
-				eq(latestTranscriptions.imageId, schema.transcriptionImages.id),
+				latestDates,
+				eq(latestDates.imageId, schema.transcriptionImages.id),
 			)
-			// Then join back to transcriptions to get the full row that matches both imageId and maxDate.
 			.leftJoin(
 				schema.transcriptions,
 				and(
@@ -286,42 +325,97 @@ export class D1TranscriptionRepository {
 						sql`latest_transcriptions.maxDate`,
 					),
 				),
-			);
-		// Now for any id on server that is not in indexedDbImgIds, we need to also fetch the data from r2 bucket;
-		const withMissingImgData = await Promise.all(
-			images.map(async (image) => {
-				// todo: upudate schmea to not accept nullable values for some of these
-				const updated: TranscribableDocument = {
-					...image,
-					data: null,
-					filename: image.fileName,
-				};
-				if (indexedDbImgIds.includes(image.id) || !image.filePath) {
-					return updated;
-				}
-				const imgData = await this.imageRepo.retrieveImage(
-					image.filePath,
-				);
-				if (!imgData) {
-					return updated;
-				}
-				const u8 = new Uint8Array(imgData);
-				const decoder = new TextDecoder("utf-8");
-				updated.data = decoder.decode(u8);
-				return updated;
-			}),
-		);
+			)
+			.orderBy(asc(schema.transcriptionImages.created));
 
-		// return as a record to make easier for client to update their own objects by doing a if localImgs[localId] => updated / else create
-		const asRecord = withMissingImgData.reduce(
-			(record: UserImageRecord, img: TranscribableDocument) => {
-				if (img.id) {
-					record[img.id] = img;
-				}
-				return record;
-			},
-			{},
-		);
-		return asRecord;
+		// Two transcriptions sharing an image's newest date would duplicate its
+		// row. Vanishingly unlikely, but a duplicate image in the list would be
+		// visible, so collapse on id.
+		const seen = new Set<string>();
+		const images: ImageSummary[] = [];
+		for (const row of rows) {
+			if (seen.has(row.id)) {
+				continue;
+			}
+			seen.add(row.id);
+			images.push({
+				...row,
+				hasTranscription: row.transcription != null,
+			});
+		}
+		return images;
 	}
+
+	/**
+	 * Looks up one image, but only if it belongs to the given user and has not
+	 * been deleted. Returns null for a missing, foreign, or deleted image alike,
+	 * so the response cannot be used to probe for other users' image ids, and
+	 * content stays unreachable once the list stops reporting it.
+	 */
+	private async getOwnedImage(
+		userId: string,
+		imageId: string,
+	): Promise<{ filePath: string; filename: string } | null> {
+		const dbUserId = await this.getDbUserId(userId);
+		if (dbUserId == null) {
+			return null;
+		}
+
+		const rows = await this.db
+			.select({
+				filePath: schema.transcriptionImages.filePath,
+				filename: schema.transcriptionImages.filename,
+			})
+			.from(schema.transcriptionImages)
+			.where(
+				and(
+					eq(schema.transcriptionImages.id, imageId),
+					eq(schema.transcriptionImages.userId, dbUserId),
+					eq(schema.transcriptionImages.userDeleted, false),
+				),
+			)
+			.limit(1);
+
+		return rows.at(0) ?? null;
+	}
+
+	/**
+	 * An image's bytes, ready to serve, or null if the caller may not have them.
+	 *
+	 * Combines the ownership check, the R2 read, and the decode from the stored
+	 * base64 form, so callers need to know none of those things - in particular not
+	 * that R2 holds a data URL as text/plain rather than raw bytes.
+	 *
+	 * Returns null indistinguishably for a missing, foreign, deleted, or
+	 * unreadable image; the route turns all of them into the same 404.
+	 */
+	async getImageBytes(
+		userId: string,
+		imageId: string,
+	): Promise<{ bytes: Uint8Array; contentType: string } | null> {
+		const owned = await this.getOwnedImage(userId, imageId);
+		if (!owned) {
+			return null;
+		}
+
+		const stored = await this.imageRepo.retrieveImage(owned.filePath);
+		if (!stored) {
+			console.error(
+				`Image row ${imageId} points at missing R2 object ${owned.filePath}`,
+			);
+			return null;
+		}
+
+		return decodeStoredImage(stored);
+	}
+}
+
+/**
+ * Builds a repository from the Worker's bindings.
+ */
+export function createRepo(env: Env): D1TranscriptionRepository {
+	return new D1TranscriptionRepository(
+		env.HTR_DATABASE,
+		new R2ImageRepository(env.HTR_STORAGE),
+	);
 }

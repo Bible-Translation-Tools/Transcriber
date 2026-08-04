@@ -1,70 +1,37 @@
-import type { TranscriptionError } from "@api/ai/TranscriptionResponse.ts";
-import type { UpdateTranscriptionRequest } from "@api/domain/TranscriptionRequest.ts";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { requireCurrentUserId } from "@src/domain/CurrentUser.ts";
 import {
-	constructTranscriptionUpdateRequest,
-	finalizeSuccessfulTranscriptionUpdate,
-	handleTranscriptionError,
-	updateImage,
+	refreshProgress,
+	saveTranscriptionText,
 } from "@src/domain/ImageActions.ts";
-import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
-import { sendUpdatedTranscription } from "@src/services/TranscriptionApi.ts";
-import { useMutation } from "@tanstack/react-query";
-
-const imageRepo = IndexedDBImageRepository.getInstance();
+import syncEngine from "@src/services/SyncEngine.ts";
 
 export function useUpdateImage() {
 	const store = useTranscriptionStore();
 
-	async function executeTranscription(
-		image: TranscribableDocument,
-		request: UpdateTranscriptionRequest,
-		reloadOnSuccess: boolean,
-	): Promise<[TranscribableDocument, boolean]> {
-		await sendUpdatedTranscription(request);
-		return [image, reloadOnSuccess];
-	}
-
-	const transcribe = useMutation({
-		mutationFn: ({
-			image,
-			request,
-			reloadOnSuccess,
-		}: {
-			image: TranscribableDocument;
-			request: UpdateTranscriptionRequest;
-			reloadOnSuccess: boolean;
-		}) => {
-			return executeTranscription(image, request, reloadOnSuccess);
-		},
-		onSuccess: async ([image, reloadOnSuccess]: [
-			TranscribableDocument,
-			boolean,
-		]) => {
-			await finalizeSuccessfulTranscriptionUpdate(
-				imageRepo,
-				store,
-				image,
-				reloadOnSuccess,
-			);
-		},
-		onError: async (error: TranscriptionError) => {
-			handleTranscriptionError(error);
-		},
-	});
-
+	/**
+	 * Saves edited transcription text: locally first, then to the server. The
+	 * local copy is what makes the edit survive a refresh or an offline spell, and
+	 * it is discarded only once the server has it.
+	 */
 	async function updateTranscription(
 		document: TranscribableDocument,
-		reloadOnSuccess = false,
 	): Promise<void> {
-		await updateImage(store, imageRepo, document);
-		const request = await constructTranscriptionUpdateRequest(document);
-		transcribe.mutate({
-			image: document,
-			request: request,
-			reloadOnSuccess: reloadOnSuccess,
-		});
+		const userId = requireCurrentUserId();
+		await saveTranscriptionText(
+			store,
+			userId,
+			document,
+			document.transcription ?? "",
+		);
+
+		try {
+			await syncEngine.sync(userId);
+			await refreshProgress(store, userId);
+		} catch (error) {
+			console.error("Sync after edit failed", error);
+		}
 	}
 
 	return updateTranscription;

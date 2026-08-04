@@ -43,6 +43,18 @@ export function TranscriptionWorkspace(props: {
 						subMessage={t("Please Retry Message")}
 					/>
 				</ShowWhen>
+				{/* Synced but never transcribed. Distinct from an error - nothing
+				    failed, the work simply has not been done yet. */}
+				<ShowWhen
+					when={
+						props.status === TranscriptionStatus.NOT_TRANSCRIBED
+					}
+				>
+					<TranscriptionStatusOverlay
+						mainMessage={t("This Image Has No Transcription Yet.")}
+						subMessage={t("Please Retry Message")}
+					/>
+				</ShowWhen>
 				<ShowWhen when={props.status === TranscriptionStatus.COMPLETED}>
 					<div className="flex h-full w-full justify-center bg-white">
 						<div className={props.isVerticalLayout ? "w-3/5" : "w-full"}>

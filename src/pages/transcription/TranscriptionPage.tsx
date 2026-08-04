@@ -4,6 +4,9 @@ import MoveImageModal from "@components/forms/MoveImageModal.tsx";
 import NavBar from "@components/navigation/NavBar.tsx";
 import { ShowWhen } from "@components/utils/ShowWhen.tsx";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { getCurrentUserId } from "@src/domain/CurrentUser.ts";
+import { refreshProgress } from "@src/domain/ImageActions.ts";
+import { sortDocuments } from "@src/domain/SortDocuments.ts";
 import { useDeleteImage } from "@src/hooks/useDeleteImage.ts";
 import { useRetranscribe } from "@src/hooks/useRetranscribe";
 import { useUpdateImage } from "@src/hooks/useUpdateImage";
@@ -11,23 +14,42 @@ import { useUploadImage } from "@src/hooks/useUploadImage.ts";
 import EditorWrapper from "@src/pages/transcription/EditorWrapper.tsx";
 import ProjectContents from "@src/pages/transcription/ProjectContents.tsx";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import syncEngine from "@src/services/SyncEngine.ts";
 import { ImageSubmittedToast } from "@src/toasts/ImageSubmittedToast.tsx";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
 function TranscriptionPage() {
-	const { images, selectedImage, setSelectedImage, refreshProject } =
-		useTranscriptionStore();
+	const store = useTranscriptionStore();
+	const { images, selectedImage, setSelectedImage, refreshProject } = store;
 	const uploadImage = useUploadImage();
 	const updateImage = useUpdateImage();
 	const deleteImage = useDeleteImage();
 	const retranscribe = useRetranscribe();
 
-	useMemo(() => {
-		images.sort((a, b) => {
-			return a.created - b.created;
-		});
-	}, [images]);
+	const sortedImages = useMemo(() => sortDocuments(images), [images]);
+
+	useEffect(() => {
+		const userId = getCurrentUserId();
+		if (!userId) {
+			return;
+		}
+		let cancelled = false;
+		(async () => {
+			try {
+				await syncEngine.sync(userId);
+				if (cancelled) return;
+				await refreshProject();
+				await refreshProgress(store, userId);
+			} catch (error) {
+				console.error("Initial sync failed", error);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+		// Deliberately once per mount, not on every store change.
+	}, []);
 
 	const [isModalOpen, setIsMoveImageModalOpen] = useState(true);
 	const [modalImage, setMoveImageModalImage] =
@@ -38,14 +60,14 @@ function TranscriptionPage() {
 	const [isProjectContentsVisible, setIsProjectContentsVisible] = useState(true);
 
 	const handleOpenMoveImageModal = (page: number) => {
-		setMoveImageModalImage(images[page]);
+		setMoveImageModalImage(sortedImages[page]);
 		setIsMoveImageModalOpen(true);
 
 		console.log(page);
 	};
 
 	const handleOpenDeleteImageDialog = (page: number) => {
-		setImageToDelete(images[page]);
+		setImageToDelete(sortedImages[page]);
 		setIsDeleteDialogOpen(true);
 
 		console.log(page);
@@ -124,10 +146,10 @@ function TranscriptionPage() {
 	};
 
 	const handlePageChange = (page: number) => {
-		if (page < images.length && page >= 0) {
-			setSelectedImage(images[page]);
+		if (page < sortedImages.length && page >= 0) {
+			setSelectedImage(sortedImages[page]);
 		} else {
-			setSelectedImage(images[0]);
+			setSelectedImage(sortedImages[0]);
 		}
 	};
 
@@ -197,8 +219,8 @@ function TranscriptionPage() {
 						</div>
 						<div className="flex-1 min-h-0">
 							<ProjectContents
-								key={images.length}
-								images={images}
+								key={sortedImages.length}
+								images={sortedImages}
 								selectedImage={selectedImage}
 								handleImageUpload={handleImageUpload}
 								handleOpenMoveImageModal={handleOpenMoveImageModal}
@@ -243,7 +265,7 @@ function TranscriptionPage() {
 						</button>
 					)}
 					<EditorWrapper
-						images={images}
+						images={sortedImages}
 						selectedImage={selectedImage}
 						handleResubmitImage={handleResubmitImage}
 						handleTextChange={handleTextChange}

@@ -1,13 +1,20 @@
 {
-    "version": "7",
-    "dialect": "sqlite",
-    "entries": [
-        {
-            "idx": 0,
-            "version": "6",
-            "when": 1745526000997,
-            "tag": "0000_funny_lily_hollister",
-            "breakpoints": true
-        }
-    ]
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1745526000997,
+      "tag": "0000_funny_lily_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1785838195063,
+      "tag": "0001_eager_george_stacy",
+      "breakpoints": true
+    }
+  ]
 }
