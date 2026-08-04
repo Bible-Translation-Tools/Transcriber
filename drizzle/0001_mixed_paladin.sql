@@ -1,0 +1,1 @@
+CREATE INDEX `idx_transcriptions_image_date` ON `Transcriptions` (`image_id`,`date`);

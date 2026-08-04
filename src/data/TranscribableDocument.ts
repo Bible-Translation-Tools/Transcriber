@@ -14,7 +14,6 @@ export interface TranscribableDocument {
 	filename: string;
 	created: EpochTimeStamp;
 	data?: any;
-	updated?: number;
 	hasTranscription?: boolean;
 	transcription: string | undefined | null; // Optional transcription
 	languageCode: string;

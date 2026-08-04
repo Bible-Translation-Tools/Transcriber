@@ -50,7 +50,6 @@ export const uploadNewImage = async (
 		languageCode: store.language.code,
 		bookCode: store.bookCode,
 		chapter: store.chapter,
-		updated: 0,
 		status: TranscriptionStatus.IN_PROGRESS,
 	};
 

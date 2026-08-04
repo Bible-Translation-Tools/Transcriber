@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c432e3ce-bb98-49e4-ae1a-b14042117a84",
+  "id": "483e1ed1-e0cf-4559-8a08-b328900de899",
   "prevId": "f6094b64-41ed-4837-a328-5cb1475e3bcc",
   "tables": {
     "TranscriptionImages": {
@@ -83,26 +83,9 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "updated": {
-          "name": "updated",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         }
       },
-      "indexes": {
-        "idx_images_user_updated": {
-          "name": "idx_images_user_updated",
-          "columns": [
-            "user_id",
-            "updated",
-            "id"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "TranscriptionImages_user_id_TranscriptionUsers_id_fk": {
           "name": "TranscriptionImages_user_id_TranscriptionUsers_id_fk",

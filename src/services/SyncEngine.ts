@@ -18,7 +18,6 @@ type ImageSummary = {
 	verseStart: number;
 	verseEnd: number;
 	created: number | null;
-	updated: number;
 	transcription: string | null;
 	hasTranscription: boolean;
 };
@@ -182,7 +181,6 @@ function toDocument(summary: ImageSummary): TranscribableDocument {
 		id: summary.id,
 		filename: summary.filename,
 		created: summary.created ?? 0,
-		updated: summary.updated,
 		hasTranscription: summary.hasTranscription,
 		transcription: summary.transcription,
 		languageCode: summary.languageCode,

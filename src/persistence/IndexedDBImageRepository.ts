@@ -38,7 +38,6 @@ type StoredImage = {
 	userId: string;
 	filename: string;
 	created: number;
-	updated: number;
 	hasTranscription: boolean;
 	transcription: string | null;
 	status: string;
@@ -84,7 +83,6 @@ function toStored(userId: string, doc: TranscribableDocument): StoredImage {
 		userId,
 		filename: doc.filename,
 		created: Number(doc.created ?? 0),
-		updated: Number(doc.updated ?? 0),
 		hasTranscription: Boolean(doc.hasTranscription),
 		transcription: doc.transcription ?? null,
 		status: String(doc.status),
@@ -351,10 +349,9 @@ class IndexedDBImageRepository {
 	 * effect here without tombstones or a cursor to keep straight.
 	 *
 	 * Transcription text comes from `documents` and is never carried over from what
-	 * was already here. Do not add a "keep the old text if..." branch: any such
-	 * condition needs a version to compare, and `updated` is not one - it advances
-	 * on every replace whether or not the text came with it, so a record would end
-	 * up holding a current version beside stale text and look valid forever.
+	 * was already here. Do not add a "keep the old text if..." branch - any such
+	 * condition needs a version to compare against, and there is deliberately no
+	 * version here. Preserving text across a replace is what made it go stale.
 	 *
 	 * Unsent local edits are overlaid afterwards, here and nowhere else, since they
 	 * are the one case where the local copy legitimately beats the server's.

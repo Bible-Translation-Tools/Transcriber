@@ -19,7 +19,6 @@ export type ImageSummary = {
 	verseStart: number;
 	verseEnd: number;
 	created: number | null;
-	updated: number;
 	transcription: string | null;
 	hasTranscription: boolean;
 };
@@ -85,7 +84,6 @@ export class D1TranscriptionRepository {
 				chapter: image.chapter,
 				verseStart: image.verse_start,
 				verseEnd: image.verse_end,
-				updated: Date.now(),
 			})
 			.onConflictDoUpdate({
 				target: schema.transcriptionImages.id,
@@ -96,25 +94,12 @@ export class D1TranscriptionRepository {
 					chapter: image.chapter,
 					verseStart: image.verse_start,
 					verseEnd: image.verse_end,
-					updated: Date.now(),
 				},
 			});
 
 		for (const transcription of image.transcription) {
 			await this.upsertTranscription(image.id, transcription);
 		}
-	}
-
-	/**
-	 * Advances an image's sync watermark. Called by every mutation, including
-	 * transcription writes, so a single cursor is enough for clients to catch up.
-	 * The timestamp is always taken server-side - never from a client clock.
-	 */
-	private async touchImage(imageId: string): Promise<void> {
-		await this.db
-			.update(schema.transcriptionImages)
-			.set({ updated: Date.now() })
-			.where(eq(schema.transcriptionImages.id, imageId));
 	}
 
 	async upsertTranscription(
@@ -172,7 +157,6 @@ export class D1TranscriptionRepository {
 			});
 		}
 
-		await this.touchImage(imageId);
 	}
 
 	async markImageAsUserDeleted(imageId: string): Promise<void> {
@@ -180,7 +164,6 @@ export class D1TranscriptionRepository {
 			.update(schema.transcriptionImages)
 			.set({
 				userDeleted: true,
-				updated: Date.now(),
 			})
 			.where(eq(schema.transcriptionImages.id, imageId));
 	}
@@ -252,7 +235,6 @@ export class D1TranscriptionRepository {
 			}
 		}
 
-		await this.touchImage(imageId);
 	}
 
 	/** Resolves a WACS user id to the local TranscriptionUsers row id. */
@@ -299,7 +281,6 @@ export class D1TranscriptionRepository {
 				verseStart: schema.transcriptionImages.verseStart,
 				verseEnd: schema.transcriptionImages.verseEnd,
 				created: schema.transcriptionImages.created,
-				updated: schema.transcriptionImages.updated,
 				transcription: schema.transcriptions.text,
 			})
 			.from(schema.transcriptionImages)

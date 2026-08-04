@@ -5,34 +5,21 @@ export const transcriptionUsers = sqliteTable("TranscriptionUsers", {
 	user: text("user").unique().notNull(),
 });
 
-export const transcriptionImages = sqliteTable(
-	"TranscriptionImages",
-	{
-		id: text("id").primaryKey(),
-		userId: integer("user_id")
-			.references(() => transcriptionUsers.id)
-			.notNull(),
-		userDeleted: integer("user_deleted", { mode: "boolean" }).notNull(),
-		filePath: text("file_path").notNull(),
-		filename: text("file_name").notNull(),
-		languageCode: text("language_code").notNull(),
-		bookCode: text("book_code").notNull(),
-		chapter: integer("chapter").notNull(),
-		verseStart: integer("verse_start").notNull(),
-		verseEnd: integer("verse_end").notNull(),
-		created: integer("created").$defaultFn(() => Date.now()),
-		updated: integer("updated")
-			.notNull()
-			.$defaultFn(() => Date.now()),
-	},
-	(table) => [
-		index("idx_images_user_updated").on(
-			table.userId,
-			table.updated,
-			table.id,
-		),
-	],
-);
+export const transcriptionImages = sqliteTable("TranscriptionImages", {
+	id: text("id").primaryKey(),
+	userId: integer("user_id")
+		.references(() => transcriptionUsers.id)
+		.notNull(),
+	userDeleted: integer("user_deleted", { mode: "boolean" }).notNull(),
+	filePath: text("file_path").notNull(),
+	filename: text("file_name").notNull(),
+	languageCode: text("language_code").notNull(),
+	bookCode: text("book_code").notNull(),
+	chapter: integer("chapter").notNull(),
+	verseStart: integer("verse_start").notNull(),
+	verseEnd: integer("verse_end").notNull(),
+	created: integer("created").$defaultFn(() => Date.now()),
+});
 
 export const transcriptions = sqliteTable(
 	"Transcriptions",
