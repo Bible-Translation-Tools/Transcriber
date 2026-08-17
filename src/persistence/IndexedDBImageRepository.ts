@@ -198,14 +198,24 @@ class IndexedDBImageRepository {
 			const legacy = await promisify<TranscribableDocument[]>(
 				readTx.objectStore(IMAGE_STORE).getAll(),
 			);
-			const fallbackUserId = localStorage.getItem("userId") ?? "";
+			// Null before the first login. A record migrated under "" would
+			// never match getAllForUser again, so ownerless records are
+			// deferred rather than stranded.
+			const fallbackUserId = localStorage.getItem("userId");
+			let deferred = false;
 
 			for (const record of legacy) {
 				const data = record.data;
 				if (typeof data !== "string" || !data.startsWith("data:")) {
 					continue;
 				}
-				const userId = String(record.userId ?? fallbackUserId);
+				const userId = record.userId
+					? String(record.userId)
+					: fallbackUserId;
+				if (!userId) {
+					deferred = true;
+					continue;
+				}
 				try {
 					const blob = await (await fetch(data)).blob();
 					const tx = db.transaction(
@@ -225,6 +235,13 @@ class IndexedDBImageRepository {
 						error,
 					);
 				}
+			}
+
+			if (deferred) {
+				// Some records still have no owner. Leave the flag unset and
+				// let a later call (after login) run the migration again.
+				this.migration = null;
+				return;
 			}
 
 			const doneTx = db.transaction(META_STORE, "readwrite");

@@ -195,24 +195,46 @@ export const retranscribe = async (
 		status: TranscriptionStatus.IN_PROGRESS,
 	});
 
-	const response = await fetch(`${API_V1}${TRANSCRIBE_ROUTE}`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(
-			buildTranscriptionRequest(
-				store,
-				document,
-				await blobToDataUrl(blob),
+	try {
+		const response = await fetch(`${API_V1}${TRANSCRIBE_ROUTE}`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(
+				buildTranscriptionRequest(
+					store,
+					document,
+					await blobToDataUrl(blob),
+				),
 			),
-		),
-	});
-	const body = (await response.json().catch(() => ({}))) as {
-		error?: string;
-	};
-	if (!response.ok || body?.error) {
-		throw new Error(
-			body?.error ?? `${response.status} ${response.statusText}`,
-		);
+		});
+		const body = (await response.json().catch(() => ({}))) as {
+			error?: string;
+			transcription?: string;
+		};
+		if (!response.ok || body?.error) {
+			throw new Error(
+				body?.error ?? `${response.status} ${response.statusText}`,
+			);
+		}
+
+		// The response carries the finished text, so the
+		// document leaves IN_PROGRESS here rather than waiting on a sync.
+		if (typeof body.transcription === "string") {
+			await updateImage(store, userId, {
+				...document,
+				transcription: body.transcription,
+				hasTranscription: true,
+				status: TranscriptionStatus.COMPLETED,
+			});
+		}
+	} catch (error) {
+		// Leave the processing state, or the overlay spins forever with no
+		// way to retry.
+		await updateImage(store, userId, {
+			...document,
+			status: TranscriptionStatus.TRANSCRIPTION_ERROR,
+		});
+		throw error;
 	}
 };
 

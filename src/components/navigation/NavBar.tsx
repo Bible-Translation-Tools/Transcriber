@@ -1,4 +1,3 @@
-import { useLanguageContext } from "@src/context/useLanguageContext.tsx";
 import { getCurrentUserId } from "@src/domain/CurrentUser.ts";
 import { refreshProgress } from "@src/domain/ImageActions.ts";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
@@ -8,31 +7,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import BookDropdown from "./BookDropdown.tsx";
-import LanguageDropdown from "./LanguageDropdown.tsx";
 
 const NavBar: React.FC = () => {
 	const { t } = useTranslation();
 	const store = useTranscriptionStore();
-	const {
-		language,
-		setLanguage,
-		recentLanguages,
-		bookCode,
-		setBookCode,
-		chapter,
-		setChapter,
-	} = store;
-
-	const { languages } = useLanguageContext();
 	const navigate = useNavigate();
 	const [isSyncing, setIsSyncing] = useState(false);
-
-	const handleBookChapterSelect = (book: string, chapter: number) => {
-		setBookCode(book);
-		setChapter(chapter);
-		console.log(`Book: ${book}, Chapter: ${chapter || "None"}`);
-	};
 
 	const onSettingsClicked = () => {
 		navigate("/settings");
@@ -58,20 +38,10 @@ const NavBar: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-between p-4 bg-white h-20 border-b border-gray-200">
-			<div className="flex flex-1 grow items-center">
-				{/* <LanguageDropdown
-					languageOptions={languages}
-					recentLanguages={recentLanguages}
-					onSelect={setLanguage}
-					selectedLanguage={language}
-				/>
-				<div className="mx-2" />
-				<BookDropdown
-					onSelect={handleBookChapterSelect}
-					selectedBook={bookCode}
-					selectedChapter={chapter}
-				/> */}
-			</div>
+			{/* Spacer where the language/book dropdowns lived. The panel now
+			    shows every image regardless of project, so navbar-level
+			    filtering went away with them. */}
+			<div className="flex flex-1 grow items-center" />
 			<div className="flex items-center gap-2">
 				{/* Sync otherwise only runs on load, so this is how a user picks
 				    up an edit made in another browser without reloading. */}
