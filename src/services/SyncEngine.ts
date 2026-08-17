@@ -51,6 +51,7 @@ const repo = IndexedDBImageRepository.getInstance();
  */
 class SyncEngine {
 	private inFlight: Promise<SyncResult> | null = null;
+	private flushInFlight: Promise<number> | null = null;
 
 	/**
 	 * Push queued edits, then replace the local list with the server's.
@@ -65,6 +66,29 @@ class SyncEngine {
 			this.inFlight = null;
 		});
 		return this.inFlight;
+	}
+
+	/**
+	 * Pushes queued text edits without re-fetching the image list.
+	 *
+	 * The light path for debounced typing: a full sync per keystroke burst
+	 * would re-fetch /images and rewrite IndexedDB every ~500ms for no new
+	 * information - the server's copy of the text is the one we just sent.
+	 * Concurrent calls share one run, like sync().
+	 */
+	flushOutbox(userId: string): Promise<number> {
+		if (typeof navigator !== "undefined" && navigator.onLine === false) {
+			// Offline: queued edits are already durable; the next sync or
+			// flush will deliver them.
+			return Promise.resolve(0);
+		}
+		if (this.flushInFlight) {
+			return this.flushInFlight;
+		}
+		this.flushInFlight = this.flushTextEdits(userId).finally(() => {
+			this.flushInFlight = null;
+		});
+		return this.flushInFlight;
 	}
 
 	private async run(userId: string): Promise<SyncResult> {

@@ -33,12 +33,18 @@ export function useUploadImage() {
 			toast.error(`Could not upload: ${failed.join(", ")}`);
 		}
 
+		// Best-effort: the uploads above already resolved each image's final
+		// status, so a failure here degrades to slightly stale counts rather
+		// than a stuck spinner.
 		try {
 			await syncEngine.sync(userId);
 			await store.refreshProject();
 			await refreshProgress(store, userId);
 		} catch (error) {
 			console.error("Refresh after upload failed", error);
+			toast.error(
+				"Uploaded, but could not refresh from the server. Reload to see the latest state.",
+			);
 		}
 	}
 

@@ -26,11 +26,14 @@ export function useUpdateImage() {
 			document.transcription ?? "",
 		);
 
+		// Outbox-only flush, not a full sync: a debounced edit fires every
+		// ~500ms of typing, and re-fetching /images plus rewriting IndexedDB
+		// on each one is churn that can also hand the editor a stale snapshot.
 		try {
-			await syncEngine.sync(userId);
+			await syncEngine.flushOutbox(userId);
 			await refreshProgress(store, userId);
 		} catch (error) {
-			console.error("Sync after edit failed", error);
+			console.error("Flush after edit failed", error);
 		}
 	}
 

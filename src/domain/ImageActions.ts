@@ -8,7 +8,10 @@ import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import { calculateProgress } from "@src/domain/CalculateProgress.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
-import type { TranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
+import {
+	type TranscriptionStore,
+	useTranscriptionStore,
+} from "@src/persistence/store/TranscriptionStore.ts";
 import { toast } from "react-toastify";
 
 const imageRepo = IndexedDBImageRepository.getInstance();
@@ -56,25 +59,57 @@ export const uploadNewImage = async (
 	if (incoming.blob) {
 		await imageRepo.putBlob(userId, document.id, incoming.blob);
 	}
+	// Metadata persisted alongside the bytes, so a refresh before the upload
+	// settles still lists the page instead of silently dropping it.
+	await imageRepo.putImage(userId, document);
 
 	// Optimistic, so the panel shows the page immediately with a spinner.
 	store.setImages((previous) => [...previous, document]);
 	store.setSelectedImage(document);
 
-	const response = await fetch(`${API_V1}${TRANSCRIBE_ROUTE}`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(
-			buildTranscriptionRequest(store, document, incoming.data),
-		),
-	});
-	const body = (await response.json().catch(() => ({}))) as {
-		error?: string;
-	};
-	if (!response.ok || body?.error) {
-		throw new Error(
-			body?.error ?? `${response.status} ${response.statusText}`,
+	try {
+		const response = await fetch(`${API_V1}${TRANSCRIBE_ROUTE}`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(
+				buildTranscriptionRequest(store, document, incoming.data),
+			),
+		});
+		const body = (await response.json().catch(() => ({}))) as {
+			error?: string;
+			transcription?: string;
+		};
+		if (!response.ok || body?.error) {
+			throw new Error(
+				body?.error ?? `${response.status} ${response.statusText}`,
+			);
+		}
+
+		// The server transcribes synchronously and returns the text, so the
+		// document's final state is known right here rather than deferred to a
+		// follow-up sync that might fail and leave the spinner stuck.
+		if (typeof body.transcription === "string") {
+			await updateImage(store, userId, {
+				...document,
+				transcription: body.transcription,
+				hasTranscription: true,
+				status: TranscriptionStatus.COMPLETED,
+			});
+		}
+	} catch (error) {
+		// Roll back the optimistic entry - cached bytes, metadata, list,
+		// selection - so a failed upload cannot leave a phantom page that
+		// spins forever.
+		await imageRepo.deleteImage(userId, document.id);
+		store.setImages((previous) =>
+			previous.filter((image) => image.id !== document.id),
 		);
+		if (
+			useTranscriptionStore.getState().selectedImage?.id === document.id
+		) {
+			store.setSelectedImage(null);
+		}
+		throw error;
 	}
 };
 
@@ -108,7 +143,11 @@ export const updateImage = async (
 			image.id === updatedImage.id ? updatedImage : image,
 		),
 	);
-	if (store.selectedImage?.id === updatedImage.id) {
+	// Read the selection fresh: the `store` argument is a render-time snapshot,
+	// and the selection may have changed while an await above was in flight.
+	if (
+		useTranscriptionStore.getState().selectedImage?.id === updatedImage.id
+	) {
 		store.setSelectedImage(updatedImage);
 	}
 };
