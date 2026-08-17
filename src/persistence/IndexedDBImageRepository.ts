@@ -320,16 +320,22 @@ class IndexedDBImageRepository {
 		this.recentLanguages.add(document.languageCode);
 	}
 
-	/** Drops an image's metadata and its cached bytes together. */
+	/** Drops an image's metadata, cached bytes, and any unsent draft together. */
 	async deleteImage(userId: string, imageId: string): Promise<void> {
 		const existing = await this.getImage(userId, imageId);
 		if (!existing) {
 			return;
 		}
 		const db = await this.db();
-		const tx = db.transaction([IMAGE_STORE, BLOB_STORE], "readwrite");
+		const tx = db.transaction(
+			[IMAGE_STORE, BLOB_STORE, OUTBOX_STORE],
+			"readwrite",
+		);
 		tx.objectStore(IMAGE_STORE).delete(imageId);
 		tx.objectStore(BLOB_STORE).delete(imageId);
+		// A draft for a deleted image would otherwise re-flush on every sync,
+		// failing forever against an image the server no longer has.
+		tx.objectStore(OUTBOX_STORE).delete(imageId);
 		await transactionDone(tx);
 	}
 
@@ -390,14 +396,21 @@ class IndexedDBImageRepository {
 		);
 
 		const db = await this.db();
-		const tx = db.transaction([IMAGE_STORE, BLOB_STORE], "readwrite");
+		const tx = db.transaction(
+			[IMAGE_STORE, BLOB_STORE, OUTBOX_STORE],
+			"readwrite",
+		);
 		const images = tx.objectStore(IMAGE_STORE);
 		const blobs = tx.objectStore(BLOB_STORE);
+		const outbox = tx.objectStore(OUTBOX_STORE);
 
 		for (const id of removed) {
 			images.delete(id);
 			// Bytes for a deleted image are dead weight; nothing can display them.
 			blobs.delete(id);
+			// So is its draft: the image is gone from the server, so the text
+			// can never be delivered and would only re-flush on every sync.
+			outbox.delete(id);
 		}
 		for (const document of documents) {
 			const draft = unsent.get(document.id);
