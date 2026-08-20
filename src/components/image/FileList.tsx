@@ -1,7 +1,13 @@
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 
 interface FileListItemProps {
@@ -27,40 +33,87 @@ const FileListItem: React.FC<FileListItemProps> = ({
 	onDeleteImage,
 }) => {
 	const { t } = useTranslation();
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	// The menu is fixed-positioned at the ⋮ button's on-screen rect: the list
+	// scrolls inside an overflow container, so an absolutely positioned menu
+	// would either be clipped by it or (with no positioned ancestor) land at
+	// the document's flow position - off-screen for items far down the list.
+	const [menuAnchor, setMenuAnchor] = useState<DOMRect | null>(null);
+	const [menuPosition, setMenuPosition] = useState<{
+		top: number;
+		left: number;
+	} | null>(null);
+	const isMenuOpen = menuAnchor != null;
 	const menuRef = useRef<HTMLDivElement>(null);
+	const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+	const closeMenu = useCallback((): void => {
+		setMenuAnchor(null);
+		setMenuPosition(null);
+	}, []);
 
 	useEffect(() => {
+		if (!isMenuOpen) {
+			return;
+		}
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
 				menuRef.current &&
-				!menuRef.current.contains(event.target as Node)
+				!menuRef.current.contains(event.target as Node) &&
+				!menuButtonRef.current?.contains(event.target as Node)
 			) {
-				setIsMenuOpen(false);
+				closeMenu();
 			}
 		};
-
-		if (isMenuOpen) {
-			document.addEventListener("mousedown", handleClickOutside);
-		}
+		// A fixed menu does not track its button, so any scroll or resize
+		// would leave it floating detached - close it instead.
+		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("scroll", closeMenu, true);
+		window.addEventListener("resize", closeMenu);
 
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("scroll", closeMenu, true);
+			window.removeEventListener("resize", closeMenu);
 		};
-	}, [isMenuOpen]);
+	}, [isMenuOpen, closeMenu]);
 
-	const handleMenuClick = (): void => {
-		setIsMenuOpen(!isMenuOpen);
+	// Placed only once the menu has rendered and its size is measurable:
+	// below the button when it fits, flipped above it when it would run off
+	// the bottom of the viewport.
+	useLayoutEffect(() => {
+		if (!menuAnchor || !menuRef.current) {
+			return;
+		}
+		const menu = menuRef.current;
+		const top =
+			menuAnchor.bottom + menu.offsetHeight > window.innerHeight
+				? Math.max(8, menuAnchor.top - menu.offsetHeight)
+				: menuAnchor.bottom;
+		const left = Math.min(
+			menuAnchor.left,
+			window.innerWidth - menu.offsetWidth - 8,
+		);
+		setMenuPosition({ top, left });
+	}, [menuAnchor]);
+
+	const handleMenuClick = (
+		event: React.MouseEvent<HTMLButtonElement>,
+	): void => {
+		if (isMenuOpen) {
+			closeMenu();
+			return;
+		}
+		setMenuAnchor(event.currentTarget.getBoundingClientRect());
 	};
 
 	const handleMoveClick = (): void => {
 		onMoveImage(index);
-		setIsMenuOpen(false);
+		closeMenu();
 	};
 
 	const handleDeleteClick = (): void => {
 		onDeleteImage(index);
-		setIsMenuOpen(false);
+		closeMenu();
 	};
 
 	const handleImageSelected = (): void => {
@@ -92,6 +145,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 					<div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blue-500"></div>
 				) : (
 					<button
+						ref={menuButtonRef}
 						type={"button"}
 						onClick={handleMenuClick}
 						className="flex-shrink-0 w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-400"
@@ -111,7 +165,14 @@ const FileListItem: React.FC<FileListItemProps> = ({
 			{isMenuOpen && (
 				<div
 					ref={menuRef}
-					className="absolute z-1 ml-[10vw] mb-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+					className="fixed z-50 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+					// Hidden until the layout effect has measured it and set a
+					// real position, so it never flashes at the wrong spot.
+					style={
+						menuPosition
+							? { top: menuPosition.top, left: menuPosition.left }
+							: { top: 0, left: 0, visibility: "hidden" }
+					}
 				>
 					<div className="py-1">
 						{/* <button
