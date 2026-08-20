@@ -3,6 +3,7 @@ import LanguageDropdown from "@components/navigation/LanguageDropdown.tsx";
 import { useLanguageContext } from "@src/context/useLanguageContext.tsx";
 import type { LanguageOption } from "@src/data/LanguageOption.tsx";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { useImageBlobUrl } from "@src/hooks/useImageBlobUrl.ts";
 import { useTranscriptionStore } from "@src/persistence/store/TranscriptionStore.ts";
 import type React from "react";
 import { useState } from "react";
@@ -32,6 +33,9 @@ const MoveImageModal: React.FC<MoveImageModalProps> = ({
 	const { t } = useTranslation();
 	const { recentLanguages } = useTranscriptionStore();
 	const { languages } = useLanguageContext();
+	// Documents no longer carry inline bytes; the preview comes from the blob
+	// cache (or one fetch) like every other image render.
+	const blobUrl = useImageBlobUrl(image.id);
 
 	const [language, setLanguage] = useState<LanguageOption>(
 		languages.find((lang) => {
@@ -75,11 +79,15 @@ const MoveImageModal: React.FC<MoveImageModalProps> = ({
 			<div className="bg-white rounded-lg p-6 flex">
 				<div className="flex flex-row items-center justify-between">
 					<div className="pr-4 max-w-fit">
-						<img
-							src={image.data}
-							alt="Image to Move"
-							className="rounded-lg object-contain w-[25vw]"
-						/>
+						{blobUrl ? (
+							<img
+								src={blobUrl}
+								alt="Image to Move"
+								className="rounded-lg object-contain w-[25vw]"
+							/>
+						) : (
+							<div className="rounded-lg w-[25vw] aspect-square animate-pulse bg-gray-200" />
+						)}
 					</div>
 					<div className="flex flex-col">
 						<h2 className="text-lg font-semibold mb-4">

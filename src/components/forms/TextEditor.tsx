@@ -9,34 +9,35 @@ interface TextEditorProps {
 
 const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 	const [inputValue, setInputValue] = useState(text);
-	const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
-		null,
-	);
+	// Pending debounce timer, held in a ref so a re-render cannot orphan it.
+	// Non-null exactly while there are keystrokes onChange has not seen yet.
+	const pendingSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const onChangeRef = useRef(onChange);
+	onChangeRef.current = onChange;
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const mirrorRef = useRef<HTMLDivElement | null>(null);
 	const [scrollTop, setScrollTop] = useState(0); // scroll position of the textarea
 	const [caretTop, setCaretTop] = useState(0);
 	const [lineHeight, setLineHeight] = useState(24);
 
-	// biome-ignore lint/suspicious/noExplicitAny: <fine for just debouncing to take any args and forward>
-	const debounce = (func: (...args: any[]) => void, delay: number) => {
-		let timer: NodeJS.Timeout;
-
-		// biome-ignore lint/suspicious/noExplicitAny: <same>
-		return (...args: any[]) => {
-			if (typingTimeout) {
-				clearTimeout(typingTimeout);
+	useEffect(() => {
+		return () => {
+			if (pendingSaveRef.current) {
+				clearTimeout(pendingSaveRef.current);
 			}
-			timer = setTimeout(() => func(...args), delay);
-			setTypingTimeout(timer);
 		};
-	};
-	const debouncedOnChange = debounce(onChange, 500);
+	}, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		const newValue = e.target.value;
 		setInputValue(newValue);
-		debouncedOnChange(newValue);
+		if (pendingSaveRef.current) {
+			clearTimeout(pendingSaveRef.current);
+		}
+		pendingSaveRef.current = setTimeout(() => {
+			pendingSaveRef.current = null;
+			onChangeRef.current(newValue);
+		}, 500);
 	};
 
 	const updateCaretPosition = () => {
@@ -63,6 +64,12 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 	};
 
 	useEffect(() => {
+		// Never reset while keystrokes are still waiting to be saved: the
+		// incoming prop is by definition an older snapshot than what the user
+		// has typed, and adopting it would silently discard their newest text.
+		if (pendingSaveRef.current) {
+			return;
+		}
 		setInputValue(text);
 	}, [text]);
 
@@ -115,14 +122,10 @@ const TextEditor: React.FC<TextEditorProps> = ({ text, onChange }) => {
 				className="textEditorMirror"
 				aria-hidden="true"
 			/>
-			<div
-				className="textEditorActiveLine"
-				style={highlightStyle}
-			/>
+			<div className="textEditorActiveLine" style={highlightStyle} />
 			<textarea
 				ref={textareaRef}
 				value={inputValue}
-				defaultValue={text}
 				onChange={(e) => {
 					handleChange(e);
 					updateCaretPosition();

@@ -6,9 +6,9 @@ import type { TranscribableDocument } from "@src/data/TranscribableDocument";
 type ReactStyleStateSetter<T> = T | ((prev: T) => T);
 
 export interface TranscriptionActions {
-	setLanguage: (option: LanguageOption) => void;
-	setBookCode: (code: string) => void;
-	setChapter: (chapter: number) => void;
+	setLanguage: (option: LanguageOption) => Promise<void>;
+	setBookCode: (code: string) => Promise<void>;
+	setChapter: (chapter: number) => Promise<void>;
 	setImages: (
 		newArrOrSetterFn: ReactStyleStateSetter<TranscribableDocument[]>,
 	) => void;
@@ -17,5 +17,5 @@ export interface TranscriptionActions {
 	setSystemPrompt: (prompt: string) => void;
 	setProgress: (progress: Progress) => void;
 	setPrompt: (prompt: string) => void;
-	refreshProject: () => void;
+	refreshProject: () => Promise<void>;
 }

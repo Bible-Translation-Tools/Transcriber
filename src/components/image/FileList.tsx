@@ -9,6 +9,7 @@ interface FileListItemProps {
 	selected: boolean;
 	id: string;
 	index: number;
+	project: string;
 	onImageSelected: (imageNumber: number) => void;
 	onMoveImage: (image: number) => void;
 	onDeleteImage: (image: number) => void;
@@ -19,6 +20,7 @@ const FileListItem: React.FC<FileListItemProps> = ({
 	selected,
 	fileName,
 	index,
+	project,
 	isLoading,
 	onImageSelected,
 	onMoveImage,
@@ -79,10 +81,11 @@ const FileListItem: React.FC<FileListItemProps> = ({
 			<div className="flex items-center justify-between">
 				<button
 					type="button"
-					className="flex flex-1 min-w-0 items-center p-4"
+					className="flex flex-1 min-w-0 flex-col items-start gap-0.5 p-4 text-left"
 					onClick={handleImageSelected}
 				>
-					<span className="truncate">{fileName}</span>
+					<span className="w-full truncate">{fileName}</span>
+					<span className="text-xs text-gray-500">{project}</span>
 				</button>
 				{isLoading ? (
 					// biome-ignore lint/style/useSelfClosingElements: <explanation>
@@ -186,6 +189,7 @@ const FileList: React.FC<FileListProps> = ({
 						id={image.id}
 						index={index}
 						fileName={image.filename}
+						project={`${image.languageCode} · ${image.bookCode} ${image.chapter}`}
 						// todo: wk: we moved away from this, so for now gonna set to false.  This might make more sense if we have lazily image by image the data from idb, but doesn't make sense I don't think with just fetchign all from rq. SEtting to ?? to false for now
 						isLoading={
 							TranscriptionStatus.IN_PROGRESS === image?.status

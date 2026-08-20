@@ -1,5 +1,4 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { TranscriptionStatus } from "@src/data/TranscriptionStatus.ts";
+import type { IncomingImage } from "@src/domain/ImageActions.ts";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?worker";
 
@@ -9,6 +8,12 @@ pdfjsLib.GlobalWorkerOptions.workerPort = worker;
 type PageInfo = {
 	index: number;
 };
+
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
+	return new Promise((resolve) => {
+		canvas.toBlob((blob) => resolve(blob), "image/jpeg");
+	});
+}
 
 export async function parsePdfFile(file: File) {
 	const arrayBuffer = await file.arrayBuffer();
@@ -34,16 +39,16 @@ export async function parsePdfFile(file: File) {
 			}
 			await page.render({ canvasContext: context, viewport }).promise;
 			const base64String = canvas.toDataURL("image/jpeg");
+			const blob = await canvasToBlob(canvas);
 			const parts = file.name.split(".");
 			const baseName = parts.slice(0, -1).join(".");
 			const extension = parts.length > 1 ? `.${parts.pop()}` : "";
 
-			const image: Partial<TranscribableDocument> = {
+			const image: IncomingImage = {
 				filename: `${baseName}-${pageIdx.index}${extension}`,
 				created: createdTime + (pageIdx.index + 100), // pad out a little for the number of pages so they sort correctly
 				data: base64String,
-				transcription: null,
-				status: TranscriptionStatus.IN_PROGRESS,
+				blob: blob ?? undefined,
 			};
 			canvas.remove();
 			return image;

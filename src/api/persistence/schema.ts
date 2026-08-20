@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const transcriptionUsers = sqliteTable("TranscriptionUsers", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
@@ -21,15 +21,21 @@ export const transcriptionImages = sqliteTable("TranscriptionImages", {
 	created: integer("created").$defaultFn(() => Date.now()),
 });
 
-export const transcriptions = sqliteTable("Transcriptions", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	imageId: text("image_id").references(() => transcriptionImages.id),
-	humanModified: integer("human_modified", { mode: "boolean" }).notNull(),
-	model: text("model").notNull(),
-	prompt: text("prompt").notNull(),
-	systemPrompt: text("system_prompt").notNull(),
-	date: integer("date")
-		.notNull()
-		.$defaultFn(() => Date.now()),
-	text: text("text").notNull(),
-});
+export const transcriptions = sqliteTable(
+	"Transcriptions",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		imageId: text("image_id").references(() => transcriptionImages.id),
+		humanModified: integer("human_modified", { mode: "boolean" }).notNull(),
+		model: text("model").notNull(),
+		prompt: text("prompt").notNull(),
+		systemPrompt: text("system_prompt").notNull(),
+		date: integer("date")
+			.notNull()
+			.$defaultFn(() => Date.now()),
+		text: text("text").notNull(),
+	},
+	(table) => [
+		index("idx_transcriptions_image_date").on(table.imageId, table.date),
+	],
+);

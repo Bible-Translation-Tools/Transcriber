@@ -43,10 +43,28 @@ export function TranscriptionWorkspace(props: {
 						subMessage={t("Please Retry Message")}
 					/>
 				</ShowWhen>
+				{/* Synced but never transcribed. Distinct from an error - nothing
+				    failed, the work simply has not been done yet. */}
+				<ShowWhen
+					when={props.status === TranscriptionStatus.NOT_TRANSCRIBED}
+				>
+					<TranscriptionStatusOverlay
+						mainMessage={t("This Image Has No Transcription Yet.")}
+						subMessage={t("Please Retry Message")}
+					/>
+				</ShowWhen>
 				<ShowWhen when={props.status === TranscriptionStatus.COMPLETED}>
 					<div className="flex h-full w-full justify-center bg-white">
-						<div className={props.isVerticalLayout ? "w-3/5" : "w-full"}>
+						<div
+							className={
+								props.isVerticalLayout ? "w-3/5" : "w-full"
+							}
+						>
+							{/* Keyed by image so switching pages remounts the editor:
+							    local state and any pending debounced save belong to
+							    the previous image and must not leak onto this one. */}
 							<TextEditor
+								key={props.selectedImage?.id}
 								text={props.transcription ?? ""}
 								onChange={props.onChange}
 							/>

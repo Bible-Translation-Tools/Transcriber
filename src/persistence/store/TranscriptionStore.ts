@@ -5,6 +5,8 @@ import {
 import type { LanguageOption } from "@src/data/LanguageOption.tsx";
 import type { Progress } from "@src/data/Progress.ts";
 import type { TranscribableDocument } from "@src/data/TranscribableDocument";
+import { getCurrentUserId } from "@src/domain/CurrentUser.ts";
+import { sortDocuments } from "@src/domain/SortDocuments.ts";
 import IndexedDBImageRepository from "@src/persistence/IndexedDBImageRepository.ts";
 import { transcriptionStateStorage } from "@src/persistence/store/PersistTranscriptionState.tsx";
 import type { TranscriptionActions } from "@src/persistence/store/TranscriptionActions.ts";
@@ -59,16 +61,11 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
 				);
 			},
 			setImages: (newArrOrSetterFn) => {
-				set(({ images }) => {
-					if (Array.isArray(newArrOrSetterFn)) {
-						const newArr = newArrOrSetterFn;
-						return { selectedImageIds: newArr };
-					}
-					const setterFn = newArrOrSetterFn;
-					return {
-						images: setterFn(images),
-					};
-				});
+				set(({ images }) => ({
+					images: Array.isArray(newArrOrSetterFn)
+						? newArrOrSetterFn
+						: newArrOrSetterFn(images),
+				}));
 			},
 			setSelectedImage: (image: TranscribableDocument | null) =>
 				set(() => ({ selectedImage: image })),
@@ -99,6 +96,17 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
 
 type SetFn = (state: Partial<TranscriptionState> | TranscriptionState) => void;
 
+/**
+ * Loads every image the signed-in user has, across all languages, books, and
+ * chapters, and reconciles the selection against it.
+ *
+ * Reads the local snapshot, which the sync engine has already replaced with the
+ * server's list - so this is a cache read, never a merge.
+ *
+ * The language/book/chapter fields are still tracked - uploads stamp new images
+ * with them, and project navigation will want them back - but they no longer
+ * filter what is displayed.
+ */
 async function updateProject(
 	set: SetFn,
 	language: LanguageOption | null,
@@ -106,41 +114,34 @@ async function updateProject(
 	chapter: number,
 	selectedImage: TranscribableDocument | null,
 ) {
-	set({
-		language: language,
-		bookCode: bookCode,
-		chapter: chapter,
-	});
-	if (language != null) {
-		const images = await imageRepo.getImages(
-			language.code,
+	const userId = getCurrentUserId();
+	if (!userId) {
+		// Not signed in yet: nothing is readable, since the cache is per user.
+		set({
+			language,
 			bookCode,
 			chapter,
-		);
-		// WK note: possible addition. More flexible would be if the img had an "order" property in case someone had a pdf out of order or whatever when uploaded and wanted ot change that order
-		images.sort((a, b) => {
-			return a.created - b.created;
-		});
-		const recentLanguages = imageRepo.getRecentLanguages();
-		const selected: TranscribableDocument | undefined =
-			selectedImage != null && images.includes(selectedImage)
-				? selectedImage
-				: images[0];
-		set({
-			recentLanguages: recentLanguages,
-			language: language,
-			bookCode: bookCode,
-			chapter: chapter,
-			images: images,
-			selectedImage: selected ?? null,
-		});
-	} else {
-		set({
-			language: language,
-			bookCode: bookCode,
-			chapter: chapter,
 			images: [],
 			selectedImage: null,
 		});
+		return;
 	}
+
+	// WK note: possible addition. More flexible would be if the img had an "order" property in case someone had a pdf out of order or whatever when uploaded and wanted ot change that order
+	const images = sortDocuments(await imageRepo.getAllForUser(userId));
+
+	// Match on id, not object identity: these documents were just deserialized
+	// from IndexedDB, so they are never the same reference as the current
+	// selection even when they represent the same image.
+	const selected =
+		images.find((image) => image.id === selectedImage?.id) ?? images[0];
+
+	set({
+		recentLanguages: imageRepo.getRecentLanguages(),
+		language,
+		bookCode,
+		chapter,
+		images,
+		selectedImage: selected ?? null,
+	});
 }

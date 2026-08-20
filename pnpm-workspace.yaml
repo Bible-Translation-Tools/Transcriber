@@ -1,0 +1,7 @@
+allowBuilds:
+  '@biomejs/biome': true
+  esbuild: true
+  lefthook: true
+  protobufjs: true
+  sharp: true
+  workerd: true

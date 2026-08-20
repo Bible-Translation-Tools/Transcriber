@@ -1,10 +1,7 @@
-import type { TranscribableDocument } from "@src/data/TranscribableDocument";
-import { TranscriptionStatus } from "@src/data/TranscriptionStatus";
+import type { IncomingImage } from "@src/domain/ImageActions.ts";
 import { parsePdfFile } from "@src/domain/PdfToImages.ts";
 
-export async function processFiles(
-	files: File[],
-): Promise<Partial<TranscribableDocument>[]> {
+export async function processFiles(files: File[]): Promise<IncomingImage[]> {
 	const validFiles = files.filter((file) => {
 		const fileType = file.type;
 		return (
@@ -17,7 +14,7 @@ export async function processFiles(
 	if (validFiles.length !== files.length) {
 		console.log("Only JPEG, PNG, and PDF files are allowed.");
 	}
-	const images: Partial<TranscribableDocument>[] = [];
+	const images: IncomingImage[] = [];
 	for (const file of validFiles) {
 		const index = validFiles.indexOf(file);
 		if (file.type !== "application/pdf") {
@@ -44,14 +41,14 @@ const file2Base64 = (file: File): Promise<string> => {
 async function processImage(
 	file: File,
 	fileNumber: number,
-): Promise<Partial<TranscribableDocument>> {
+): Promise<IncomingImage> {
 	const base64String = await file2Base64(file);
 
-	const image: Partial<TranscribableDocument> = {
+	const image: IncomingImage = {
 		filename: file.name,
 		created: Date.now() + (fileNumber + 100),
 		data: base64String,
-		status: TranscriptionStatus.IN_PROGRESS,
+		blob: file,
 	};
 
 	return image;
